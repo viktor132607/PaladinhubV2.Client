@@ -1,0 +1,104 @@
+@model PaladinHub.Areas.Admin.Models.CreatePageViewModel
+@{
+    ViewData["Title"] = "Create Page";
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+    string sec = (Model?.Section ?? "Holy").Trim();
+}
+
+<div class="container py-3">
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="m-0">Create Page</h2>
+        <button id="pb-edit-toggle"
+                class="btn btn-sm btn-warning"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#pb-overlay-col"
+                aria-expanded="true"
+                aria-controls="pb-overlay-col">
+            ✎ Editor ON/OFF
+        </button>
+    </div>
+
+    <form asp-controller="PageBuilder" asp-action="Create" method="post" class="mt-2">
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label asp-for="Section" class="form-label">Section</label>
+                <select asp-for="Section" class="form-select">
+                    <option value="Holy" selected="@(sec.Equals("Holy", StringComparison.OrdinalIgnoreCase))">Holy</option>
+                    <option value="Protection" selected="@(sec.Equals("Protection", StringComparison.OrdinalIgnoreCase))">Protection</option>
+                    <option value="Retribution" selected="@(sec.Equals("Retribution", StringComparison.OrdinalIgnoreCase))">Retribution</option>
+                </select>
+                <span asp-validation-for="Section" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="Title" class="form-label">Title</label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="Slug" class="form-label">Slug</label>
+                <input asp-for="Slug" class="form-control" />
+                <span asp-validation-for="Slug" class="text-danger"></span>
+            </div>
+        </div>
+
+        <input type="hidden" id="jsonLayout" name="jsonLayout"
+               value="@((ViewBag?.JsonLayout as string) ?? Model?.JsonLayout ?? "[]")" />
+        <input type="hidden" id="JsonLayoutVm" asp-for="JsonLayout" />
+
+        <div class="row g-4 mt-3">
+            <div id="pb-overlay-col" class="col-12 col-lg-3 collapse show">
+                @await Html.PartialAsync("~/Views/Shared/_EditOverlay.cshtml",
+                new { JsonLayout = (ViewBag?.JsonLayout as string) ?? Model?.JsonLayout ?? "[]" })
+            </div>
+
+            <div class="col-12 col-lg-9">
+                <div class="alert alert-info">
+                    Use the editor on the left to build your layout. Click <b>Save layout</b> to sync JSON into this form,
+                    then click <b>Create</b>. (Submit will also auto-sync.)
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Create</button>
+            <a asp-controller="PageBuilder" asp-action="Index" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function(){
+            const form     = document.currentScript.closest('form');
+            const holder   = document.getElementById('pb-json');
+            const hidden   = document.getElementById('jsonLayout');
+            const hiddenVm = document.getElementById('JsonLayoutVm');
+
+            function sync(val){
+                if (hidden)   hidden.value   = val;
+                if (hiddenVm) hiddenVm.value = val;
+            }
+
+            if (form && holder) {
+                form.addEventListener('submit', function(){
+                    const val = (holder.value && holder.value.trim().length) ? holder.value : "[]";
+                    sync(val);
+                });
+            }
+
+            const observer = new MutationObserver(() => {
+                if (hidden && hiddenVm && hidden.value !== hiddenVm.value) hiddenVm.value = hidden.value;
+            });
+            if (hidden) observer.observe(hidden, { attributes: true, attributeFilter: ['value'] });
+        })();
+    </script>
+}

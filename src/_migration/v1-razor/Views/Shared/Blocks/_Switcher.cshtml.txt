@@ -1,0 +1,50 @@
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model dynamic
+@{
+    var id = (string)(Model?.SectionId ?? $"block-switcher-{Guid.NewGuid():N}");
+    var options = (IEnumerable<dynamic>)(Model?.Options ?? new List<dynamic>()); // { Label, Html }
+}
+
+<section id="@id" class="switcher">
+    <div class="switcher-buttons">
+        @for (int i = 0; i < options.Count(); i++)
+        {
+            var o = options.ElementAt(i);
+            <button class="switch-btn @(i == 0 ? "active" : "")"
+                    data-i="@i">
+                @(o?.Label?.ToString() ?? $"Option {i + 1}")
+            </button>
+        }
+    </div>
+
+    <div class="switcher-panes">
+        @for (int i = 0; i < options.Count(); i++)
+        {
+            var o = options.ElementAt(i);
+            <div class="switch-pane @(i == 0 ? "active" : "")"
+                 data-i="@i">
+                @PaladinHub.Infrastructure.SafeHtmlExtensions.SafeHtml(
+                (IHtmlHelper)Html,
+                        o?.Html?.ToString() ?? ""
+                        )
+        </div>
+                }
+    </div>
+</section>
+
+<script>
+    document.currentScript && (()=>{
+        const s = document.currentScript.closest('section');
+        if (!s) return;
+        const btns = s.querySelectorAll('.switch-btn'),
+              panes = s.querySelectorAll('.switch-pane');
+        s.querySelector('.switcher-buttons').addEventListener('click', e => {
+            const b = e.target.closest('.switch-btn');
+            if (!b) return;
+            btns.forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
+            const i = b.dataset.i;
+            panes.forEach(p => p.classList.toggle('active', p.dataset.i === i));
+        });
+    })();
+</script>

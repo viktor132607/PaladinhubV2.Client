@@ -1,0 +1,49 @@
+@model PaladinHub.Models.Products.ProductDetailsViewModel
+using PaladinHub.Models.Products;
+@{
+    ViewData["Title"] = "Add Product to Cart";
+}
+
+<link rel="stylesheet" href="/text.css" type="text/css" />
+<h1 class="text-center">Add Product to Cart</h1>
+
+<form asp-controller="Carts" asp-action="AddProduct" method="post" class="mx-auto half-width col-5">
+    @Html.AntiForgeryToken()
+    <div class="top-border-line primary-separator"></div>
+
+    <div class="form-group text-center mb-3">
+        <img src="@(string.IsNullOrWhiteSpace(Model.ImageUrl)
+                                 ? Url.Content("~/images/placeholder.png")
+                                 : Model.ImageUrl)"
+             alt="@Model.Name"
+             class="product-image" />
+    </div>
+
+    <div class="form-group">
+        <label>Name</label>
+        <input type="text" class="form-control" value="@Model.Name" disabled />
+    </div>
+
+    <div class="form-group">
+        <label>Price</label>
+        <input type="text" class="form-control" value="@Model.Price" disabled />
+    </div>
+
+    <input type="hidden" asp-for="Id" />
+
+    <div class="top-border-line primary-separator"></div>
+    <div class="button-holder d-flex justify-content-center">
+        <button type="submit" class="btn SMS-bg-color">Add to Cart</button>
+    </div>
+</form>
+
+<style>
+    .product-image {
+        max-width: 128px;
+        max-height: 128px;
+        border-radius: 6px;
+        object-fit: cover;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
+    }
+</style>

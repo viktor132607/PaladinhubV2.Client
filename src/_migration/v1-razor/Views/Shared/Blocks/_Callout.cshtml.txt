@@ -1,0 +1,9 @@
+@model dynamic
+@{
+    var id = (string)(Model?.SectionId ?? $"block-callout-{Guid.NewGuid():N}");
+    var variant = (string)(Model?.Variant ?? "info"); // info|tip|warn|success
+    var text = (string)(Model?.Text ?? "");
+}
+<section id="@id" class="callout callout-@variant">
+    @Html.SafeHtml(text)
+</section>

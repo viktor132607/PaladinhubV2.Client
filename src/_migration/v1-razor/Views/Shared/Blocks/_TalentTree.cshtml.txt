@@ -1,0 +1,13 @@
+@model dynamic
+@{
+    var id = (string)(Model?.SectionId ?? $"block-tree-{Guid.NewGuid():N}");
+    var treeKey = (string)(Model?.TreeKey ?? "paladin"); // "paladin"|"holy"|hero keys
+    var build = (string)(Model?.Build ?? ""); // optional
+    var vm = ViewData["TalentTreesModel"]; // очакваме да подадем CombinedViewModel/списъци ако трябва
+}
+<section id="@id" class="talent-tree-block" data-tree-key="@treeKey" data-build="@build">
+    @* Вариант А: използваме готовия секционен парциал *@
+    @await Html.PartialAsync("~/Views/Shared/TalentTrees/_SectionTalentTrees.cshtml", ViewData.Model, new ViewDataDictionary(ViewData) {
+    ["keys"] = new[] { treeKey }
+        })
+</section>

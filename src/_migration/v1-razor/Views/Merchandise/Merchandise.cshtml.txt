@@ -1,0 +1,684 @@
+@using System.Security.Claims
+@using PaladinHub.Models.Products
+@model MerchandisePageViewModel
+
+@{
+    ViewData["Title"] = "Merchandise Shop";
+    var q = Model.Query;
+    var currentMin = q.MinRating ?? 0;
+    var selectedBands = q.PriceRanges ?? new List<string>();
+}
+
+@if (TempData["AddedSuccessfully"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show alert-floating" role="alert" id="alert">
+        <i class="fa fa-check"></i>
+        The product is added successfully to your cart.
+    </div>
+    <script>
+        (function(){
+            function hide(){
+                var el = document.getElementById('alert');
+                if (!el) return;
+                if (window.jQuery) { try { jQuery(el).delay(1000).fadeOut(300); return; } catch(e){} }
+                setTimeout(function(){ el.classList.remove('show'); }, 1000);
+            }
+            setTimeout(hide, 100);
+        })();
+    </script>
+}
+
+<main class="catalog-dark py-4">
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-12 col-lg-3 col-xl-3 mb-4 mb-lg-0">
+                <div class="filter-card p-3">
+                    <h5 class="mb-3">Filters</h5>
+
+                    <form id="filtersForm" method="get" asp-controller="Merchandise" asp-action="Merchandise">
+                        <input type="hidden" name="Page" value="@q.Page" />
+                        <input type="hidden" id="DescTopHidden" name="Desc" value="@(q.Desc ? "true" : "false")" />
+                        <input type="hidden" id="SortByHidden" name="SortBy" value="@((int)q.SortBy)" />
+                        <input type="hidden" id="PageSizeHidden" name="PageSize" value="@q.PageSize" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Search</label>
+                            <input name="Search" value="@q.Search" type="text" class="form-control form-control-sm" placeholder="Name, category, descr">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            @foreach (var cat in Model.AllCategories)
+                            {
+                                var isChecked = q.Categories != null && q.Categories.Contains(cat);
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="Categories" value="@cat" id="cat-@cat" @(isChecked ? "checked" : null) />
+                                    <label class="form-check-label" for="cat-@cat">@cat</label>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Price ranges</label>
+                            @{
+                                var selectedBands = q.PriceRanges ?? new List<string>();
+                                var bands = new (string key, string text)[] {
+                                                        ("0-100",   "$0–100"),
+                                                        ("100-200", "$100–200"),
+                                                        ("200-500", "$200–500"),
+                                                        ("500+",    "$500+")
+                                                        };
+                            }
+                            @foreach (var b in bands)
+                            {
+                                var chk = selectedBands.Contains(b.key) ? "checked" : null;
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="PriceRanges" value="@b.key" id="band-@b.key" @chk />
+                                    <label class="form-check-label" for="band-@b.key">@b.text</label>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Price (custom)</label>
+                            <div class="d-flex gap-2">
+                                <input name="MinPrice" value="@(q.MinPrice?.ToString() ?? "")" type="number" step="1" class="form-control form-control-sm" placeholder="From" />
+                                <input name="MaxPrice" value="@(q.MaxPrice?.ToString() ?? "")" type="number" step="1" class="form-control form-control-sm" placeholder="To" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Rating</label>
+                            <div class="rating-pills" id="ratingPills">
+                                @for (int r = 5; r >= 1; r--)
+                                {
+                                    var id = $"minr-{r}";
+                                    var count = Model.RatingAtLeast != null && Model.RatingAtLeast.TryGetValue(r, out var v) ? v : 0;
+                                    var active = (q.MinRating ?? 0) == r ? "active" : null;
+
+                                    <input class="visually-hidden" type="radio" name="MinRating" id="@id" value="@r" @((q.MinRating ?? 0) == r ? "checked" : null) />
+                                    <label class="rating-pill @active" for="@id" data-value="@r" title="At least @r stars">
+                                        <span class="stars">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= r)
+                                                {
+                                                    <i class="fa-solid fa-star"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fa-regular fa-star"></i>
+                                                }
+                                            }
+                                        </span>
+                                        <span class="count text-muted small">(@count)</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+
+                        <button type="button" id="btnClearFilters" class="btn btn-clear w-100 btn-sm">
+                            <i class="fa-solid fa-broom me-2"></i> Clear all filters
+                        </button>
+                        <button type="submit" class="btn btn-primary w-100 btn-sm d-none">Apply</button>
+                    </form>
+
+                </div>
+            </aside>
+
+            <section class="col-12 col-lg-9 col-xl-9">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <h3 class="m-0">Welcome to PaladinHub's Merch Shop!</h3>
+                    <div class="d-flex align-items-center gap-2">
+                        <a asp-controller="Carts" asp-action="MyCart"
+                           class="btn btn-warning btn-sm fw-bold px-3 py-1 rounded-pill align-items-center shadow-sm">
+                            <i class="fa-solid fa-cart-shopping me-2"></i> My Cart
+                        </a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-controller="Products" asp-action="Create" class="btn btn-success btn-sm">+ Create Product</a>
+                        }
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
+                    <div id="js-summary">
+                        <strong>@Model.Products.TotalItems</strong> results
+                        @if (Model.Products.TotalItems > 0)
+                        {
+                            var start = (Model.Products.Page - 1) * Model.Products.PageSize + 1;
+                            var end = Math.Min(Model.Products.Page * Model.Products.PageSize, Model.Products.TotalItems);
+                            <span class="text-muted">— showing @start–@end</span>
+                        }
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <div id="js-pageinfo" class="text-muted">Page @Model.Products.Page of @Model.Products.TotalPages</div>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="sortByTop" class="small text-muted mb-0">Sort by</label>
+                            <select id="sortByTop" class="form-select form-select-sm w-auto">
+                                @{
+                                    var currentSort = (int)q.SortBy;
+                                    var sortOptions = new[]
+                                    {
+                                                                (val: 0, text: "Relevance"),
+                                                                (val: 1, text: "Name"),
+                                                                (val: 2, text: "Price"),
+                                                                (val: 3, text: "Newest"),
+                                                                (val: 4, text: "Rating"),
+                                                                (val: 5, text: "Most reviewed"),
+                                                                };
+                                }
+                                @foreach (var o in sortOptions)
+                                {
+                                    <option value="@o.val" selected="@(currentSort == o.val ? "selected" : null)">@o.text</option>
+                                }
+                            </select>
+
+                            <button type="button" id="btnSortDir" class="btn btn-sm btn-outline-light sortdir-btn" data-desc="@(q.Desc.ToString().ToLower())">
+                                <i class="fa-solid @(q.Desc ? "fa-arrow-down-wide-short" : "fa-arrow-up-short-wide") me-1"></i>
+                                <span>@(q.Desc ? "Desc" : "Asc")</span>
+                            </button>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="pageSizeTop" class="small text-muted mb-0">Items per page</label>
+                            <select id="pageSizeTop" class="form-select form-select-sm w-auto">
+                                @{
+                                    var sizesTop = new[] { 20, 40, 100 };
+                                    var currentTop = q.PageSize;
+                                }
+                                @foreach (var s in sizesTop)
+                                {
+                                    <option value="@s" selected="@(currentTop == s ? "selected" : null)">@s</option>
+                                }
+                                @if (!sizesTop.Contains(currentTop))
+                                {
+                                    <option value="@currentTop" selected="selected">@currentTop</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="js-list" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3">
+                    @if (Model.Products.Items.Count == 0)
+                    {
+                        <div class="col-12">
+                            <div class="alert alert-info mb-0">No products match your filters.</div>
+                        </div>
+                    }
+                    else
+                    {
+                        foreach (var product in Model.Products.Items)
+                        {
+                            var rr = Math.Clamp((int)Math.Round(product.AverageRating, MidpointRounding.AwayFromZero), 0, 5);
+                            <div class="col">
+                                <div class="card product-card h-100">
+                                    <div class="ratio product-thumb ratio-2x3">
+                                        <img src="@(string.IsNullOrWhiteSpace(product.ImageUrl) ? Url.Content("~/images/placeholder.png") : product.ImageUrl)"
+                                             alt="@product.Name" class="card-img-top" />
+                                        <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="stretched-link"></a>
+                                    </div>
+
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="product-cat small text-muted" title="@product.Category">@product.Category</div>
+                                        <h6 class="card-title mb-1" title="@product.Name">
+                                            <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="text-reset text-decoration-none">
+                                                @product.Name
+                                            </a>
+                                        </h6>
+
+                                        <div class="small d-flex align-items-center mb-2">
+                                            <span class="me-1 text-warning">
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    if (i <= rr)
+                                                    {
+                                                        <i class="fa-solid fa-star"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="fa-regular fa-star"></i>
+                                                    }
+                                                }
+                                            </span>
+                                            <span class="text-muted small">(@product.ReviewsCount)</span>
+                                        </div>
+
+                                        <div class="mt-auto">
+                                            <div class="price fw-semibold mb-2">$@product.Price</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-footer bg-transparent border-0 pt-0">
+                                        <div class="d-grid gap-2">
+                                            <a asp-controller="Carts" asp-action="AddProduct" asp-route-id="@product.Id" class="btn btn-primary btn-sm">
+                                                Add to Cart
+                                            </a>
+                                            @if (User.IsInRole("Admin"))
+                                            {
+                                                <div class="d-grid gap-2">
+                                                    <a asp-controller="Products" asp-action="Edit" asp-route-id="@product.Id" class="btn btn-warning btn-sm">Edit</a>
+                                                    <a asp-controller="Products" asp-action="DeleteProduct" asp-route-id="@product.Id" class="btn btn-outline-danger btn-sm">Delete</a>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+
+                @if (Model.Products.TotalPages > 1)
+                {
+                    <nav id="js-pager" class="mt-4" aria-label="Pagination">
+                        <ul class="pagination justify-content-center">
+                            @{
+                                var canPrev = Model.Products.HasPrevious;
+                                var canNext = Model.Products.HasNext;
+
+                                var routeBase = new Dictionary<string, object?>
+                                {
+                                    ["Search"] = q.Search,
+                                    ["MinPrice"] = q.MinPrice,
+                                    ["MaxPrice"] = q.MaxPrice,
+                                    ["MinRating"] = q.MinRating,
+                                    ["SortBy"] = (int)q.SortBy,
+                                    ["Desc"] = q.Desc,
+                                    ["PageSize"] = q.PageSize
+                                };
+
+                                if (q.Categories is { Count: > 0 })
+                                {
+                                    int idx = 0;
+                                    foreach (var c in q.Categories)
+                                    {
+                                        routeBase[$"Categories[{idx}]"] = c; idx++;
+                                    }
+                                }
+                                if (q.PriceRanges is { Count: > 0 })
+                                {
+                                    int idx = 0;
+                                    foreach (var b in q.PriceRanges)
+                                    {
+                                        routeBase[$"PriceRanges[{idx}]"] = b; idx++;
+                                    }
+                                }
+
+                                Func<int, object> pageRoute = pageNum =>
+                                {
+                                    var dict = new Dictionary<string, object?>(routeBase) { ["Page"] = pageNum };
+                                    return dict;
+                                };
+                            }
+
+                            <li class="page-item @(canPrev ? "" : "disabled")">
+                                <a class="page-link js-nav" href="@(canPrev? Url.Action("Merchandise", pageRoute(Model.Products.Page - 1)) : "#")">Prev</a>
+                            </li>
+
+                            @{
+                                int cur = Model.Products.Page;
+                                int total = Model.Products.TotalPages;
+                                int window = 2;
+                                int start = Math.Max(1, cur - window);
+                                int end = Math.Min(total, cur + window);
+
+                                if (start > 1)
+                                {
+                                    <li class="page-item"><a class="page-link js-nav" href="@Url.Action("Merchandise", pageRoute(1))">1</a></li>
+                                    if (start > 2)
+                                    {
+                                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                                    }
+                                }
+
+                                for (int i = start; i <= end; i++)
+                                {
+                                    if (i == cur)
+                                    {
+                                        <li class="page-item active"><span class="page-link">@i</span></li>
+                                    }
+                                    else
+                                    {
+                                        <li class="page-item"><a class="page-link js-nav" href="@Url.Action("Merchandise", pageRoute(i))">@i</a></li>
+                                    }
+                                }
+
+                                if (end < total)
+                                {
+                                    if (end < total - 1)
+                                    {
+                                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                                    }
+                                    <li class="page-item"><a class="page-link js-nav" href="@Url.Action("Merchandise", pageRoute(total))">@total</a></li>
+                                }
+                            }
+
+                            <li class="page-item @(canNext ? "" : "disabled")">
+                                <a class="page-link js-nav" href="@(canNext? Url.Action("Merchandise", pageRoute(Model.Products.Page + 1)) : "#")">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            </section>
+        </div>
+    </div>
+</main>
+
+<style>
+    html, body {
+        overflow-x: hidden;
+    }
+
+    .catalog-dark {
+        background: #0f1115;
+        color: #e6e6e6;
+        min-height: 100vh;
+    }
+
+    .filter-card {
+        background: #171a21;
+        border: 1px solid #272b35;
+        border-radius: 12px;
+        min-width: 270px;
+    }
+
+        .filter-card .form-label {
+            font-weight: 600;
+            color: #d7dde7;
+        }
+
+        .filter-card .form-control, .filter-card .form-select {
+            background: #0f1115;
+            color: #e6e6e6;
+            border-color: #2a2f3a;
+            border-radius: 8px;
+        }
+
+            .filter-card .form-control::placeholder {
+                color: #6b7280;
+            }
+
+        .filter-card .form-check-input {
+            background: #0f1115;
+            border-color: #2a2f3a;
+        }
+
+        .filter-card .form-select {
+            padding-right: 2.25rem;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='%23cfd3da' d='M3.2 5.5l4.8 5 4.8-5H3.2z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right .6rem center;
+            background-size: 14px 14px;
+        }
+
+            .filter-card .form-select:focus {
+                border-color: #3a7bd5;
+                box-shadow: 0 0 0 .2rem rgba(58,123,213,.25);
+                color: #fff;
+            }
+
+    .rating-pills {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .4rem;
+    }
+
+    .rating-pill {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .5rem;
+        padding: .45rem .6rem;
+        background: #111419;
+        border: 1px solid #2a2f3a;
+        border-radius: 8px;
+        cursor: pointer;
+        user-select: none;
+        transition: border-color .12s ease, background-color .12s ease, box-shadow .12s ease;
+    }
+
+        .rating-pill:hover {
+            border-color: #3a4150;
+            background: #161a21;
+            box-shadow: 0 0 0 2px rgba(58,123,213,.12);
+        }
+
+        .rating-pill.active {
+            border-color: #3a7bd5;
+            background: #1a2230;
+            box-shadow: 0 0 0 2px rgba(58,123,213,.2);
+        }
+
+        .rating-pill .stars {
+            display: inline-flex;
+            gap: 2px;
+            color: #f6c441;
+            line-height: 1;
+        }
+
+        .rating-pill .fa-regular.fa-star {
+            color: #6b7280;
+        }
+
+    .product-card {
+        position: relative;
+        background: #171a21;
+        border: 1px solid #272b35;
+        border-radius: 10px;
+        transition: transform .12s ease, box-shadow .12s ease;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,.35);
+            border-color: #2f3542;
+        }
+
+    .ratio-2x3 {
+        --bs-aspect-ratio: 160%;
+    }
+
+    .product-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        background: transparent;
+        padding: 5px;
+        display: block;
+    }
+
+    .product-card .product-cat {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        overflow: hidden;
+        line-height: 1.2;
+        min-height: calc(3 * 1.2em);
+    }
+
+    .product-card .card-title {
+        margin-top: 10px;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.2;
+        min-height: calc(3 * 1.2em);
+    }
+
+    .product-card .card-footer, .product-card .btn {
+        position: relative;
+        z-index: 2;
+    }
+
+    .price {
+        color: #9bd66f;
+    }
+
+    .product-card .fa-star {
+        margin-right: 1px;
+    }
+
+    .btn-clear {
+        background: #0f1115;
+        border: 1px solid #2a2f3a;
+        color: #cfd3da;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+
+        .btn-clear:hover {
+            background: #171a21;
+            border-color: #3a4150;
+            color: #fff;
+            box-shadow: 0 0 0 2px rgba(66,153,225,.15);
+        }
+
+    .sortdir-btn {
+        background: transparent;
+        border-color: #2a2f3a;
+    }
+
+        .sortdir-btn:hover {
+            border-color: #3a7bd5;
+        }
+</style>
+
+<script>
+    (function () {
+      const form = document.getElementById('filtersForm');
+      function buildUrlFromForm() {
+        const url = new URL(window.location.href);
+        const sp = new URLSearchParams();
+        const fd = new FormData(form);
+        fd.forEach((v, k) => {
+          if (v === null || v === undefined) return;
+          const val = String(v).trim();
+          if (k === "MinRating" && val === "") return;
+          sp.append(k, val);
+        });
+        url.search = sp.toString();
+        return url;
+      }
+      async function loadUrl(url) {
+        const res = await fetch(url, { headers: { "X-Requested-With": "fetch" } });
+        const html = await res.text();
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        const newList = tmp.querySelector('#js-list');
+        const newPager = tmp.querySelector('#js-pager');
+        const newSummary = tmp.querySelector('#js-summary');
+        const newPageInfo = tmp.querySelector('#js-pageinfo');
+        if (newList) document.querySelector('#js-list').innerHTML = newList.innerHTML;
+        if (newPager) {
+          const curPager = document.querySelector('#js-pager');
+          if (curPager) curPager.outerHTML = newPager.outerHTML;
+          else if (newPager) document.querySelector('section.col-12.col-lg-9').appendChild(newPager);
+        }
+        if (newSummary) document.querySelector('#js-summary').innerHTML = newSummary.innerHTML;
+        if (newPageInfo) document.querySelector('#js-pageinfo').innerHTML = newPageInfo.innerHTML;
+        window.history.pushState({}, "", url);
+      }
+      let t;
+      function debounceApply(ms=400){ clearTimeout(t); t = setTimeout(applyFilters, ms); }
+      async function applyFilters() {
+        const p = form.querySelector('input[name="Page"]');
+        if (p) p.value = '1';
+        const url = buildUrlFromForm();
+        await loadUrl(url);
+      }
+      if (form) {
+        form.addEventListener('change', (e) => {
+          if (!e.target) return;
+          if (e.target.matches('select, input[type="checkbox"], input[type="radio"]')) {
+            applyFilters();
+          }
+        });
+        form.querySelectorAll('input[type="text"], input[type="number"]').forEach(inp=>{
+          inp.addEventListener('input', ()=>debounceApply(500));
+          inp.addEventListener('blur', applyFilters);
+        });
+        form.addEventListener('submit', (e)=>{ e.preventDefault(); applyFilters(); });
+      }
+      const sortSel = document.getElementById('sortByTop');
+      const pageSizeSel = document.getElementById('pageSizeTop');
+      const btnDir = document.getElementById('btnSortDir');
+      const inpSort = document.getElementById('SortByHidden');
+      const inpSize = document.getElementById('PageSizeHidden');
+      const inpDesc = document.getElementById('DescTopHidden');
+      if (sortSel) sortSel.addEventListener('change', ()=>{ if (inpSort) inpSort.value = sortSel.value; applyFilters(); });
+      if (pageSizeSel) pageSizeSel.addEventListener('change', ()=>{ if (inpSize) inpSize.value = pageSizeSel.value; applyFilters(); });
+      if (btnDir) btnDir.addEventListener('click', ()=>{
+        const isDesc = (btnDir.getAttribute('data-desc') === 'true');
+        const next = !isDesc;
+        btnDir.setAttribute('data-desc', String(next));
+        if (inpDesc) inpDesc.value = next ? 'true' : 'false';
+        btnDir.classList.toggle('active', next);
+        const icon = btnDir.querySelector('i');
+        const label = btnDir.querySelector('span');
+        if (icon) icon.className = 'fa-solid ' + (next ? 'fa-arrow-down-wide-short' : 'fa-arrow-up-short-wide') + ' me-1';
+        if (label) label.textContent = next ? 'Desc' : 'Asc';
+        applyFilters();
+      });
+      document.addEventListener('click', (e)=>{
+        const a = e.target.closest('a.js-nav');
+        if (!a) return;
+        e.preventDefault();
+        try{
+          const url = new URL(a.href, window.location.origin);
+          const sp = new URLSearchParams(url.search);
+          const page = sp.get('Page');
+          if (page && form) {
+            const p = form.querySelector('input[name="Page"]');
+            if (p) p.value = page;
+          }
+          loadUrl(buildUrlFromForm());
+        }catch{ window.location.href = a.href; }
+      });
+      const btnClear = document.getElementById('btnClearFilters');
+      if (btnClear) btnClear.addEventListener('click', ()=>{
+        if (!form) return;
+        form.querySelectorAll('input[type="text"], input[type="number"]').forEach(i => i.value = '');
+        form.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = false);
+        form.querySelectorAll('.rating-pills input[type="radio"]').forEach(i => i.checked = false);
+        document.querySelectorAll('.rating-pill').forEach(p => p.classList.remove('active'));
+        if (sortSel){ sortSel.value = '0'; inpSort.value = '0'; }
+        if (pageSizeSel){ pageSizeSel.value = '20'; inpSize.value = '20'; }
+        if (btnDir){
+          btnDir.setAttribute('data-desc', 'false'); inpDesc.value = 'false';
+          btnDir.classList.remove('active');
+          const icon = btnDir.querySelector('i'); if (icon) icon.className = 'fa-solid fa-arrow-up-short-wide me-1';
+          const label = btnDir.querySelector('span'); if (label) label.textContent = 'Asc';
+        }
+        const p = form.querySelector('input[name="Page"]'); if (p) p.value = '1';
+        applyFilters();
+      });
+      document.querySelectorAll('.rating-pills .rating-pill').forEach(pill => {
+        pill.addEventListener('click', (e) => {
+          const val = pill.getAttribute('data-value');
+          const input = document.getElementById('minr-' + val);
+          const isActive = pill.classList.contains('active');
+          document.querySelectorAll('.rating-pills .rating-pill').forEach(p => p.classList.remove('active'));
+          if (!isActive) pill.classList.add('active');
+          if (input) {
+            if (isActive && input.checked) {
+              input.checked = false;
+            } else { input.checked = true; }
+          }
+          const p = form.querySelector('input[name="Page"]');
+          if (p) p.value = '1';
+          applyFilters();
+          e.preventDefault();
+        });
+      });
+      window.addEventListener('popstate', ()=> loadUrl(new URL(window.location.href)));
+    })();
+</script>

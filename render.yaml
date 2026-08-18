@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: paladinhubv2-client
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./out
+
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://paladinhubv2-api.onrender.com/api
+
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

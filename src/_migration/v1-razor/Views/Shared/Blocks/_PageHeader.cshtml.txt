@@ -1,0 +1,14 @@
+@model dynamic
+@{
+    var id = (string)(Model?.SectionId ?? $"block-header-{Guid.NewGuid():N}");
+    var title = (string)(Model?.Title ?? "Section Title");
+    var icon = (string)(Model?.IconUrl ?? "/images/itemIcons/inv_scroll_03.jpg");
+    var small = (bool)(Model?.SmallIcon ?? false);
+    var clsIcon = small ? "section-icon small-icon" : "section-icon";
+}
+<section id="@id">
+    <h2 class="section-header" style="text-align:left;">
+        <img src="@icon" alt="Icon" class="@clsIcon">
+        @title
+    </h2>
+</section>

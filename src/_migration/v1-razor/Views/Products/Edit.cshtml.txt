@@ -1,0 +1,304 @@
+@model PaladinHub.Models.Products.EditProductViewModel
+@{
+    ViewData["Title"] = "Edit Product";
+    var placeholder = Url.Content("~/images/placeholder.png");
+    // текущото главно изображение за началния preview
+    var ordered = (Model.Images ?? new List<PaladinHub.Models.Products.ProductImageInputModel>()).OrderBy(i => i.SortOrder).ToList();
+    var thumb = Model.ThumbnailImageId.HasValue
+        ? ordered.FirstOrDefault(x => x.Id == Model.ThumbnailImageId.Value)?.Url
+        : ordered.FirstOrDefault()?.Url;
+    var initialPreview = string.IsNullOrWhiteSpace(thumb) ? placeholder : thumb;
+}
+
+<div class="container py-4">
+    <h2 class="mb-3">Edit Product</h2>
+
+    <form asp-action="Edit" method="post" class="bg-dark border border-secondary rounded p-3">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="ThumbnailImageId" id="ThumbnailImageId" />
+        <input type="hidden" asp-for="ThumbnailIndex" id="ThumbnailIndex" />
+
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 d-none" id="val-summary"></div>
+
+        <div class="row g-4">
+            <!-- Left: fields -->
+            <div class="col-12 col-lg-7">
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Name..." />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Price" class="form-label">Price</label>
+                    <div class="input-group">
+                        <input asp-for="Price" class="form-control" type="number" step="0.01" min="0" />
+                        <span class="input-group-text">$</span>
+                    </div>
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <!-- Category (same as Create) -->
+                <div class="mb-2">
+                    <label class="form-label">Category</label>
+                    <select asp-for="Category" asp-items="Model.CategorySelectList" class="form-select">
+                        <option value="">-- choose --</option>
+                    </select>
+                    <span asp-validation-for="Category" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <button type="button" id="btn-add-cat" class="btn btn-sm btn-outline-warning">+ Add category</button>
+                </div>
+
+                <div id="new-cat-wrap" class="mb-3 d-none">
+                    <label asp-for="NewCategory" class="form-label">New category</label>
+                    <input asp-for="NewCategory" class="form-control" placeholder="e.g. Shirts" />
+                    <div class="form-text">If filled, it will be used instead of the selected one.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Description</label>
+                    <textarea asp-for="Description" rows="4" class="form-control" placeholder="Optional…"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex">
+                    <a asp-controller="Merchandise" asp-action="Merchandise" class="btn btn-outline-light">Cancel</a>
+                    <button type="submit" class="btn btn-warning fw-bold px-4">Save</button>
+                </div>
+            </div>
+
+            <!-- Right: preview + gallery -->
+            <div class="col-12 col-lg-5">
+                <div class="card bg-black border border-secondary mb-3">
+                    <div class="card-header border-secondary">Main image preview</div>
+                    <div class="card-body">
+                        <div class="ratio ratio-1x1 mb-2">
+                            <img id="main-preview" src="@initialPreview" alt="preview" class="w-100 h-100 rounded" style="object-fit:cover;">
+                        </div>
+                        <div class="small text-muted">Click the ⭐ on a row to set it as main (thumbnail).</div>
+                    </div>
+                </div>
+
+                <div class="mb-2 d-flex align-items-center justify-content-between">
+                    <label class="form-label m-0">Gallery images</label>
+                    <button type="button" id="btn-add-img" class="btn btn-sm btn-outline-warning">+ Add image</button>
+                </div>
+
+                <div id="img-list" class="d-flex flex-column gap-2">
+                    @for (var i = 0; i < ordered.Count; i++)
+                    {
+                        var im = ordered[i];
+                        <div class="img-row @(Model.ThumbnailImageId.HasValue && im.Id == Model.ThumbnailImageId.Value ? "active-main" : "")" data-id="@(im.Id?.ToString() ?? "")">
+                            <div class="d-flex align-items-center gap-2">
+                                <img class="thumb rounded" src="@(string.IsNullOrWhiteSpace(im.Url) ? placeholder : im.Url)" alt="">
+                                <span class="badge bg-warning text-dark badge-main @(Model.ThumbnailImageId.HasValue && im.Id == Model.ThumbnailImageId.Value ? "" : "d-none")">Main</span>
+
+                                <input class="form-control form-control-sm flex-grow-1 img-url" value="@im.Url" placeholder="https://...">
+                                <input type="hidden" class="img-id" value="@(im.Id?.ToString() ?? "")">
+                                <input type="hidden" class="img-sort" value="@i">
+
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-outline-secondary btn-up" title="Up">▲</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-down" title="Down">▼</button>
+                                </div>
+                                <button type="button" class="btn btn-outline-warning btn-sm btn-main" title="Set as main">⭐</button>
+                                <button type="button" class="btn btn-outline-danger btn-sm btn-remove" title="Remove">🗑</button>
+                            </div>
+
+                            <!-- Bind names for model binding -->
+                            <input type="hidden" name="Images[@i].Id" value="@(im.Id?.ToString() ?? "")" />
+                            <input type="hidden" name="Images[@i].Url" value="@im.Url" class="bind-url" />
+                            <input type="hidden" name="Images[@i].SortOrder" value="@i" class="bind-sort" />
+                            <input type="hidden" name="Images[@i].AltText" value="@(im.AltText ?? "")" class="bind-alt" />
+                        </div>
+                    }
+                </div>
+
+                <small class="text-muted">Order is top → bottom. If no main is picked, the first non-empty is used.</small>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+    .img-row {
+        border: 1px solid var(--bs-secondary);
+        border-radius: .5rem;
+        padding: .5rem;
+        background: #111;
+    }
+
+        .img-row .thumb {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+        }
+
+        .img-row.active-main {
+            border-color: #f59f00;
+            box-shadow: 0 0 0 2px rgba(245,159,0,.15) inset;
+        }
+
+        .img-row .badge-main {
+            font-size: .65rem;
+        }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            // Toggle new category field
+            const btnCat = document.getElementById('btn-add-cat');
+            const wrapCat = document.getElementById('new-cat-wrap');
+            if (btnCat && wrapCat) btnCat.addEventListener('click', () => wrapCat.classList.toggle('d-none'));
+
+            // Show summary only if errors
+            const summary = document.getElementById('val-summary');
+            if (summary && summary.querySelector('ul')) {
+                summary.classList.toggle('d-none', summary.querySelectorAll('li').length === 0);
+            }
+
+            // ----- Gallery / binding -----
+            const list = document.getElementById('img-list');
+            const addBtn = document.getElementById('btn-add-img');
+            const mainPreview = document.getElementById('main-preview');
+            const hiddenThumbId = document.getElementById('ThumbnailImageId');
+            const hiddenThumbIndex = document.getElementById('ThumbnailIndex');
+            const placeholder = '@placeholder';
+
+            function rows() { return Array.from(list.querySelectorAll('.img-row')); }
+            function indexOfRow(row) { return rows().indexOf(row); }
+            function idOfRow(row) { return (row.querySelector('.img-id')?.value || '').trim(); }
+            function urlOfRow(row) { return (row.querySelector('.img-url')?.value || '').trim(); }
+
+            function bindRow(row) {
+                const urlInput = row.querySelector('.img-url');
+                const thumb = row.querySelector('.thumb');
+                const btnUp = row.querySelector('.btn-up');
+                const btnDown = row.querySelector('.btn-down');
+                const btnRemove = row.querySelector('.btn-remove');
+                const btnMain = row.querySelector('.btn-main');
+
+                urlInput.addEventListener('input', () => {
+                    const v = urlInput.value.trim();
+                    thumb.src = v || placeholder;
+                    row.querySelector('.bind-url').value = v;
+                    // ако текущият main е по индекс (нов елемент), обнови preview ако съвпада
+                    const mainIdx = parseInt(hiddenThumbIndex.value || '-1', 10);
+                    if (indexOfRow(row) === mainIdx) mainPreview.src = v || placeholder;
+                    updateMainUI();
+                });
+
+                btnUp.addEventListener('click', () => { const prev = row.previousElementSibling; if (prev) list.insertBefore(row, prev); reindex(); });
+                btnDown.addEventListener('click', () => { const next = row.nextElementSibling; if (next) list.insertBefore(next, row); reindex(); });
+
+                btnRemove.addEventListener('click', () => {
+                    const wasMain = row.classList.contains('active-main');
+                    row.remove();
+                    reindex();
+                    if (wasMain) { hiddenThumbId.value = ''; hiddenThumbIndex.value = ''; mainPreview.src = firstNonEmptyUrl() || placeholder; }
+                    updateMainUI();
+                });
+
+                btnMain.addEventListener('click', () => {
+                    const idx = indexOfRow(row);
+                    const id = idOfRow(row);
+                    const url = urlOfRow(row);
+                    if (!url) return;
+
+                    if (id) { // съществуващо изображение
+                        hiddenThumbId.value = id;
+                        hiddenThumbIndex.value = '';
+                    } else {  // нов запис – още няма Id
+                        hiddenThumbId.value = '';
+                        hiddenThumbIndex.value = String(idx);
+                    }
+                    mainPreview.src = url;
+                    updateMainUI();
+                });
+            }
+
+            function reindex() {
+                rows().forEach((row, i) => {
+                    // визуален SortOrder
+                    row.querySelector('.img-sort').value = i;
+                    // bind имена за model binding
+                    const hidId = row.querySelector('input[name$=".Id"]');
+                    const hidUrl = row.querySelector('input[name$=".Url"]');
+                    const hidSort = row.querySelector('input[name$=".SortOrder"]');
+                    const hidAlt = row.querySelector('input[name$=".AltText"]');
+                    if (hidId)   hidId.name   = `Images[${i}].Id`;
+                    if (hidUrl)  hidUrl.name  = `Images[${i}].Url`;
+                    if (hidSort) hidSort.name = `Images[${i}].SortOrder`;
+                    if (hidAlt)  hidAlt.name  = `Images[${i}].AltText`;
+                });
+            }
+
+            function updateMainUI() {
+                const thumbId = (hiddenThumbId.value || '').trim();
+                const thumbIdx = parseInt(hiddenThumbIndex.value || '-1', 10);
+
+                rows().forEach((row, i) => {
+                    const badge = row.querySelector('.badge-main');
+                    const isActive = (thumbId && idOfRow(row) === thumbId) || (!thumbId && i === thumbIdx);
+                    row.classList.toggle('active-main', isActive);
+                    if (badge) badge.classList.toggle('d-none', !isActive);
+                });
+
+                // ако няма зададен main – показваме първия непразен
+                if (!thumbId && (isNaN(thumbIdx) || thumbIdx < 0)) {
+                    mainPreview.src = firstNonEmptyUrl() || placeholder;
+                }
+            }
+
+            function firstNonEmptyUrl() {
+                for (const row of rows()) {
+                    const v = urlOfRow(row);
+                    if (v) return v;
+                }
+                return '';
+            }
+
+            function addEmptyRow() {
+                const i = rows().length;
+                const row = document.createElement('div');
+                row.className = 'img-row';
+                row.innerHTML = `
+                    <div class="d-flex align-items-center gap-2">
+                        <img class="thumb rounded" src="${placeholder}" alt="">
+                        <span class="badge bg-warning text-dark badge-main d-none">Main</span>
+
+                        <input class="form-control form-control-sm flex-grow-1 img-url" placeholder="https://..." value="">
+                        <input type="hidden" class="img-id" value="">
+                        <input type="hidden" class="img-sort" value="${i}">
+
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-outline-secondary btn-up" title="Up">▲</button>
+                            <button type="button" class="btn btn-outline-secondary btn-down" title="Down">▼</button>
+                        </div>
+                        <button type="button" class="btn btn-outline-warning btn-sm btn-main" title="Set as main">⭐</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm btn-remove" title="Remove">🗑</button>
+                    </div>
+
+                    <input type="hidden" name="Images[${i}].Id" value="" />
+                    <input type="hidden" name="Images[${i}].Url" value="" class="bind-url" />
+                    <input type="hidden" name="Images[${i}].SortOrder" value="${i}" class="bind-sort" />
+                    <input type="hidden" name="Images[${i}].AltText" value="" class="bind-alt" />
+                `;
+                list.appendChild(row);
+                bindRow(row);
+                updateMainUI();
+            }
+
+            // Bind already rendered rows
+            rows().forEach(bindRow);
+            reindex();
+            updateMainUI();
+
+            if (addBtn) addBtn.addEventListener('click', addEmptyRow);
+        })();
+    </script>
+}

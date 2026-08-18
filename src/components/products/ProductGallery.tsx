@@ -1,0 +1,6 @@
+
+"use client";
+import { useMemo, useState } from "react";
+export type ProductImage = { id?: string | number; url: string; altText?: string };
+export type ProductGalleryProps = { images?: ProductImage[]; productName?: string; onOpen?: (index: number) => void };
+export default function ProductGallery({ images = [], productName = "Product", onOpen }: ProductGalleryProps) { const safeImages = useMemo(() => images.length ? images : [{ url: "/images/WoW_icon.svg.png", altText: productName }], [images, productName]); const [active, setActive] = useState(0); return <div className="product-gallery"><button type="button" onClick={() => onOpen?.(active)} className="block w-full"><img src={safeImages[active]?.url} alt={safeImages[active]?.altText ?? productName} className="aspect-square w-full rounded-xl object-cover" /></button><div className="mt-3 grid grid-cols-5 gap-2">{safeImages.map((image, index) => <button key={image.id ?? image.url} type="button" onClick={() => setActive(index)} className={active === index ? "ring-2 ring-primary-500" : ""}><img src={image.url} alt={image.altText ?? `${productName} ${index + 1}`} className="aspect-square w-full rounded object-cover" /></button>)}</div></div>; }

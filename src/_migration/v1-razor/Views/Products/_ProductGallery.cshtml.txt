@@ -1,0 +1,58 @@
+@using PaladinHub.Models.Products
+@model PaladinHub.Models.Products.ProductDetailsViewModel
+
+@{
+    // Събираме URL-ите от доп. снимки
+    var extras = (Model.Images ?? new List<ProductDetailsViewModel.ImageItem>())
+                 .Select(x => x.Url)
+                 .Where(u => !string.IsNullOrWhiteSpace(u));
+
+    // Главна + допълнителни, без дублажи (case-insensitive)
+    var allImages = new[] { Model.ImageUrl }
+        .Concat(extras)
+        .Where(u => !string.IsNullOrWhiteSpace(u))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToList();
+
+    if (allImages.Count == 0)
+        allImages.Add(Url.Content("~/images/placeholder.png"));
+
+    var carouselId = "productCarousel";
+}
+
+<div id="@carouselId" class="carousel slide" data-bs-ride="false">
+  <div class="carousel-inner rounded bg-body-tertiary p-2 text-center">
+    @for (int i = 0; i < allImages.Count; i++)
+    {
+        <div class="carousel-item @(i==0 ? "active" : "")">
+            <img src="@allImages[i]"
+                 class="d-block mx-auto img-fluid"
+                 style="max-height:460px;object-fit:contain;cursor:pointer"
+                 alt="image @i"
+                 data-gallery-index="@i" />
+        </div>
+    }
+  </div>
+
+  @if (allImages.Count > 1)
+  {
+    <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+
+    <div class="d-flex gap-2 mt-2 flex-wrap justify-content-center">
+      @for (int i = 0; i < allImages.Count; i++)
+      {
+          <button type="button" class="btn p-0 border-0" data-bs-target="#@carouselId" data-bs-slide-to="@i" aria-label="Slide @(i+1)">
+            <img src="@allImages[i]" class="img-thumbnail"
+                 style="width:64px;height:64px;object-fit:cover;cursor:pointer" data-gallery-index="@i" />
+          </button>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,155 @@
+@{
+    ViewData["Title"] = "Connections";
+    ViewBag.Active = "Connections";
+
+    var providers = new (string Name, string Key)[]
+    {
+        ("Apple", "apple"),
+        ("Facebook", "facebook"),
+        ("Google", "google"),
+        ("Xbox Network", "xbox"),
+        ("Nintendo", "nintendo"),
+        ("PlayStation™Network", "psn"),
+        ("Steam", "steam"),
+        ("Twitch", "twitch"),
+        ("Ubisoft", "uplay")
+    };
+}
+
+<style>
+    #acc {
+        --bg: #0f1216;
+        --panel: #1a1f24;
+        --panel2: #20262d;
+        --br: #313a45;
+        --txt: #e9ecef;
+        --mut: #a8b0bd;
+        --link: #8ab4ff
+    }
+
+    #acc {
+        background: var(--bg);
+        min-height: calc(100vh - 56px);
+        color: var(--txt)
+    }
+
+        #acc .card {
+            background: var(--panel);
+            border: 1px solid var(--br)
+        }
+
+        #acc .mut {
+            color: var(--mut) !important
+        }
+
+    .conn-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 0;
+        border-top: 1px solid #26303a
+    }
+
+        .conn-row:first-child {
+            border-top: 0
+        }
+
+    .badge-pill {
+        border-radius: 999px;
+        padding: .2rem .6rem;
+        font-weight: 700;
+        font-size: .82rem
+    }
+
+    .badge-off {
+        background: #3d2e12;
+        color: #ffd66e;
+        border: 1px solid #a57a12
+    }
+
+    .btn-linkish {
+        color: var(--link);
+        text-decoration: none
+    }
+
+        .btn-linkish:hover {
+            text-decoration: underline
+        }
+
+    .app-row {
+        border-top: 1px solid #26303a;
+        padding: 16px 0
+    }
+
+        .app-row:first-child {
+            border-top: 0
+        }
+
+    .app-cap {
+        max-width: 560px
+    }
+</style>
+
+<div id="acc">
+    <div class="container-xxl py-4">
+        <h2 class="mb-4">Connections</h2>
+
+        <div class="row g-4">
+            @await Html.PartialAsync("~/Views/Shared/_AccountSideNav.cshtml")
+
+            <section class="col-12 col-lg-9">
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="mb-3">Connected Accounts</h5>
+
+                        @foreach (var p in providers)
+                        {
+                            <div class="conn-row">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="fw-semibold">@p.Name</div>
+                                    <span class="badge-pill badge-off">Not Connected</span>
+                                </div>
+                                <a href="#" class="btn-linkish">+ Connect</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="mb-3">Authorized Applications</h5>
+                        <p class="mut small mb-3">
+                            When you log in to certain applications or 3rd-party sites with your account, you can choose what profile and gameplay data to share.
+                            You can revoke access at any time.
+                        </p>
+
+                        <div class="app-row d-flex justify-content-between align-items-start">
+                            <div class="app-cap">
+                                <div class="fw-semibold">Raider.IO Raids & Mythic Plus</div>
+                                <ul class="small mb-0 mt-2">
+                                    <li>Your account ID and BattleTag</li>
+                                    <li>Your World of Warcraft profile</li>
+                                </ul>
+                            </div>
+                            <a href="#" class="btn-linkish">× Remove</a>
+                        </div>
+
+                        <div class="app-row d-flex justify-content-between align-items-start">
+                            <div class="app-cap">
+                                <div class="fw-semibold">Warcraft Logs</div>
+                                <ul class="small mb-0 mt-2">
+                                    <li>Your account ID and BattleTag</li>
+                                    <li>Your World of Warcraft profile</li>
+                                </ul>
+                            </div>
+                            <a href="#" class="btn-linkish">× Remove</a>
+                        </div>
+
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </div>
+</div>

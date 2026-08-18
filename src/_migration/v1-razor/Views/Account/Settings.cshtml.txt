@@ -1,0 +1,336 @@
+@{
+    ViewData["Title"] = "Settings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Скопваме с #settings-page, за да не засяга други изгледи */
+    #settings-page {
+        --ph-bg: #1a1d20; /* фон (по желание) */
+        --ph-surface: #23272b; /* тъмно сиво за карти */
+        --ph-surface-2: #2b3036; /* по-тъмно за инпути */
+        --ph-border: #3a4047;
+        --ph-text: #e9ecef;
+        --ph-muted: #b8c0cc;
+        --ph-link: #8ab4ff;
+        /* бутони – чист dark вид */
+        --ph-btn-primary: #f6b21a; /* жълт фон */
+        --ph-btn-primary-h: #e0a10f; /* hover */
+        --ph-btn-secondary: #3f4650; /* НЕ синкаво, неутрално тъмно сиво */
+        --ph-btn-secondary-h: #4a525e; /* hover */
+        --ph-btn-danger: #c0392b; /* ПЛЪТНО червено за Logout */
+        --ph-btn-danger-h: #a93226; /* hover */
+    }
+
+    #settings-page {
+        background-color: var(--ph-bg);
+        min-height: calc(100vh - 56px);
+    }
+
+        /* Карти */
+        #settings-page .card {
+            background-color: var(--ph-surface);
+            color: var(--ph-text);
+            border-color: var(--ph-border);
+            box-shadow: 0 6px 24px rgba(0,0,0,.35);
+        }
+
+            #settings-page .card .text-muted,
+            #settings-page .card .small.text-muted {
+                color: var(--ph-muted) !important;
+            }
+
+        /* Суичове/чекбокси и интерактивни елементи */
+        #settings-page .form-check-input {
+            background-color: var(--ph-surface-2);
+            border-color: var(--ph-border);
+        }
+
+        #settings-page .form-check-label {
+            color: var(--ph-text);
+        }
+
+        /* Линкове (в текста) */
+        #settings-page a {
+            color: var(--ph-link);
+        }
+
+            #settings-page a:hover {
+                text-decoration: underline;
+            }
+
+        /* Общи рамки */
+        #settings-page .border {
+            border-color: var(--ph-border) !important;
+        }
+
+    /* Бутони – унифицирани, БЯЛ текст навсякъде */
+    .ph-btn {
+        border: 1px solid transparent;
+        border-radius: .6rem;
+        padding: .55rem .95rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: .55rem;
+        text-decoration: none;
+        color: #fff; /* ← бял текст по дефиниция */
+        line-height: 1.1;
+        transition: background-color .15s ease, box-shadow .15s ease, transform .02s ease;
+    }
+
+        .ph-btn:focus,
+        .ph-btn:focus-visible {
+            outline: none; /* маха синята браузърна рамка */
+            box-shadow: 0 0 0 2px rgba(255,255,255,.12);
+        }
+
+        .ph-btn:active {
+            transform: translateY(1px);
+        }
+
+    .ph-btn-primary {
+        background: var(--ph-btn-primary);
+        color: #fff; /* ← бял текст и за primary */
+        border-color: #00000030;
+    }
+
+        .ph-btn-primary:hover {
+            background: var(--ph-btn-primary-h);
+            color: #fff;
+        }
+
+    .ph-btn-secondary {
+        background: var(--ph-btn-secondary);
+        color: #fff;
+        border-color: #00000040;
+    }
+
+        .ph-btn-secondary:hover {
+            background: var(--ph-btn-secondary-h);
+            color: #fff;
+        }
+
+    .ph-btn-danger {
+        background: var(--ph-btn-danger); /* плътно червено */
+        color: #fff;
+        border-color: transparent;
+    }
+
+        .ph-btn-danger:hover {
+            background: var(--ph-btn-danger-h);
+            color: #fff;
+        }
+
+    .ph-icon {
+        width: 1rem;
+        height: 1rem
+    }
+    /* svg с fill="currentColor" стават бели */
+    .btn-outline-secondary.btn-sm {
+        background-color: var(--ph-surface-2);
+        color: var(--ph-text);
+        border-color: var(--ph-border);
+    }
+
+    /* AJAX диалог */
+    #ajaxDialog::backdrop {
+        background: rgba(0,0,0,.55);
+    }
+
+    #ajaxDialog {
+        border: none;
+        border-radius: 12px;
+        padding: 0;
+        width: min(720px,95vw);
+        background: var(--ph-surface);
+        color: var(--ph-text);
+        box-shadow: 0 24px 48px rgba(0,0,0,.45);
+    }
+
+        #ajaxDialog header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--ph-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+            #ajaxDialog header h3 {
+                margin: 0;
+                font-size: 1rem
+            }
+
+        #ajaxDialog .dlg-body {
+            padding: 16px;
+            max-height: min(70vh,680px);
+            overflow: auto
+        }
+
+        #ajaxDialog .dlg-close {
+            background: transparent;
+            border: 1px solid var(--ph-border);
+            color: var(--ph-text);
+            border-radius: 8px;
+            padding: .25rem .6rem
+        }
+
+            #ajaxDialog .dlg-close:hover {
+                background: var(--ph-surface-2)
+            }
+</style>
+
+<div id="settings-page">
+    <div class="container py-4">
+        <h2 class="mb-4">Settings</h2>
+
+        <div class="row g-4">
+            <div class="col-12 col-xl-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">UI Preferences</h5>
+                        <p class="text-muted small">Local to your browser (stored in localStorage).</p>
+
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="prefMiniCartHover">
+                            <label class="form-check-label" for="prefMiniCartHover">
+                                Enable mini cart on hover (when logged in)
+                            </label>
+                        </div>
+
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="prefStickyNavbar">
+                            <label class="form-check-label" for="prefStickyNavbar">
+                                Keep navbar always visible (disable auto-hide)
+                            </label>
+                        </div>
+
+                        <button id="btnResetPrefs" class="btn btn-outline-secondary btn-sm mt-2">
+                            Reset to defaults
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-xl-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Account</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a class="ph-btn ph-btn-primary js-ajax-link"
+                               href="@Url.Action("ChangePassword", "Account")"
+                               data-title="Change Password">
+                                <svg class="ph-icon" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M3.5 8a2.5 2.5 0 114.95.5h3.05a1.5 1.5 0 110 3H8.45a2.5 2.5 0 11-4.95-.5H3.5z" />
+                                </svg>
+                                Change Password
+                            </a>
+                            <a class="ph-btn ph-btn-secondary js-ajax-link"
+                               href="@Url.Action("MyAccount", "Account")"
+                               data-title="My Account">
+                                <svg class="ph-icon" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M8 8a3 3 0 100-6 3 3 0 000 6zm-5 6a5 5 0 1110 0H3z" />
+                                </svg>
+                                My Account
+                            </a>
+                            <form id="logoutForm" method="post" asp-controller="Account" asp-action="Logout" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="ph-btn ph-btn-danger">
+                                    <svg class="ph-icon" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M6 2a1 1 0 011-1h6a1 1 0 011 1v12a1 1 0 01-1 1H7a1 1 0 01-1-1V9h2v4h6V3H8v4H6V2z" />
+                                        <path d="M1 8l4-4v3h6v2H5v3L1 8z" />
+                                    </svg>
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AJAX Dialog -->
+<dialog id="ajaxDialog">
+    <header>
+        <h3 id="ajaxDialogTitle">Loading…</h3>
+        <button type="button" class="dlg-close" data-close>Close</button>
+    </header>
+    <div class="dlg-body" id="ajaxDialogBody"></div>
+</dialog>
+
+@section Scripts {
+    <script>
+        (function(){
+            // prefs
+            const K_HOVER="ph_enableMiniCartHover", K_NAV="ph_stickyNavbar";
+            const chkHover=document.getElementById('prefMiniCartHover');
+            const chkNav=document.getElementById('prefStickyNavbar');
+            const btnReset=document.getElementById('btnResetPrefs');
+            function getBool(k,d){const v=localStorage.getItem(k);return v===null?d:v==="true";}
+            function setBool(k,val){localStorage.setItem(k,val?"true":"false");}
+            if(chkHover) chkHover.checked=getBool(K_HOVER,true);
+            if(chkNav)   chkNav.checked=getBool(K_NAV,true);
+            applyMiniCartHover(chkHover?.checked??true);
+            applyNavbar(chkNav?.checked??true);
+            chkHover?.addEventListener('change',()=>{setBool(K_HOVER,chkHover.checked);applyMiniCartHover(chkHover.checked);});
+            chkNav?.addEventListener('change',()=>{setBool(K_NAV,chkNav.checked);applyNavbar(chkNav.checked);});
+            btnReset?.addEventListener('click',()=>{localStorage.removeItem(K_HOVER);localStorage.removeItem(K_NAV); if(chkHover) chkHover.checked=true; if(chkNav) chkNav.checked=true; applyMiniCartHover(true); applyNavbar(true);});
+            function applyMiniCartHover(enabled){
+                const host=document.getElementById('nav-cart'); if(!host) return;
+                const clone=host.cloneNode(true); host.parentNode.replaceChild(clone,host);
+                const panel=document.getElementById('mini-cart-panel');
+                if(panel && !enabled) panel.classList.add('d-none');
+                if(!enabled) return;
+                if(window.__isAuthenticated__!==true) return;
+                clone.addEventListener('mouseenter',()=>{ if(typeof showMiniCart==="function") showMiniCart(); });
+                clone.addEventListener('mouseleave',()=>{ if(typeof hideMiniCart==="function") hideMiniCart(); });
+            }
+            function applyNavbar(sticky){
+                const navbar=document.querySelector(".navbar-custom"); if(!navbar) return;
+                if(sticky){ navbar.style.top="0"; window.updateNavbarVisibility=function(){ navbar.style.top="0"; }; }
+                else{ window.updateNavbarVisibility=function(mouseY){ if(window.scrollY===0 || (mouseY??999)<=600) navbar.style.top="0"; else navbar.style.top="-100px"; }; }
+            }
+
+            // AJAX модал
+            const dlg=document.getElementById('ajaxDialog');
+            const dlgTitle=document.getElementById('ajaxDialogTitle');
+            const dlgBody=document.getElementById('ajaxDialogBody');
+            document.querySelectorAll('.js-ajax-link').forEach(a=>{
+                a.addEventListener('click', async (e)=>{
+                    e.preventDefault();
+                    const url=a.getAttribute('href');
+                    dlgTitle.textContent=a.getAttribute('data-title')||'Loading…';
+                    dlgBody.innerHTML='<div class="small text-muted">Loading…</div>';
+                    try{
+                        const res=await fetch(url,{credentials:'same-origin',headers:{'X-Requested-With':'XMLHttpRequest','Accept':'text/html'}});
+                        if(!res.ok) throw new Error('Failed to load');
+                        const html=await res.text();
+                        const tmp=document.createElement('div'); tmp.innerHTML=html;
+                        const extracted=tmp.querySelector('#account-page .container, .container, main, body')||tmp;
+                        dlgBody.innerHTML=extracted.innerHTML||html;
+                    }catch(err){
+                        dlgBody.innerHTML=`<div class="alert alert-danger">Could not load content. <a href="${url}">Open in new page</a></div>`;
+                    }
+                    if(typeof dlg.showModal==='function') dlg.showModal(); else dlg.setAttribute('open','');
+                });
+            });
+            dlg?.querySelector('[data-close]')?.addEventListener('click',()=>{ if(typeof dlg.close==='function') dlg.close(); else dlg.removeAttribute('open'); });
+
+            // AJAX logout (ако сложиш бутона тук)
+            const logoutForm=document.getElementById('logoutForm');
+            if(logoutForm){
+                logoutForm.addEventListener('submit',async (e)=>{
+                    e.preventDefault();
+                    const fd=new FormData(logoutForm);
+                    const res=await fetch('/Account/Logout',{method:'POST',body:fd,credentials:'same-origin',headers:{'X-Requested-With':'XMLHttpRequest','Accept':'application/json'}});
+                    try{
+                        const data=await res.json();
+                        if(data.ok){ window.location.href=data.redirect||'/'; } else { window.location.href='/'; }
+                    }catch{ window.location.href='/'; }
+                });
+            }
+        })();
+    </script>
+}

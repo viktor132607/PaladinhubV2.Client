@@ -1,0 +1,52 @@
+@using PaladinHub.Models.Products
+@model PaladinHub.Models.Products.ProductDetailsViewModel
+
+@{
+    var extras = (Model.Images ?? new List<ProductDetailsViewModel.ImageItem>())
+                 .Select(x => x.Url)
+                 .Where(u => !string.IsNullOrWhiteSpace(u));
+
+    var allImages = new[] { Model.ImageUrl }
+        .Concat(extras)
+        .Where(u => !string.IsNullOrWhiteSpace(u))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToList();
+
+    if (allImages.Count == 0)
+        allImages.Add(Url.Content("~/images/placeholder.png"));
+}
+
+<div class="modal fade" id="productGalleryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered gallery-zoom-dialog">
+        <div class="modal-content bg-dark gallery-zoom">
+            <div class="modal-body p-0 position-relative">
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 m-3 z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <div id="modalCarousel" class="carousel slide" data-bs-ride="false">
+                    <div class="carousel-inner text-center">
+                        @for (int i = 0; i < allImages.Count; i++)
+                        {
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <img src="@allImages[i]" alt="image @i"
+                                     class="gallery-zoom-img" />
+                            </div>
+                        }
+                    </div>
+
+                    @if (allImages.Count > 1)
+                    {
+                        <button class="carousel-control-prev" type="button" data-bs-target="#modalCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#modalCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

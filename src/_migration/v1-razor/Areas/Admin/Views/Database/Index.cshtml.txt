@@ -1,0 +1,274 @@
+@model PaladinHub.Areas.Admin.ViewModels.AdminDatabaseIndexViewModel
+@using PaladinHub.Areas.Admin.ViewModels
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Admin Database";
+}
+
+@functions {
+    string Active(AdminEntity t) => Model.Entity == t ? "active" : "";
+}
+
+<style>
+    #admin-db-bleed {
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        width: 100vw;
+    }
+
+    #admin-db-inner {
+        max-width: 1920px;
+        margin: 0 auto;
+        padding: 0 16px;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table-wide {
+        min-width: 1920px;
+    }
+
+    .icon-cell img {
+        width: 28px;
+        height: 28px;
+        object-fit: cover;
+        border-radius: 4px;
+        display: block;
+    }
+
+    .icon-name {
+        font-size: .75rem;
+        opacity: .8;
+        line-height: 1.1;
+        white-space: nowrap;
+    }
+
+    .w-id {
+        width: 72px;
+    }
+
+    .w-actions {
+        width: 260px;
+    }
+
+    .w-icon {
+        width: 140px;
+    }
+
+    .text-trim {
+        max-width: 520px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .url-cell a {
+        word-break: break-all;
+    }
+</style>
+
+<div id="admin-db-bleed">
+    <div id="admin-db-inner">
+
+        <ul class="nav nav-pills mb-3">
+            <li class="nav-item">
+                <a class="nav-link @Active(AdminEntity.Spells)"
+                   asp-area="Admin" asp-controller="Database" asp-action="Index"
+                   asp-route-entity="Spells"
+                   asp-route-search="@Model.Search"
+                   asp-route-page="1" asp-route-pageSize="@Model.PageSize">Spells</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @Active(AdminEntity.Items)"
+                   asp-area="Admin" asp-controller="Database" asp-action="Index"
+                   asp-route-entity="Items"
+                   asp-route-search="@Model.Search"
+                   asp-route-page="1" asp-route-pageSize="@Model.PageSize">Items</a>
+            </li>
+        </ul>
+
+        <form method="get" class="row g-2 mb-3"
+              asp-area="Admin" asp-controller="Database" asp-action="Index">
+            <input type="hidden" name="entity" value="@Model.Entity" />
+            <div class="col-auto">
+                <input class="form-control" type="text" name="search" value="@Model.Search" placeholder="Search..." />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Search</button>
+                <a class="btn btn-secondary"
+                   asp-area="Admin" asp-controller="Database" asp-action="Index"
+                   asp-route-entity="@Model.Entity">Clear</a>
+            </div>
+            <div class="col ms-auto text-end">
+                <a class="btn btn-success"
+                   asp-area="Admin"
+                   asp-controller="@Model.ControllerName"
+                   asp-action="Create">Create</a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            @if (Model.Entity == AdminEntity.Spells)
+            {
+                <table class="table table-dark table-striped align-middle table-wide">
+                    <thead>
+                        <tr>
+                            <th class="w-id">Id</th>
+                            <th class="w-icon">Icon</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Url</th>
+                            <th>Quality</th>
+                            <th class="w-actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in (Model.Spells ?? Enumerable.Empty<PaladinHub.Data.Entities.Spell>()))
+                        {
+                            <tr>
+                                <td>@s.Id</td>
+                                <td class="icon-cell">
+                                    @if (!string.IsNullOrWhiteSpace(s.Icon))
+                                    {
+                                        <img src="~/images/SpellIcons/@s.Icon" alt="@s.Name" title="@s.Icon" />
+                                        <div class="icon-name">@s.Icon</div>
+                                    }
+                                </td>
+                                <td>@s.Name</td>
+                                <td class="text-trim" title="@s.Description">@s.Description</td>
+                                <td class="url-cell">
+                                    @if (!string.IsNullOrWhiteSpace(s.Url))
+                                    {
+                                        <a href="@s.Url" target="_blank" rel="noopener noreferrer">@s.Url</a>
+                                    }
+                                </td>
+                                <td>@s.Quality</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a class="btn btn-outline-info"
+                                           asp-area="Admin" asp-controller="@Model.ControllerName" asp-action="Details"
+                                           asp-route-id="@s.Id">Detail</a>
+                                        <a class="btn btn-outline-light"
+                                           asp-area="Admin" asp-controller="@Model.ControllerName" asp-action="Edit"
+                                           asp-route-id="@s.Id">Edit</a>
+                                        <a class="btn btn-outline-warning"
+                                           asp-area="Admin" asp-controller="@Model.ControllerName" asp-action="Delete"
+                                           asp-route-id="@s.Id">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <table class="table table-dark table-striped align-middle table-wide">
+                    <thead>
+                        <tr>
+                            <th class="w-id">Id</th>
+                            <th class="w-icon">Icon</th>
+                            <th class="w-icon">SecondIcon</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Url</th>
+                            <th>ItemLevel</th>
+                            <th>RequiredLevel</th>
+                            <th>Quality</th>
+                            <th class="w-actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var it in (Model.Items ?? Enumerable.Empty<PaladinHub.Data.Entities.Item>()))
+                        {
+                            <tr>
+                                <td>@it.Id</td>
+                                <td class="icon-cell">
+                                    @if (!string.IsNullOrWhiteSpace(it.Icon))
+                                    {
+                                        <img src="~/images/ItemIcons/@it.Icon" alt="@it.Name" title="@it.Icon" />
+                                        <div class="icon-name">@it.Icon</div>
+                                    }
+                                </td>
+                                <td class="icon-cell">
+                                    @if (!string.IsNullOrWhiteSpace(it.SecondIcon))
+                                    {
+                                        <img src="~/images/ItemIcons/@it.SecondIcon" alt="@it.Name" title="@it.SecondIcon" />
+                                        <div class="icon-name">@it.SecondIcon</div>
+                                    }
+                                </td>
+                                <td>@it.Name</td>
+                                <td class="text-trim" title="@it.Description">@it.Description</td>
+                                <td class="url-cell">
+                                    @if (!string.IsNullOrWhiteSpace(it.Url))
+                                    {
+                                        <a href="@it.Url" target="_blank" rel="noopener noreferrer">@it.Url</a>
+                                    }
+                                </td>
+                                <td>@it.ItemLevel</td>
+                                <td>@it.RequiredLevel</td>
+                                <td>@it.Quality</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a class="btn btn-outline-info"
+                                           asp-area="Admin" asp-controller="@Model.ControllerName" asp-action="Details"
+                                           asp-route-id="@it.Id">Detail</a>
+                                        <a class="btn btn-outline-light"
+                                           asp-area="Admin" asp-controller="@Model.ControllerName" asp-action="Edit"
+                                           asp-route-id="@it.Id">Edit</a>
+                                        <a class="btn btn-outline-warning"
+                                           asp-area="Admin" asp-controller="@Model.ControllerName" asp-action="Delete"
+                                           asp-route-id="@it.Id">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+
+        @if (Model.Pages > 1)
+        {
+            <nav>
+                <ul class="pagination pagination-sm">
+                    <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-area="Admin" asp-controller="Database" asp-action="Index"
+                           asp-route-entity="@Model.Entity"
+                           asp-route-search="@Model.Search"
+                           asp-route-page="@(Model.Page - 1)"
+                           asp-route-pageSize="@Model.PageSize">«</a>
+                    </li>
+
+                    @for (var p = 1; p <= Model.Pages; p++)
+                    {
+                        <li class="page-item @(p == Model.Page ? "active" : "")">
+                            <a class="page-link"
+                               asp-area="Admin" asp-controller="Database" asp-action="Index"
+                               asp-route-entity="@Model.Entity"
+                               asp-route-search="@Model.Search"
+                               asp-route-page="@p"
+                               asp-route-pageSize="@Model.PageSize">@p</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.Page >= Model.Pages ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-area="Admin" asp-controller="Database" asp-action="Index"
+                           asp-route-entity="@Model.Entity"
+                           asp-route-search="@Model.Search"
+                           asp-route-page="@(Model.Page + 1)"
+                           asp-route-pageSize="@Model.PageSize">»</a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    </div>
+</div>

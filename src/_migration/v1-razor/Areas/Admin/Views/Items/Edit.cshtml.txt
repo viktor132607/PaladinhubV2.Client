@@ -1,0 +1,55 @@
+@model PaladinHub.Data.Entities.Item
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Create Item";
+}
+
+<h2>Edit Item</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Icon" class="form-label"></label>
+        <input asp-for="Icon" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="SecondIcon" class="form-label"></label>
+        <input asp-for="SecondIcon" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Url" class="form-label"></label>
+        <input asp-for="Url" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ItemLevel" class="form-label"></label>
+        <input asp-for="ItemLevel" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="RequiredLevel" class="form-label"></label>
+        <input asp-for="RequiredLevel" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Quality" class="form-label"></label>
+        <input asp-for="Quality" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-area="Admin" asp-controller="Database" asp-action="Index" asp-route-entity="Items" class="btn btn-secondary">Cancel</a>
+</form>

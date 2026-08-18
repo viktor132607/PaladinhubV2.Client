@@ -1,0 +1,47 @@
+@model PaladinHub.Models.Carts.MyCartViewModel
+
+<div id="mini-cart" class="mini-cart">
+    @if (Model?.MyProducts == null || !Model.MyProducts.Any())
+    {
+        <div class="p-3 text-center text-muted">The cart is empty!</div>
+    }
+    else
+    {
+        <ul class="list-unstyled mini-cart-list mb-0">
+            @foreach (var p in Model.MyProducts.Take(6))
+            {
+                <li class="mini-cart-item d-flex align-items-start">
+                    <a asp-controller="Products" asp-action="Details" asp-route-id="@p.Id"
+                       class="mini-cart-link d-flex align-items-start flex-grow-1 text-reset text-decoration-none">
+                        <img src="@p.ImageUrl" alt="@p.Name" class="mini-cart-thumb" />
+                        <div class="mini-cart-text">
+                            <div class="mini-cart-name text-truncate">@p.Name</div>
+                            <div class="mini-cart-meta">@p.Price.ToString("0.##") $ × @p.Quantity</div>
+                        </div>
+                    </a>
+
+                    <button type="button" class="mini-remove" data-id="@p.Id" title="Remove" aria-label="Remove">
+                        &times;
+                    </button>
+                </li>
+            }
+        </ul>
+
+        <div class="mini-cart-total">
+            <span>Total:</span>
+            <span>@Model.TotalPrice.ToString("0.##") $</span>
+        </div>
+
+        <div class="mini-cart-actions">
+            <a class="go-to-cart-btn" asp-controller="Carts" asp-action="MyCart">My Cart</a>
+
+            <div class="d-grid">
+                <button type="button"
+                        class="mini-buy-btn"
+                        onclick="location.href='@Url.Action("Start", "Checkout")'">
+                    Buy
+                </button>
+            </div>
+        </div>
+    }
+</div>

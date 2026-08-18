@@ -1,0 +1,103 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Add Payment Method";
+    var pk = (string?)ViewBag.StripePk ?? "";
+}
+
+<style>
+    #acc {
+        --bg: #0f1216;
+        --panel: #1a1f24;
+        --br: #313a45;
+        --txt: #e9ecef;
+        --mut: #a8b0bd;
+        background: var(--bg);
+        color: var(--txt);
+        min-height: calc(100vh - 56px);
+    }
+
+        #acc .card {
+            background: var(--panel);
+            border: 1px solid var(--br);
+        }
+
+    .form-control, .StripeElement {
+        background: #0f1216 !important;
+        color: #e9ecef !important;
+    }
+
+    .StripeElement--webkit-autofill {
+        background: #0f1216 !important;
+    }
+
+    .mut {
+        color: var(--mut);
+    }
+</style>
+
+<div id="acc">
+    <div class="container-xxl py-4">
+        <h2 class="mb-4">Add Payment Method</h2>
+        <div class="row g-4">
+            @await Html.PartialAsync("~/Views/Shared/_AccountSideNav.cshtml")
+            <section class="col-12 col-lg-9">
+                <div class="card">
+                    <div class="card-body">
+                        <form id="pm-form" method="post" action="@Url.Action("AddPaymentMethodStripe","Account")">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label class="form-label">Card</label>
+                                <div id="card-element" class="form-control" style="height:auto;padding:.6rem .75rem"></div>
+                                <div id="card-errors" class="text-danger small mt-2" role="alert"></div>
+                            </div>
+                            <input type="hidden" name="paymentMethodId" id="paymentMethodId" />
+                            <button id="btn-save" class="btn btn-primary">Save card</button>
+                        </form>
+                        <div class="mut small mt-3">
+                            Use Stripe test cards, e.g. 4242 4242 4242 4242, any future date, any CVC.
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<script src="https://js.stripe.com/v3"></script>
+<script>
+    const stripe = Stripe('@pk');
+    const elements = stripe.elements({ locale: 'en' });
+    const style = {
+      base: {
+        color: '#e9ecef',
+        fontSize: '16px',
+        fontSmoothing: 'antialiased',
+        fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
+        iconColor: '#a8b0bd',
+        '::placeholder': { color: '#a8b0bd' }
+      },
+      invalid: { color: '#ff6b6b', iconColor: '#ff6b6b' }
+    };
+    const card = elements.create('card', { style, hidePostalCode: true });
+    card.mount('#card-element');
+
+    const form = document.getElementById('pm-form');
+    const errorEl = document.getElementById('card-errors');
+    const btn = document.getElementById('btn-save');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorEl.textContent = '';
+      btn.disabled = true;
+
+      const { paymentMethod, error } = await stripe.createPaymentMethod({ type: 'card', card });
+      if (error) {
+        errorEl.textContent = error.message || 'Card error';
+        btn.disabled = false;
+        return;
+      }
+
+      document.getElementById('paymentMethodId').value = paymentMethod.id;
+      form.submit();
+    });
+</script>

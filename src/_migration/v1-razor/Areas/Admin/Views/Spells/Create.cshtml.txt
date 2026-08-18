@@ -1,0 +1,53 @@
+@model PaladinHub.Data.Entities.Spell
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Create Spell";
+}
+
+<h2>Create Spell</h2>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Icon" class="form-label"></label>
+        <input asp-for="Icon" class="form-control" />
+        @if (!string.IsNullOrWhiteSpace(Model?.Icon))
+        {
+            <div class="mt-2">
+                <img src="~/images/SpellIcons/@Model.Icon" alt="@Model.Name" class="img-thumbnail" style="max-width:64px;" />
+                <div class="small text-muted">@Model.Icon</div>
+            </div>
+        }
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Url" class="form-label"></label>
+        <input asp-for="Url" class="form-control" />
+        @if (!string.IsNullOrWhiteSpace(Model?.Url))
+        {
+            <div class="mt-1">
+                <a href="@Model.Url" target="_blank">@Model.Url</a>
+            </div>
+        }
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Quality" class="form-label"></label>
+        <input asp-for="Quality" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Create</button>
+    <a asp-area="Admin" asp-controller="Database" asp-action="Index" asp-route-entity="Spells" class="btn btn-secondary">Cancel</a>
+</form>

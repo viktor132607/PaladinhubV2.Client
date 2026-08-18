@@ -1,0 +1,30 @@
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model dynamic
+@{
+    var id = (string)(Model?.SectionId ?? $"block-spelllist-{Guid.NewGuid():N}");
+    var title = (string)(Model?.Title ?? "");
+    var spells = (IEnumerable<dynamic>)(Model?.Spells ?? new List<dynamic>()); // { Id|Name, Note? }
+}
+<section id="@id" class="spell-list">
+    @if (!string.IsNullOrWhiteSpace(title))
+    {
+        <h3>@title</h3>
+    }
+    <ul>
+        @foreach (var s in spells)
+        {
+            string name = s?.Name?.ToString();
+            string idText = s?.Id?.ToString();
+            string display = !string.IsNullOrWhiteSpace(name) ? name : (!string.IsNullOrWhiteSpace(idText) ? idText : "-");
+            string note = s?.Note?.ToString() ?? "";
+
+            <li>
+                <span class="spell-name">@display</span>
+                @if (!string.IsNullOrWhiteSpace(note))
+                {
+                    <span> — @PaladinHub.Infrastructure.SafeHtmlExtensions.SafeHtml((IHtmlHelper)Html, note)</span>
+                }
+            </li>
+        }
+    </ul>
+</section>

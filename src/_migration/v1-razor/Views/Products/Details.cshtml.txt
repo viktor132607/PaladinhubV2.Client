@@ -1,0 +1,319 @@
+@using PaladinHub.Models.Products
+@model PaladinHub.Models.Products.ProductDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+    var rounded = (int)Math.Round(Model.AverageRating);
+}
+
+@if (TempData["ImgOk"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show alert-floating" role="alert">
+        <i class="fa fa-check"></i> Image list updated.
+    </div>
+}
+@if (TempData["ImgError"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show alert-floating" role="alert">
+        <i class="fa fa-exclamation-circle"></i> @TempData["ImgError"]
+    </div>
+}
+
+<div class="container my-4">
+    <div class="row g-4 align-items-start">
+        <!-- Gallery -->
+        <div class="col-12 col-lg-5">
+            <partial name="_ProductGallery" model="Model" />
+        </div>
+
+        <!-- Info -->
+        <div class="col-12 col-lg-7">
+            <h2 class="mb-2 product-title">@Model.Name</h2>
+
+            <div class="product-meta d-flex flex-wrap align-items-center gap-3 text-muted mb-2">
+                <span>Category: <span class="text-reset fw-semibold">@Model.Category</span></span>
+                <span class="vr d-none d-sm-inline"></span>
+                <span class="rating text-warning">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        if (i <= rounded)
+                        {
+                            <i class="fa-solid fa-star"></i>
+                        }
+                        else
+                        {
+
+                            <i class="fa-regular fa-star"></i>
+                        }
+                    }
+                    <span class="small text-muted ms-1">(@Model.ReviewsCount)</span>
+                </span>
+            </div>
+
+            <div class="fs-3 fw-bold text-success mb-3"><span class="me-1">$</span>@Model.Price.ToString("0.##")</div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Description))
+            {
+                <p class="mb-4">@Model.Description</p>
+            }
+
+            <div class="d-flex gap-2 mb-4">
+                <a class="btn btn-warning fw-bold"
+                   asp-controller="Carts" asp-action="AddProduct" asp-route-id="@Model.Id">
+                    <i class="fa-solid fa-cart-plus me-1"></i> Add to Cart
+                </a>
+                <a class="btn btn-outline-light" asp-controller="Merchandise" asp-action="Merchandise">Back</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mt-4" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-reviews" type="button">
+                Reviews (@Model.ReviewsCount)
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-similar" type="button">
+                Similar
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content bg-dark rounded-bottom p-3 border border-top-0">
+        <!-- REVIEWS -->
+        <div class="tab-pane fade show active" id="tab-reviews">
+            @if (User.Identity?.IsAuthenticated ?? false)
+            {
+                <form asp-action="AddReview" method="post" class="mb-4">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="ProductId" value="@Model.Id" />
+                    <div class="row g-2 align-items-center">
+                        <div class="col-auto"><label class="form-label mb-0 me-2">Your rating</label></div>
+                        <div class="col-auto">
+                            <select name="Rating" class="form-select form-select-sm">
+                                @for (var r = 5; r >= 1; r--)
+                                {
+                                    <option value="@r">@r</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-12 col-md">
+                            <input name="Content" class="form-control form-control-sm" placeholder="Share your thoughts…" />
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-warning btn-sm fw-bold" type="submit">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="alert alert-secondary">Login to leave a review.</div>
+            }
+
+            @if (Model.Reviews.Count == 0)
+            {
+                <div class="text-muted">No reviews yet.</div>
+            }
+            else
+            {
+                <ul class="list-unstyled">
+                    @foreach (var r in Model.Reviews)
+                    {
+                        <li class="py-3 border-bottom border-secondary review-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-semibold review-user">@r.UserName</div>
+                                    <div class="text-warning small">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= r.Rating)
+                                            {
+                                                <i class="fa-solid fa-star"></i>
+                                            }
+                                            else
+                                            {
+
+                                                <i class="fa-regular fa-star"></i>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                                <div class="text-nowrap small text-muted">@r.CreatedAt.ToLocalTime().ToString("g")</div>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(r.Content))
+                            {
+                                <div class="mt-2">@r.Content</div>
+                            }
+
+                            @if (r.CanDelete)
+                            {
+                                <form asp-action="DeleteReview" method="post" class="mt-2">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@r.Id" />
+                                    <input type="hidden" name="productId" value="@Model.Id" />
+                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <!-- SIMILAR -->
+        <div class="tab-pane fade" id="tab-similar">
+            @if (Model.Similar.Count == 0)
+            {
+                <div class="text-muted">No similar products.</div>
+            }
+            else
+            {
+                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3">
+                    @foreach (var s in Model.Similar)
+                    {
+                        <div class="col">
+                            <div class="card product-sim-card h-100 border-0">
+                                <div class="product-sim-thumb d-flex align-items-center justify-content-center">
+                                    <img src="@(string.IsNullOrWhiteSpace(s.ImageUrl) ? Url.Content("~/images/placeholder.png") : s.ImageUrl)"
+                                         alt="@s.Name" />
+                                </div>
+
+                                <div class="card-body d-flex flex-column">
+                                    <h6 class="card-title text-truncate mb-2">@s.Name</h6>
+                                    <div class="price fw-semibold mb-3">
+                                        <span class="currency">$</span>@s.Price.ToString("0.##")
+                                    </div>
+                                    <a asp-controller="Carts" asp-action="AddProduct" asp-route-id="@s.Id"
+                                       class="btn btn-primary btn-sm mt-auto w-100">Add to Cart</a>
+                                </div>
+
+                                <a asp-controller="Products" asp-action="Details" asp-route-id="@s.Id"
+                                   class="stretched-link" aria-label="@s.Name"></a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+
+    </div>
+</div>
+
+<partial name="_ProductGalleryModal" model="Model" />
+
+<style>
+    /* Заглавие */
+    .product-title {
+        color: #e6e6e6 !important;
+        font-weight: 700;
+    }
+
+    /* Similar cards */
+    .product-sim-card {
+        background-color: #2a2e33;
+        box-shadow: 0 2px 8px rgba(0,0,0,.25);
+        border-radius: .5rem;
+    }
+
+    .product-sim-thumb {
+        background-color: #1f2226;
+        height: 180px;
+        border-top-left-radius: .5rem;
+        border-top-right-radius: .5rem;
+        overflow: hidden;
+    }
+
+        .product-sim-thumb img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+            padding: .5rem;
+        }
+
+    .price {
+        color: #9bd66f;
+    }
+
+        .price .currency {
+            font-size: 0.85em;
+            margin-right: 2px;
+            vertical-align: baseline;
+        }
+
+    .tab-content {
+        border-radius: .5rem
+    }
+
+    .text-pink, .text-fuchsia, .text-magenta {
+        color: #e6e6e6 !important;
+    }
+
+    .product-sim-card .btn {
+        background-color: #f59f00;
+        border: none;
+        color: #000;
+        font-weight: 600;
+    }
+
+        .product-sim-card .btn:hover {
+            background-color: #d88c00;
+            color: #000;
+        }
+
+    /* Modal zoom */
+    .gallery-zoom-dialog {
+        max-width: min(95vw, 1600px);
+    }
+
+    .gallery-zoom {
+        background: #111;
+    }
+
+    .gallery-zoom-img {
+        display: block;
+        margin: 0 auto;
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: 90vh;
+        object-fit: contain;
+        padding: 8px;
+        background: #111;
+    }
+
+    .gallery-zoom .modal-body {
+        padding: 0;
+    }
+
+
+</style>
+
+@section Scripts {
+    <script>
+        // скрий плаващите алърти
+        setTimeout(function(){ document.querySelectorAll('.alert-floating').forEach(el=>el.style.display='none'); }, 1600);
+
+        // клик на снимка/thumbnail -> модал, на същия индекс
+        (function () {
+          const small = document.getElementById('productCarousel');
+          if (!small) return;
+
+          small.querySelectorAll('[data-gallery-index]').forEach(function (el) {
+            el.addEventListener('click', function () {
+              const idx = Number(el.getAttribute('data-gallery-index')) || 0;
+              const modalEl = document.getElementById('productGalleryModal');
+              const carouselEl = document.getElementById('modalCarousel');
+              const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+              const carousel = bootstrap.Carousel.getOrCreateInstance(carouselEl, { interval: false });
+              carousel.to(idx);
+              modal.show();
+            });
+          });
+        })();
+    </script>
+}

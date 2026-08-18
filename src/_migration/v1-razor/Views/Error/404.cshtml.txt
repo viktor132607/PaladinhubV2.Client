@@ -1,0 +1,52 @@
+@{
+    ViewData["Title"] = "404 – Page Not Found";
+}
+<style>
+    html, body {
+        height: 100%;
+    }
+
+    .bg-cover {
+        position: fixed;
+        inset: 0;
+        background: url('@Url.Content("~/images/404.jpg")') center/cover no-repeat;
+        z-index: -1;
+    }
+
+    .page-center {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .card {
+        backdrop-filter: blur(6px);
+        background: rgba(0,0,0,.45);
+        border-radius: 12px;
+        padding: 2rem 2.5rem;
+        color: #fff;
+        max-width: 720px;
+        width: 100%;
+    }
+
+        .card a {
+            display: inline-block;
+            padding: .7rem 1.2rem;
+            border-radius: 10px;
+            background: #ffc107;
+            color: #121212;
+            text-decoration: none;
+        }
+</style>
+
+<div class="bg-cover"></div>
+<div class="page-center">
+    <div class="card">
+        <h1>404 – Page Not Found</h1>
+        <p>The address may be incorrect or the content has been moved.</p>
+        <a href="@Url.Action("Home", "Home")">Back to Home</a>
+    </div>
+</div>

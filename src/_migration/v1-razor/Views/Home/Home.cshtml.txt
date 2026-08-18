@@ -1,0 +1,111 @@
+@{
+	ViewData["Title"] = "Home";
+}
+
+<link rel="stylesheet" href="~/css/home.css" />
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - PaladinHub</title>
+
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/PaladinHub.styles.css" asp-append-version="true" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-pD+rHgR6yHg9dwT1trENc69MxO4pH2UjF8lq1yMYFbB8XelFgphE1TfHDH4o2v+5p7W9k5NV07u6e1kI+p7k5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+	<div class="outer-wrapper">
+		<div class="page-container">
+			<div class="main-cover-container">
+				<img src="~/images/mainHD.jpg" alt="Main Image" class="main-cover" />
+			</div>
+			<div class="main-wrapper">
+
+				<div class="hero-section">
+					<h1>PaladinHub</h1>
+					<p><strong>Welcome to PaladinHub — your ultimate resource for mastering the Paladin class in World of Warcraft.</strong></p>
+					<p>Whether you’re a seasoned veteran or a new initiate, here you’ll find up-to-date guides, talent builds, rotation tips, gearing advice, and more — tailored for <strong>Holy</strong>, <strong>Protection</strong>, and <strong>Retribution</strong> Paladins.</p>
+					<p>Embrace the Light, perfect your gameplay, and smite your enemies with righteous fury.</p>
+					<a href="#guides" class="btn-hero">Explore Guides</a>
+					<a href="http://localhost:10000/Merchandise/List" class="btn-hero">Our Shop</a>
+				</div>
+
+				<section id="hero-tree">
+					<h2>NEW 11.0 Hero Talents</h2>
+					<div class="hero-tree-grid">
+						<div class="hero-tree-card">
+							<img src="~/images/Herald.jpg" alt="Herald of the Sun" class="hero-tree-img" />
+							<h3>HERALD OF THE SUN</h3>
+							<p><em>(Holy/Retribution)</em></p>
+							<p>Heralds of the Sun develop a deep bond to the sun and solar energy, using it to burn enemies and cauterize their allies' wounds. They can manifest potent solar rays while fully connected to the Light.</p>
+						</div>
+						<div class="hero-tree-card">
+							<img src="~/images/Lightsmith.jpg" alt="Lightsmith" class="hero-tree-img" />
+							<h3>LIGHTSMITH</h3>
+							<p><em>(Holy/Protection)</em></p>
+							<p>Lightsmiths have developed such masterful control over the Light that they are able to wield it tangibly, employing constructs to empower their weapons and defenses and to protect their allies.</p>
+						</div>
+						<div class="hero-tree-card">
+							<img src="~/images/Templar.jpg" alt="Templar" class="hero-tree-img" />
+							<h3>TEMPLAR</h3>
+							<p><em>(Protection/Retribution)</em></p>
+							<p>Templars stop at nothing to bring justice to the wicked. They call down hammers of Light and unleash devastating combinations of physical and holy attacks to vanquish their enemies.</p>
+						</div>
+					</div>
+				</section>
+
+				<div class="content-wrapper">
+					<section class="captions-section">
+						<div class="container">
+							<div class="row text-center mb-5">
+								<div class="col-md-4"><div class="caption">Holy</div></div>
+								<div class="col-md-4"><div class="caption">Protection</div></div>
+								<div class="col-md-4"><div class="caption">Retribution</div></div>
+							</div>
+						</div>
+					</section>
+
+					<section id="guides">
+						<div class="container">
+							<div class="row text-center">
+								<div class="col-md-4 mb-4 d-flex justify-content-center">
+									<div class="card h-100">
+										<div class="position-relative">
+											<img src="~/images/twws1-home-small-1.png" alt="Holy Paladin" class="guide-image" />
+											<div class="position-absolute start-50 translate-middle-x" style="bottom: 10px;">
+												<a href="/Holy/Overview" class="view-guide-link">View Guide</a>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-4 mb-4 d-flex justify-content-center">
+									<div class="card h-100">
+										<div class="position-relative">
+											<img src="~/images/twws1-home-small-2.png" alt="Protection Paladin" class="guide-image" />
+											<div class="position-absolute start-50 translate-middle-x" style="bottom: 10px;">
+												<a href="/Protection/Overview" class="view-guide-link">View Guide</a>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-4 mb-4 d-flex justify-content-center">
+									<div class="card h-100">
+										<div class="position-relative">
+											<img src="~/images/twws1-home-small-3.png" alt="Retribution Paladin" class="guide-image" />
+											<div class="position-absolute start-50 translate-middle-x" style="bottom: 10px;">
+												<a href="/Retribution/Overview" class="view-guide-link">View Guide</a>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+

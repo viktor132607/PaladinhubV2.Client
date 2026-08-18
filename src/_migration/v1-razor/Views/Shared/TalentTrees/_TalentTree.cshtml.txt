@@ -1,0 +1,94 @@
+@model PaladinHub.Models.Talents.TalentTreeViewModel
+@using PaladinHub.Data.Entities
+@using Microsoft.AspNetCore.Html
+@using System.Linq
+
+@{
+    // FIX: няма Model.Spells в TalentTreeViewModel
+    var spells = (ViewData["Spells"] as List<Spell>) ?? new List<Spell>();
+
+    var spellDict = spells
+        .Where(s => !string.IsNullOrWhiteSpace(s.Name))
+        .GroupBy(s => s.Name!.Trim(), StringComparer.OrdinalIgnoreCase)
+        .Select(g => g.First())
+        .ToDictionary(s => s.Name!.Trim(), StringComparer.OrdinalIgnoreCase);
+
+    string key = Model?.Key ?? "tree";
+    string ContainerClass() => (Model?.IsHero ?? false) ? "hero-tree-container" : (key + "-tree-container");
+
+    bool isAdmin = (User?.IsInRole("Admin") ?? false);
+
+    IHtmlContent RenderNode(PaladinHub.Models.Talents.TalentNodeViewModel n)
+    {
+        spellDict.TryGetValue(n.SpellName ?? "", out var spell);
+
+        var icon = string.IsNullOrWhiteSpace(spell?.Icon) ? "placeholder.png" : spell!.Icon!;
+        var url = string.IsNullOrWhiteSpace(spell?.Url) ? "#" : spell!.Url!;
+        var alt = spell?.Name ?? n.SpellName ?? n.Id ?? "node";
+
+        var shapeClass = $"node-{(n.Shape ?? "circle").ToLower()}";
+        var stateClass = n.Active ? "active" : "inactive";
+        var requires = (n.Requires != null && n.Requires.Count > 0) ? string.Join(",", n.Requires) : string.Empty;
+
+        var html = $@"
+            <div class='node {shapeClass} {stateClass}'
+                 style='grid-column: {n.Col}; grid-row: {n.Row};'
+                 data-id='{n.Id}' data-cost='{n.Cost}' data-requires='{requires}'>
+                <a href='{url}' data-url='{url}' target='_blank' rel='noopener'>
+                    <img src='/images/SpellIcons/{icon}' alt='{alt}' />
+                </a>
+            </div>";
+        return new HtmlString(html);
+    }
+
+    string LineStyle(int fromCol, int fromRow, int toCol, int toRow, double offsetX = 7.5, double offsetY = 7.5)
+    {
+        int cellW = 50, cellH = 60, gap = 20;
+        int stepX = cellW + gap, stepY = cellH + gap;
+
+        double x = (fromCol - 1) * stepX + stepX / 2 + offsetX;
+        double y = (fromRow - 1) * stepY + stepY / 2 + offsetY;
+
+        int dx = (toCol - fromCol) * stepX;
+        int dy = (toRow - fromRow) * stepY;
+
+        double length = Math.Sqrt(dx * dx + dy * dy);
+        double angle = Math.Atan2(dy, dx) * 180.0 / Math.PI;
+
+        return $"left:{x}px; top:{y}px; width:{length}px; transform: rotate({angle}deg);";
+    }
+
+    IHtmlContent RenderLine(int fromCol, int fromRow, int toCol, int toRow)
+        => new HtmlString($"<div class='line' style='{LineStyle(fromCol, fromRow, toCol, toRow)}'></div>");
+}
+
+<section>
+    <header style="text-align:center;margin-top: 20px">
+        <h2>@(Model?.Title ?? "Talents")</h2>
+        @if (isAdmin)
+        {
+            <div class="admin-controls" data-tree-key="@(Model?.Key ?? "tree")">
+                <button type="button" class="btn btn-sm btn-outline-secondary js-tree-edit">Edit</button>
+                <button type="button" class="btn btn-sm btn-primary js-tree-save d-none">Save</button>
+                <button type="button" class="btn btn-sm btn-light js-tree-cancel d-none">Cancel</button>
+            </div>
+        }
+    </header>
+
+    <div class="@ContainerClass()" data-tree-key="@(Model?.Key ?? "tree")">
+        @foreach (var n in (Model?.Nodes ?? Enumerable.Empty<PaladinHub.Models.Talents.TalentNodeViewModel>()))
+        {
+            @RenderNode(n)
+        }
+
+        @foreach (var e in (Model?.Edges ?? Enumerable.Empty<PaladinHub.Models.Talents.TalentEdgeViewModel>()))
+        {
+            var from = Model!.Nodes!.FirstOrDefault(x => x.Id == e.FromId);
+            var to = Model!.Nodes!.FirstOrDefault(x => x.Id == e.ToId);
+            if (from != null && to != null)
+            {
+                @RenderLine(from.Col, from.Row, to.Col, to.Row)
+            }
+        }
+    </div>
+</section>

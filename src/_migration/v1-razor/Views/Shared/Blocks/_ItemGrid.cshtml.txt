@@ -1,0 +1,19 @@
+@model dynamic
+@{
+    var id = (string)(Model?.SectionId ?? $"block-itemgrid-{Guid.NewGuid():N}");
+    var title = (string)(Model?.Title ?? "");
+    var items = (IEnumerable<dynamic>)(Model?.Items ?? new List<dynamic>()); // { Id|Name }
+    int cols = (int?)(Model?.Columns) ?? 4;
+}
+<section id="@id" class="item-grid cols-@cols">
+    @if (!string.IsNullOrWhiteSpace(title))
+    {
+        <h3>@title</h3>
+    }
+    <div class="grid">
+        @foreach (var it in items)
+        {
+            <div class="cell">@((it?.Id is int vi) ? Item(vi) : Item(it?.Name?.ToString() ?? ""))</div>
+        }
+    </div>
+</section>

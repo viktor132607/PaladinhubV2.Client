@@ -1,0 +1,36 @@
+@model dynamic
+@{
+    var id = (string)(Model?.SectionId ?? $"block-tier-{Guid.NewGuid():N}");
+    var title = (string)(Model?.Title ?? "Tier List");
+    var tiers = (IEnumerable<string>)(Model?.Tiers ?? new []{"S","A","B","C"});
+    var itemsByTier = (IDictionary<string, IEnumerable<dynamic>>)(Model?.ItemsByTier ?? new Dictionary<string, IEnumerable<dynamic>>());
+}
+<section id="@id" class="tier-list">
+    <h3>@title</h3>
+    @foreach (var t in tiers)
+    {
+        <div class="tier-row">
+            <div class="tier-label">@t</div>
+            <div class="tier-items">
+                @{
+                    itemsByTier.TryGetValue(t, out var list);
+                    foreach (var x in (list ?? Enumerable.Empty<dynamic>()))
+                    {
+                        string type = (string)(x?.Type ?? "item"); // item|spell
+                        var idOrName = x?.Id ?? (object)(x?.Name ?? "");
+                        <span class="tier-item">
+                            @if (type=="item")
+                            {
+                                if (idOrName is int vi) { @:@Item(vi) } else { @:@Item(idOrName?.ToString() ?? "") }
+                            }
+                            else
+                            {
+                                if (idOrName is int vi) { @:@Spell(vi) } else { @:@Spell(idOrName?.ToString() ?? "") }
+                            }
+                        </span>
+                    }
+                }
+            </div>
+        </div>
+    }
+</section>

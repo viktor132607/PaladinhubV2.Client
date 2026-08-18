@@ -1,0 +1,72 @@
+@model PaladinHub.Models.Carts.MyCartViewModel
+
+@if (Model.TotalPrice != 0)
+{
+    @if (TempData["AddedSuccessfully"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show alert-floating" role="alert" id="alert">
+            <i class="fa fa-check"></i>
+            The product is added successfully to your cart.
+        </div>
+    }
+    @if (TempData["RemovedFromCart"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show alert-floating" role="alert" id="alert">
+            <i class="fa fa-minus-circle"></i>
+            The product is removed successfully from your cart.
+        </div>
+    }
+
+    <main class="mt-3 section-wrapper">
+        <div class="container justify-content-center">
+            <h2 class="text-center highlight mb-4">
+                <i class="fa fa-shopping-cart"></i> My Cart
+            </h2>
+
+            <table class="table table-hover merch-table text-center">
+                <thead>
+                    <tr class="row">
+                        <th scope="col" class="col-lg-4">Name</th>
+                        <th scope="col" class="col-lg-4">Quantity</th>
+                        <th scope="col" class="col-lg-4">Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model.MyProducts)
+                    {
+                        <tr class="row">
+                            <td class="col-lg-4">@product.Name</td>
+                            @if (product.Quantity >= 1)
+                            {
+                                <td class="col-lg-4">@product.Quantity</td>
+                                <td class="col-lg-4">$@product.Price</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <h3 class="text-center mt-4">
+                Total Cost: <span class="highlight">$@Model.TotalPrice</span>
+            </h3>
+
+            <div class="button-holder text-center mt-3">
+                <a href="/Carts/Archive" class="btn btn-outline-primary">
+                    <i class="fa fa-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
+    </main>
+}
+else
+{
+    <div class="text-center mt-5">
+        <h2 class="highlight"><i class="fa fa-shopping-basket"></i> Your cart is empty!</h2>
+    </div>
+}
+
+<script>
+    setTimeout(function () {
+        $('#alert').delay(1000).fadeOut(300);
+    }, 1000);
+</script>

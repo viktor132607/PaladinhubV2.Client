@@ -1,0 +1,125 @@
+
+.page {
+  min-height: calc(100vh - 4rem);
+  background: #0f1216;
+  color: #e9ecef;
+  padding: 2rem 1rem 4rem;
+}
+
+.pageInner {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+.pageTitle {
+  margin: 0 0 1.25rem;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.content,
+.fragment {
+  color: inherit;
+}
+
+.content :global(a),
+.fragment :global(a) {
+  color: #8ab4ff;
+  text-decoration: none;
+}
+
+.content :global(a:hover),
+.fragment :global(a:hover) {
+  text-decoration: underline;
+}
+
+.content :global(img),
+.fragment :global(img) {
+  max-width: 100%;
+  height: auto;
+}
+
+.content :global(table),
+.fragment :global(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.content :global(th),
+.content :global(td),
+.fragment :global(th),
+.fragment :global(td) {
+  border: 1px solid #313a45;
+  padding: 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.content :global(input),
+.content :global(select),
+.content :global(textarea),
+.fragment :global(input),
+.fragment :global(select),
+.fragment :global(textarea) {
+  width: 100%;
+  border: 1px solid #3a424d;
+  border-radius: 0.5rem;
+  background: #11161c;
+  color: #f8fafc;
+  padding: 0.65rem 0.75rem;
+}
+
+.content :global(button),
+.content :global(.btn),
+.fragment :global(button),
+.fragment :global(.btn) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 1px solid #3a424d;
+  border-radius: 0.5rem;
+  background: #2d333b;
+  color: #fff;
+  padding: 0.6rem 0.9rem;
+  cursor: pointer;
+}
+
+.content :global(.card),
+.fragment :global(.card) {
+  border: 1px solid #313a45;
+  border-radius: 0.75rem;
+  background: #1a1f24;
+}
+
+.content :global(.card-body),
+.fragment :global(.card-body) {
+  padding: 1rem;
+}
+
+.content :global(.row),
+.fragment :global(.row) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.content :global(.alert),
+.fragment :global(.alert) {
+  border: 1px solid #46515e;
+  border-radius: 0.65rem;
+  padding: 0.85rem 1rem;
+  background: #202832;
+}
+
+.content :global(.migration-placeholder),
+.fragment :global(.migration-placeholder) {
+  border: 1px dashed #475569;
+  border-radius: 0.6rem;
+  padding: 0.8rem;
+  color: #cbd5e1;
+  background: rgba(15, 23, 42, 0.55);
+}

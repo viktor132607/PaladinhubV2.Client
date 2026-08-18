@@ -1,0 +1,30 @@
+@model PaladinHub.Areas.Admin.Models.DeletePageViewModel
+@{
+    ViewData["Title"] = "Delete Page Confirmation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="text-danger">Delete Page</h2>
+    <hr />
+
+    <div class="alert alert-warning">
+        <strong>Warning!</strong> You are about to delete the page:
+        <span class="fw-bold">@Model.Title</span>
+        from section <span class="fw-bold text-uppercase">@Model.Section</span>.
+        <br />This action <strong>cannot</strong> be undone.
+    </div>
+
+    <form asp-controller="PageBuilder" asp-action="DeleteConfirmed" method="post">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="Section" />
+        <input type="hidden" asp-for="Slug" />
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">
+                <i class="fa-solid fa-trash"></i> Confirm Delete
+            </button>
+            <a asp-controller="@Model.Section" asp-action="Overview" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>

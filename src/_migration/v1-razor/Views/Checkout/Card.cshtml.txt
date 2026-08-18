@@ -1,0 +1,103 @@
+@using Microsoft.Extensions.Configuration
+@{
+    ViewData["Title"] = "Card Payment";
+    var publishableKey = Context.RequestServices.GetRequiredService<IConfiguration>()["Stripe:PublishableKey"];
+    var clientSecret = ViewData["ClientSecret"] as string;
+}
+
+<div class="card bg-dark text-light border-secondary p-4">
+    <h2 class="text-center mb-4">Card Payment</h2>
+
+    <form id="payment-form" autocomplete="off">
+        @Html.AntiForgeryToken()
+
+        <style>
+            /* рамката си остава тъмна */
+            #card-element {
+                background: #0b0e12;
+                border: 1px solid #2a3139 !important;
+                border-radius: .5rem;
+            }
+        </style>
+
+        <div id="card-element" class="p-3 rounded"></div>
+        <div id="card-errors" class="text-danger mt-2 mb-3" role="alert"></div>
+        <div class="text-muted mb-3">Use a Stripe test card, e.g. 4242 4242 4242 4242 · 12/34 · 123.</div>
+
+        <button id="submit" class="btn btn-success w-100 mb-2">Pay</button>
+        <a asp-action="Review" class="btn btn-outline-secondary w-100">Back</a>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const stripe = Stripe("@publishableKey", { locale: 'en' });
+
+        // Ясно зададени цветове (бял текст върху тъмно)
+        const style = {
+            base: {
+                color: '#ffffff',
+                iconColor: '#ffffff',
+                fontSize: '16px',
+                fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
+                fontSmoothing: 'antialiased',
+                '::placeholder': { color: '#9aa5b1' }
+            },
+            invalid: {
+                color: '#ff8a80',
+                iconColor: '#ff8a80'
+            }
+        };
+
+        const elements = stripe.elements(); // без appearance: theme, за да не override-ва цветовете
+        const card = elements.create('card', {
+            hidePostalCode: true,
+            style: style
+        });
+        card.mount('#card-element');
+
+        const form = document.getElementById('payment-form');
+        const btn  = document.getElementById('submit');
+        const err  = document.getElementById('card-errors');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            err.textContent = '';
+            btn.disabled = true; btn.textContent = 'Processing...';
+
+            const { error, paymentIntent } = await stripe.confirmCardPayment("@clientSecret", {
+                payment_method: { card: card }
+            });
+
+            if (error) {
+                err.textContent = error.message || 'Payment failed.';
+                btn.disabled = false; btn.textContent = 'Pay';
+                return;
+            }
+
+            if (paymentIntent && paymentIntent.status === 'succeeded') {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                const resp = await fetch("@Url.Action("CardFinalize", "Checkout")", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "RequestVerificationToken": token
+                    },
+                    body: new URLSearchParams({ paymentIntentId: paymentIntent.id })
+                });
+
+                if (resp.ok) {
+                    const data = await resp.json();
+                    window.location.href = data.redirect;
+                } else {
+                    err.textContent = 'Server finalize failed.';
+                    btn.disabled = false; btn.textContent = 'Pay';
+                }
+            } else {
+                err.textContent = 'Payment was not completed.';
+                btn.disabled = false; btn.textContent = 'Pay';
+            }
+        });
+    </script>
+}

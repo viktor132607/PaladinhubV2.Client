@@ -1,0 +1,42 @@
+@using PaladinHub.Data.Entities
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> signInManager
+@inject UserManager<User> userManager
+
+@if (signInManager.IsSignedIn(User))
+{
+    var me = await userManager.GetUserAsync(User);
+    var displayName = me?.FullName ?? me?.Email ?? User.Identity?.Name ?? "Account";
+    var avatarSrc = string.IsNullOrWhiteSpace(me?.AvatarPath) ? "/images/avatars/default01.png" : me?.AvatarPath;
+
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="@avatarSrc" alt="Avatar" class="rounded-circle flex-shrink-0" style="width:40px;height:40px;object-fit:cover;">
+            <span>@displayName</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+            <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="MyAccount">My Account</a></li>
+            <li><a class="dropdown-item" asp-area="" asp-controller="AccountSecurity" asp-action="Security">Security</a></li>
+            <li><a class="dropdown-item" asp-area="" asp-controller="Payments" asp-action="Methods">Payment Methods</a></li>
+            @if (User.IsInRole("Admin"))
+            {
+                <li><a class="dropdown-item" href="/Admin">Admin</a></li>
+            }
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+                <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+                    <button type="submit" class="dropdown-item">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </li>
+}
+else
+{
+    <li class="nav-item">
+        <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+    </li>
+}

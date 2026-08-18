@@ -1,0 +1,5 @@
+@model PaladinHub.Models.Blocks.BlockVM
+
+<div class="alert alert-info small">
+    <strong>Unimplemented block:</strong> @(Model?.GetType()?.Name ?? "unknown")
+</div>

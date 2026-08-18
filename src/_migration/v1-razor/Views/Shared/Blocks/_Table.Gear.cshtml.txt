@@ -1,0 +1,78 @@
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model dynamic
+@{
+    var id = (string)(Model?.SectionId ?? $"block-gear-{Guid.NewGuid():N}");
+    var title = (string)(Model?.Title ?? "");
+    var rows = (IEnumerable<dynamic>)(Model?.Rows ?? new List<dynamic>());
+}
+<section id="@id" class="table-gear">
+    @if (!string.IsNullOrWhiteSpace(title))
+    {
+        <h3>@title</h3>
+    }
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Slot</th>
+                <th>Item</th>
+                <th>Source</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in rows)
+            {
+                string slot = r?.Slot?.ToString() ?? "";
+                string source = r?.Source?.ToString() ?? "";
+
+                int? itemId = null;
+                string itemName = null;
+                var item = r?.Item;
+
+                if (item is int ii) itemId = ii;
+                else if (item is long il) itemId = (int)il;
+                else if (item != null)
+                {
+                    try
+                    {
+                        var t = item.GetType();
+                        var idProp = t.GetProperty("Id", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
+                        var nameProp = t.GetProperty("Name", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
+                        var idVal = idProp?.GetValue(item);
+
+                        if (idVal is int) itemId = (int)idVal;
+                        else if (idVal is long) itemId = (int)(long)idVal;
+                        else if (idVal != null)
+                        {
+                            int parsed;
+                            if (int.TryParse(idVal.ToString(), out parsed)) itemId = parsed;
+                        }
+
+                        itemName = nameProp?.GetValue(item)?.ToString();
+                    }
+                    catch { }
+                }
+
+                <tr>
+                    <td>@slot</td>
+                    <td>
+                        @if (itemId.HasValue)
+                        {
+                            <span class="item" data-item-id="@itemId">@itemId</span>
+                        }
+                        else if (!string.IsNullOrWhiteSpace(itemName))
+                        {
+                            <span class="item-name">@itemName</span>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </td>
+                    <td>
+                        @PaladinHub.Infrastructure.SafeHtmlExtensions.SafeHtml((IHtmlHelper)Html, source)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</section>

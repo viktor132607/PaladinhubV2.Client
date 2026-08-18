@@ -1,0 +1,47 @@
+@{
+	ViewData["Title"] = "Enable Authenticator";
+	var sharedKey = (string)ViewBag.SharedKey;
+	var authUri = (string)ViewBag.AuthenticatorUri;
+}
+<div class="container py-4">
+	<h2 class="mb-3">Enable Authenticator</h2>
+	<div class="row g-4">
+		<div class="col-md-6">
+			<div class="card bg-dark border-secondary">
+				<div class="card-body">
+					<div class="mb-2">Secret key</div>
+					<div class="h5 mb-3"><code>@sharedKey</code></div>
+					<div class="text-muted">Enter this key in your authenticator app or scan the QR.</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="card bg-dark border-secondary">
+				<div class="card-body d-flex justify-content-center">
+					<img alt="Scan QR" style="width:180px;height:180px"
+						 src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=@Uri.EscapeDataString(authUri)" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<form method="post" asp-action="Enable2FA" class="mt-4">
+		@Html.AntiForgeryToken()
+		<div class="row g-3 align-items-end">
+			<div class="col-sm-6 col-md-4">
+				<label class="form-label">6-digit code</label>
+				<input name="code" class="form-control" autocomplete="one-time-code" inputmode="numeric" />
+			</div>
+			<div class="col-sm-6 col-md-3">
+				<button type="submit" class="btn btn-warning w-100">Verify & Enable</button>
+			</div>
+			@if (TempData["Error"] != null)
+			{
+				<div class="col-12 text-danger">@TempData["Error"]</div>
+			}
+		</div>
+	</form>
+	<div class="mt-4 d-flex gap-2">
+		<form method="post" asp-action="ResetAuthenticator">@Html.AntiForgeryToken()<button class="btn btn-outline-secondary">Reset Key</button></form>
+		<form method="post" asp-action="Disable2FA">@Html.AntiForgeryToken()<button class="btn btn-outline-danger">Disable 2FA</button></form>
+	</div>
+</div>

@@ -1,0 +1,11 @@
+@{
+    ViewData["Title"] = "Order Registered";
+    var orderId = TempData["orderId"]?.ToString();
+}
+<h2>Order Registered</h2>
+<p>Your order was registered successfully and will be processed for cash on delivery.</p>
+@if (!string.IsNullOrEmpty(orderId))
+{
+    <p><strong>Order #:</strong> @orderId</p>
+}
+<a asp-controller="Home" asp-action="Home" class="btn btn-primary mt-3">Back to Home</a>

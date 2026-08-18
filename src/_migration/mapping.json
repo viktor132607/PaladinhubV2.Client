@@ -1,0 +1,567 @@
+[
+  {
+    "v1": "Views/Home/Home.cshtml",
+    "v2": "src/pages/Home.tsx",
+    "mode": "existing-v2-file-preserved-source-appended"
+  },
+  {
+    "v1": "Views/Home/Privacy.cshtml",
+    "v2": "src/pages/content/Privacy.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Home/ThanksForPurchasing.cshtml",
+    "v2": "src/pages/checkout/ThanksForPurchasing.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Account/Login.cshtml",
+    "v2": "src/pages/auth/Login.tsx",
+    "mode": "existing-v2-file-preserved-source-appended"
+  },
+  {
+    "v1": "Views/Account/Register.cshtml",
+    "v2": "src/pages/auth/Register.tsx",
+    "mode": "existing-v2-file-preserved-source-appended"
+  },
+  {
+    "v1": "Views/Account/LoginWith2fa.cshtml",
+    "v2": "src/pages/auth/LoginWith2FA.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Account/RecoveryCodeLogin.cshtml",
+    "v2": "src/pages/auth/RecoveryCodeLogin.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Account/VerifyEmail.cshtml",
+    "v2": "src/pages/auth/VerifyEmail.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Account/ShowRecoveryCodes.cshtml",
+    "v2": "src/pages/auth/ShowRecoveryCodes.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Account/MyAccount.cshtml",
+    "v2": "src/pages/account/MyAccount.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Account/AccountDetails.cshtml",
+    "v2": "src/pages/account/AccountDetails.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Account/ChangePassword.cshtml",
+    "v2": "src/pages/account/ChangePassword.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Account/Connections.cshtml",
+    "v2": "src/pages/account/Connections.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Account/Enable2FA.cshtml",
+    "v2": "src/pages/account/Enable2FA.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Account/PaymentMethods.cshtml",
+    "v2": "src/pages/account/PaymentMethods.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Account/AddPaymentMethod.cshtml",
+    "v2": "src/pages/account/AddPaymentMethod.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Account/Privacy.cshtml",
+    "v2": "src/pages/account/Privacy.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Account/Security.cshtml",
+    "v2": "src/pages/account/Security.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Account/Settings.cshtml",
+    "v2": "src/pages/account/Settings.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Account/TransactionHistory.cshtml",
+    "v2": "src/pages/account/TransactionHistory.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Carts/MyCart.cshtml",
+    "v2": "src/pages/Cart.tsx",
+    "mode": "existing-v2-file-preserved-source-appended"
+  },
+  {
+    "v1": "Views/Carts/Details.cshtml",
+    "v2": "src/pages/cart/CartDetails.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Carts/Archive.cshtml",
+    "v2": "src/pages/cart/CartArchive.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Carts/_MiniCart.cshtml",
+    "v2": "src/components/cart/MiniCart.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Checkout/Shipping.cshtml",
+    "v2": "src/pages/checkout/Shipping.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Checkout/Payment.cshtml",
+    "v2": "src/pages/checkout/Payment.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Checkout/Card.cshtml",
+    "v2": "src/pages/checkout/CardPayment.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Checkout/Review.cshtml",
+    "v2": "src/pages/checkout/Review.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Checkout/Registered.cshtml",
+    "v2": "src/pages/checkout/Registered.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Checkout/Success.cshtml",
+    "v2": "src/pages/checkout/Success.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Checkout/Failure.cshtml",
+    "v2": "src/pages/checkout/Failure.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Merchandise/Merchandise.cshtml",
+    "v2": "src/pages/Products.tsx",
+    "mode": "existing-v2-file-preserved-source-appended"
+  },
+  {
+    "v1": "Views/Products/Details.cshtml",
+    "v2": "src/pages/ProductDetails.tsx",
+    "mode": "existing-v2-file-preserved-source-appended"
+  },
+  {
+    "v1": "Views/Products/Add.cshtml",
+    "v2": "src/pages/cart/AddProduct.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Products/Create.cshtml",
+    "v2": "src/pages/admin/products/CreateProduct.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Products/Edit.cshtml",
+    "v2": "src/pages/admin/products/EditProduct.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Products/_ProductGallery.cshtml",
+    "v2": "src/components/products/ProductGallery.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Products/_ProductGalleryModal.cshtml",
+    "v2": "src/components/products/ProductGalleryModal.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Discussions/Index.cshtml",
+    "v2": "src/pages/discussions/Discussions.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Discussions/Details.cshtml",
+    "v2": "src/pages/discussions/DiscussionDetails.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Discussions/Create.cshtml",
+    "v2": "src/pages/discussions/CreateDiscussion.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Error/404.cshtml",
+    "v2": "src/pages/NotFound.tsx",
+    "mode": "existing-v2-file-preserved-source-appended"
+  },
+  {
+    "v1": "Views/Error/500.cshtml",
+    "v2": "src/pages/errors/ServerError.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Error.cshtml",
+    "v2": "src/pages/errors/ErrorPage.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Areas/Admin/Views/Database/Index.cshtml",
+    "v2": "src/pages/admin/database/Database.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Areas/Admin/Views/Items/Create.cshtml",
+    "v2": "src/pages/admin/items/CreateItem.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Areas/Admin/Views/Items/Edit.cshtml",
+    "v2": "src/pages/admin/items/EditItem.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Areas/Admin/Views/Items/Details.cshtml",
+    "v2": "src/pages/admin/items/ItemDetails.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Areas/Admin/Views/Items/Delete.cshtml",
+    "v2": "src/pages/admin/items/DeleteItem.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Areas/Admin/Views/Spells/Create.cshtml",
+    "v2": "src/pages/admin/spells/CreateSpell.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Areas/Admin/Views/Spells/Edit.cshtml",
+    "v2": "src/pages/admin/spells/EditSpell.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Areas/Admin/Views/Spells/Details.cshtml",
+    "v2": "src/pages/admin/spells/SpellDetails.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Areas/Admin/Views/Spells/Delete.cshtml",
+    "v2": "src/pages/admin/spells/DeleteSpell.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Areas/Admin/Views/PageBuilder/Create.cshtml",
+    "v2": "src/pages/admin/page-builder/CreatePage.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Areas/Admin/Views/PageBuilder/DeleteConfirm.cshtml",
+    "v2": "src/pages/admin/page-builder/DeletePage.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Areas/Admin/Views/PromoCodes/Index.cshtml",
+    "v2": "src/pages/admin/promo-codes/PromoCodes.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Areas/Admin/Views/PromoCodes/Create.cshtml",
+    "v2": "src/pages/admin/promo-codes/CreatePromoCode.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Areas/Admin/Views/Shared/_LayoutAdmin.cshtml",
+    "v2": "src/components/admin/AdminLayout.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/_Layout.cshtml",
+    "v2": "src/components/layout/Layout.tsx",
+    "mode": "existing-v2-file-preserved-source-appended"
+  },
+  {
+    "v1": "Views/Shared/_LoginPartial.cshtml",
+    "v2": "src/components/layout/AuthMenu.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/_AccountLayout.cshtml",
+    "v2": "src/components/account/AccountLayout.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/_AccountSideNav.cshtml",
+    "v2": "src/components/account/AccountSideNav.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/_EditOverlay.cshtml",
+    "v2": "src/components/admin/page-builder/EditOverlay.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/_PageHeader.cshtml",
+    "v2": "src/components/shared/PageHeader.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/ContentPage.cshtml",
+    "v2": "src/pages/content/ContentPage.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/ContentPageBlockFallback.cshtml",
+    "v2": "src/components/page-builder/BlockFallback.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_Callout.cshtml",
+    "v2": "src/components/page-builder/blocks/CalloutBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_ColumnsText.cshtml",
+    "v2": "src/components/page-builder/blocks/ColumnsTextBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_Divider.cshtml",
+    "v2": "src/components/page-builder/blocks/DividerBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_Heading.cshtml",
+    "v2": "src/components/page-builder/blocks/HeadingBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_ItemGrid.cshtml",
+    "v2": "src/components/page-builder/blocks/ItemGridBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_PageHeader.cshtml",
+    "v2": "src/components/page-builder/blocks/PageHeaderBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_RotationCard.cshtml",
+    "v2": "src/components/page-builder/blocks/RotationCardBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_Section.cshtml",
+    "v2": "src/components/page-builder/blocks/SectionBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_SpellList.cshtml",
+    "v2": "src/components/page-builder/blocks/SpellListBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_Switcher.cshtml",
+    "v2": "src/components/page-builder/blocks/SwitcherBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_Table.Consumables.cshtml",
+    "v2": "src/components/page-builder/blocks/ConsumablesTableBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_Table.Gear.cshtml",
+    "v2": "src/components/page-builder/blocks/GearTableBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_Table.Generic.cshtml",
+    "v2": "src/components/page-builder/blocks/GenericTableBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_Tabs.cshtml",
+    "v2": "src/components/page-builder/blocks/TabsBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_TalentBuildMenu.cshtml",
+    "v2": "src/components/page-builder/blocks/TalentBuildMenuBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_TalentTree.cshtml",
+    "v2": "src/components/page-builder/blocks/TalentTreeBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Blocks/_TierList.cshtml",
+    "v2": "src/components/page-builder/blocks/TierListBlock.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/TalentTrees/_HolyTalentTreeHerald.cshtml",
+    "v2": "src/components/talent-trees/HolyTalentTreeHerald.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/TalentTrees/_HolyTalentTreeLightsmith.cshtml",
+    "v2": "src/components/talent-trees/HolyTalentTreeLightsmith.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/TalentTrees/_ProtectionTreeLightsmith.cshtml",
+    "v2": "src/components/talent-trees/ProtectionTreeLightsmith.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/TalentTrees/_ProtectionTreeTemplar.cshtml",
+    "v2": "src/components/talent-trees/ProtectionTreeTemplar.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/TalentTrees/_RetributionTreeHerald.cshtml",
+    "v2": "src/components/talent-trees/RetributionTreeHerald.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/TalentTrees/_RetributionTreeTemplar.cshtml",
+    "v2": "src/components/talent-trees/RetributionTreeTemplar.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/TalentTrees/_SectionTalentTrees.cshtml",
+    "v2": "src/components/talent-trees/SectionTalentTrees.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/TalentTrees/_TalentTree.cshtml",
+    "v2": "src/components/talent-trees/TalentTree.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Tooltip/_ItemTooltip.cshtml",
+    "v2": "src/components/tooltips/ItemTooltip.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Tooltip/_SpellTooltip.cshtml",
+    "v2": "src/components/tooltips/SpellTooltip.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/Tooltip/_TalentTooltip.cshtml",
+    "v2": "src/components/tooltips/TalentTooltip.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Holy/Overview.cshtml",
+    "v2": "src/pages/guides/holy/Overview.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Holy/Talents.cshtml",
+    "v2": "src/pages/guides/holy/Talents.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Holy/Rotation.cshtml",
+    "v2": "src/pages/guides/holy/Rotation.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Holy/Gear.cshtml",
+    "v2": "src/pages/guides/holy/Gear.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Holy/Stats.cshtml",
+    "v2": "src/pages/guides/holy/Stats.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Holy/Consumables.cshtml",
+    "v2": "src/pages/guides/holy/Consumables.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Protection/Overview.cshtml",
+    "v2": "src/pages/guides/protection/Overview.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Protection/Talents.cshtml",
+    "v2": "src/pages/guides/protection/Talents.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Protection/Rotation.cshtml",
+    "v2": "src/pages/guides/protection/Rotation.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Protection/Gear.cshtml",
+    "v2": "src/pages/guides/protection/Gear.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Protection/Stats.cshtml",
+    "v2": "src/pages/guides/protection/Stats.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Protection/Consumables.cshtml",
+    "v2": "src/pages/guides/protection/Consumables.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Retribution/Overview.cshtml",
+    "v2": "src/pages/guides/retribution/Overview.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Retribution/Talents.cshtml",
+    "v2": "src/pages/guides/retribution/Talents.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Retribution/Rotation.cshtml",
+    "v2": "src/pages/guides/retribution/Rotation.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Retribution/Gear.cshtml",
+    "v2": "src/pages/guides/retribution/Gear.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Retribution/Stats.cshtml",
+    "v2": "src/pages/guides/retribution/Stats.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Retribution/Consumables.cshtml",
+    "v2": "src/pages/guides/retribution/Consumables.tsx",
+    "mode": "new-valid-tsx-stub-with-source"
+  },
+  {
+    "v1": "Views/Shared/_Layout.cshtml.css",
+    "v2": "src/components/layout/Layout.css",
+    "mode": "copied"
+  }
+]

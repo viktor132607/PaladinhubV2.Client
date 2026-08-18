@@ -1,0 +1,17 @@
+@model dynamic
+@{
+    var id = (string)(Model?.SectionId ?? $"block-rot-{Guid.NewGuid():N}");
+    var title = (string)(Model?.Title ?? "Rotation");
+    var seq = (IEnumerable<dynamic>)(Model?.Sequence ?? new List<dynamic>()); // [{Id|Name}, ...]
+}
+<section id="@id" class="rotation-card">
+    <h3>@title</h3>
+    <div class="rotation-seq">
+        @foreach (var s in seq)
+        {
+            <span class="spell-chip">
+                @((s?.Id is int vi) ? Spell(vi) : Spell(s?.Name?.ToString() ?? ""))
+            </span>
+        }
+    </div>
+</section>

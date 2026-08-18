@@ -1,0 +1,41 @@
+@inherits PaladinHub.Helpers.SpellsAndItemsView
+@model PaladinHub.Models.CombinedViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Retribution Paladin Talents";
+}
+
+<body>
+    <div class="outer-wrapper">
+        <div class="page-container">
+            <div class="main-wrapper">
+
+                <section class="mb-4" id="talent-tree-1">
+                    <h2 style="text-align:center;margin-top: 10px">Retribution + Herald of the Sun</h2>
+                    @await Html.PartialAsync(
+                        "~/Views/Shared/TalentTrees/_SectionTalentTrees.cshtml",
+                        Model,
+                        new ViewDataDictionary(ViewData) {
+                            ["keys"] = new[] { "paladin", "retribution-herald", "retribution" }
+                        })
+                </section>
+
+                <div class="separator-container">
+                    <img src="~/images/Separators/D1.png" alt="Separator 1" class="separator" />
+                </div>
+
+                <section class="mb-4" id="talent-tree-2">
+                    <h2 style="text-align:center;margin-top: 10px">Retribution + Templar</h2>
+                    @await Html.PartialAsync(
+                        "~/Views/Shared/TalentTrees/_SectionTalentTrees.cshtml",
+                        Model,
+                        new ViewDataDictionary(ViewData) {
+                            ["keys"] = new[] { "paladin", "retribution-templar", "retribution" }
+                        })
+                </section>
+
+            </div>
+        </div>
+    </div>
+</body>

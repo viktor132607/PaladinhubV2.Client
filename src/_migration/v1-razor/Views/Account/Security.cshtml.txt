@@ -1,0 +1,291 @@
+@using PaladinHub.Data.Entities
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<User> UserManager
+@{
+    ViewData["Title"] = "Security";
+    var me = await UserManager.GetUserAsync(User);
+    ViewBag.Active = "Security";
+    var twoFaOn = me?.TwoFactorEnabled == true;
+    var require2fa = (bool?)ViewBag.Require2FA == true;
+    var pwdChangedAt = ViewBag.PasswordChangedAt as DateTime?;
+    var pwdChanged = pwdChangedAt?.ToString("d MMM yyyy") ?? "—";
+    var lastRecoveryCode = ViewBag.LastRecoveryCode as string;
+    var phoneVerified = me?.PhoneNumberConfirmed == true;
+}
+
+<style>
+    #acc {
+        --bg: #0f1216;
+        --panel: #1a1f24;
+        --br: #313a45;
+        --txt: #e9ecef;
+        --mut: #a8b0bd;
+        --ok: #28d17c;
+        --warn: #ffd66e
+    }
+
+    #acc {
+        background: var(--bg);
+        min-height: calc(100vh - 56px);
+        color: var(--txt)
+    }
+
+        #acc .card {
+            background: var(--panel);
+            border: 1px solid var(--br)
+        }
+
+        #acc .mut {
+            color: var(--mut) !important
+        }
+
+    .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: .5rem
+    }
+
+        .section-head a {
+            color: #8ab4ff;
+            text-decoration: none
+        }
+
+            .section-head a:hover {
+                text-decoration: underline
+            }
+
+    .rowline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: .9rem 0;
+        border-top: 1px solid #26303a
+    }
+
+        .rowline:first-child {
+            border-top: 0
+        }
+
+    .bullet {
+        display: inline-block;
+        width: .5rem;
+        height: .5rem;
+        border-radius: 50%;
+        margin-right: .4rem;
+        background: var(--ok)
+    }
+
+    .badge-pill {
+        border-radius: 999px;
+        padding: .25rem .55rem;
+        font-weight: 700;
+        font-size: .82rem
+    }
+
+    .tip {
+        background: #1e242b;
+        border: 1px dashed #3b4652;
+        border-radius: .5rem;
+        padding: .6rem .8rem
+    }
+
+    .login-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 0;
+        border-top: 1px solid #26303a
+    }
+
+        .login-item:first-child {
+            border-top: 0
+        }
+
+    .login-left {
+        display: flex;
+        align-items: center;
+        gap: .9rem
+    }
+
+    .login-ico {
+        width: 34px;
+        height: 34px;
+        border-radius: .5rem;
+        background: #1f2831;
+        display: flex;
+        align-items: center;
+        justify-content: center
+    }
+
+    .actions-inline form {
+        display: inline
+    }
+
+    .btn-linklike {
+        background: none;
+        border: 0;
+        color: #8ab4ff;
+        padding: 0;
+        cursor: pointer
+    }
+
+        .btn-linklike:hover {
+            text-decoration: underline
+        }
+</style>
+
+<div id="acc">
+    <div class="container-xxl py-4">
+        <h2 class="mb-4">Security</h2>
+
+        @if (TempData["Msg"] is string ok && !string.IsNullOrWhiteSpace(ok))
+        {
+            <div class="alert alert-success small mb-3">@ok</div>
+        }
+        @if (TempData["Err"] is string err && !string.IsNullOrWhiteSpace(err))
+        {
+            <div class="alert alert-danger small mb-3">@err</div>
+        }
+        @if (!string.IsNullOrWhiteSpace(lastRecoveryCode))
+        {
+            <div class="alert alert-warning small mb-3">Your recovery code: <strong>@lastRecoveryCode</strong> — store it in a safe place.</div>
+        }
+
+        <div class="row g-4">
+            @await Html.PartialAsync("~/Views/Shared/_AccountSideNav.cshtml")
+
+            <section class="col-12 col-lg-9">
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="section-head">
+                            <h5 class="mb-0">Password</h5>
+                            <a href="@Url.Action("ChangePassword", "Account", new { username = me?.Email })">Update</a>
+                        </div>
+                        <div class="mut small mb-2">We recommend updating your password periodically to prevent unauthorized access.</div>
+                        <div class="rowline">
+                            <div class="mut">Password</div>
+                            <div class="small">Last updated <strong>@pwdChanged</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="section-head">
+                            <h5 class="mb-0">Authenticator</h5>
+                            <div class="actions-inline">
+                                @if (twoFaOn)
+                                {
+                                    <form asp-action="Disable2FA" asp-controller="AccountSecurity" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button class="btn-linklike" type="submit">Disable</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="Enable2FA" asp-controller="AccountSecurity" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button class="btn-linklike" type="submit">Enable</button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                        <div class="mut small mb-2">Prevent unauthorized logins with one-click verification using the mobile app.</div>
+
+                        <div class="rowline">
+                            <div class="mut">Status</div>
+                            <div class="small">
+                                <span class="bullet" style="background:@(twoFaOn ? "var(--ok)" : "#ff6b6b")"></span>
+                                <strong>@(twoFaOn ? "Active" : "Inactive")</strong>
+                            </div>
+                        </div>
+
+                        <div class="rowline">
+                            <div class="mut">Restore Code</div>
+                            <div class="small">
+                                <form asp-action="GenerateRecoveryCode" asp-controller="AccountSecurity" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-linklike">Get Restore Code</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="rowline">
+                            <div class="mut">Always require authenticator for login</div>
+                            <div class="small">
+                                <form asp-action="ToggleRequire2FA" asp-controller="AccountSecurity" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="on" value="@(!require2fa)" />
+                                    <button type="submit" class="badge-pill" style="background:@(require2fa ? "#1b6f3b" : "#2a3037");color:@(require2fa ? "#e9f7ee" : "#c9d2de");border:1px solid #3d4651">
+                                        @(require2fa ? "On" : "Off")
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="section-head">
+                            <h5 class="mb-0">Phone</h5>
+                            <div class="actions-inline">
+                                @if (!phoneVerified)
+                                {
+                                    <form asp-action="MarkPhoneVerified" asp-controller="Account" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button class="btn-linklike" type="submit">Mark as Verified</button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                        <div class="mut small mb-2">For now this simply marks your phone as verified to help you test the 0/33/67/100 security score.</div>
+                        <div class="rowline">
+                            <div class="mut">Status</div>
+                            <div class="small">
+                                <span class="bullet" style="background:@(phoneVerified ? "var(--ok)" : "#ff6b6b")"></span>
+                                <strong>@(phoneVerified ? "Verified" : "Not Verified")</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="section-head">
+                            <h5 class="mb-0">Recent login activity</h5>
+                            <form asp-action="LogoutAllDevices" asp-controller="AccountSecurity" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn-linklike">Log out from all devices</button>
+                            </form>
+                        </div>
+
+                        <div class="tip small mb-3">
+                            Notice anything suspicious? <a href="@Url.Action("ChangePassword", "Account", new { username = me?.Email })">Update your password to secure your account.</a>
+                        </div>
+
+                        <div class="login-item">
+                            <div class="login-left">
+                                <div class="login-ico"><i class="fa fa-globe"></i></div>
+                                <div>
+                                    <div class="fw-semibold">Website</div>
+                                    <div class="mut small">@ViewBag.DeviceOs</div>
+                                </div>
+                            </div>
+                            <div class="small text-end">
+                                @ViewBag.LastLoginWhen<br /><span class="mut">@ViewBag.LastLoginWhere</span>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-3 small">
+                            Showing the most recent logins. <a href="#">View all login history</a>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,161 @@
+@{
+    Layout = null;
+    var title = ViewData["Title"] ?? "Admin Panel";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand"
+                   asp-area="Admin" asp-controller="Database" asp-action="Index">
+                    Admin
+                </a>
+
+                <button class="navbar-toggler" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#adminNavbar"
+                        aria-controls="adminNavbar"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="adminNavbar">
+                    <!-- Лява група: нормалният сайт -->
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Home">Home</a>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Holy Paladin</a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                <li><a class="dropdown-item" href="/Holy/Overview">Overview</a></li>
+                                <li><a class="dropdown-item" href="/Holy/Gear">Gear</a></li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-area="" asp-controller="Talents" asp-action="SectionPage" asp-route-section="Holy">
+                                        Talents
+                                    </a>
+                                </li>
+                                <li><a class="dropdown-item" href="/Holy/Consumables">Consumables</a></li>
+                                <li><a class="dropdown-item" href="/Holy/Rotation">Rotation</a></li>
+                                <li><a class="dropdown-item" href="/Holy/Stats">Stats</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Protection Paladin</a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                <li><a class="dropdown-item" href="/Protection/Overview">Overview</a></li>
+                                <li><a class="dropdown-item" href="/Protection/Gear">Gear</a></li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-area="" asp-controller="Talents" asp-action="SectionPage" asp-route-section="Protection">
+                                        Talents
+                                    </a>
+                                </li>
+                                <li><a class="dropdown-item" href="/Protection/Consumables">Consumables</a></li>
+                                <li><a class="dropdown-item" href="/Protection/Rotation">Rotation</a></li>
+                                <li><a class="dropdown-item" href="/Protection/Stats">Stats</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Retribution Paladin</a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                <li><a class="dropdown-item" href="/Retribution/Overview">Overview</a></li>
+                                <li><a class="dropdown-item" href="/Retribution/Gear">Gear</a></li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-area="" asp-controller="Talents" asp-action="SectionPage" asp-route-section="Retribution">
+                                        Talents
+                                    </a>
+                                </li>
+                                <li><a class="dropdown-item" href="/Retribution/Consumables">Consumables</a></li>
+                                <li><a class="dropdown-item" href="/Retribution/Rotation">Rotation</a></li>
+                                <li><a class="dropdown-item" href="/Retribution/Stats">Stats</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Discussion" asp-action="Index">Discussion</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Privacy">Privacy</a>
+                        </li>
+                    </ul>
+
+                    <!-- Дясна група: админ + търговия -->
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Merchandise" asp-action="Merchandise">Merchandise</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="PageBuilder" asp-action="Index">Pages</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="Database" asp-action="Index">Database</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Merchandise" asp-action="Merchandise">Products</a>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle @(ViewContext.RouteData.Values["controller"]?.ToString() == "PromoCodes" ? "active" : "")"
+                               href="#" id="promoMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Promo Codes
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="promoMenu">
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-area="Admin" asp-controller="PromoCodes" asp-action="Index">
+                                        All
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-area="Admin" asp-controller="PromoCodes" asp-action="Create">
+                                        Create
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Home">Back to Site</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mt-4">
+        @RenderBody()
+    </div>
+
+    <footer class="footer bg-dark text-light text-center py-2 mt-5">
+        Admin Panel © @DateTime.Now.Year
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,607 @@
+@using PaladinHub.Data.Entities
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<User> UserManager
+@model PaladinHub.Models.Account.MyAccountViewModel
+
+@{
+    ViewData["Title"] = "Account Overview";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Active = "Overview";
+
+    var me = await UserManager.GetUserAsync(User);
+    var roles = me != null ? await UserManager.GetRolesAsync(me) : new List<string>();
+    string Display(string? s) => string.IsNullOrWhiteSpace(s) ? "(not set)" : s!;
+
+    var balance = Model?.Balance ?? ((decimal?)ViewBag.Balance ?? 0m);
+    var recent = Model?.RecentPurchases ?? ((IEnumerable<PaladinHub.Data.Entities.Transaction>?)ViewBag.RecentPurchases ?? Enumerable.Empty<PaladinHub.Data.Entities.Transaction>());
+    var currentPage = Model?.Page ?? ((int?)ViewBag.Page ?? 1);
+    var totalPages = Math.Max(Model?.TotalPages ?? ((int?)ViewBag.TotalPages ?? 1), 1);
+
+    var defaults = Enumerable.Range(1, 39).Select(i => $"default{i:00}.png").ToArray();
+    var uploads = Model?.Uploads ?? ((IEnumerable<string>?)ViewBag.Uploads ?? Enumerable.Empty<string>());
+
+    string Curr() => "$";
+
+    var sCount = (me?.EmailConfirmed == true ? 1 : 0) + (me?.TwoFactorEnabled == true ? 1 : 0) + (me?.PhoneNumberConfirmed == true ? 1 : 0);
+    var securityScore = sCount == 3 ? 100 : sCount == 2 ? 67 : sCount == 1 ? 33 : 0;
+    IEnumerable<string> securityTips = Model?.SecurityTips ?? (ViewBag.SecurityTips as IEnumerable<string> ?? Enumerable.Empty<string>());
+
+    var redeemEndpoint = Url.Action("RedeemCode", "Account");
+    var setUploadedEndpoint = Url.Action("SetUploadedAvatar", "Account");
+    var deleteUploadEndpoint = Url.Action("DeleteUpload", "Account");
+    var uploadEndpoint = Url.Action("UploadAvatar", "Account");
+}
+
+<style>
+    #acc {
+        --bg: #0f1216;
+        --panel: #1a1f24;
+        --panel2: #222831;
+        --br: #313a45;
+        --txt: #e9ecef;
+        --mut: #a8b0bd;
+        --link: #8ab4ff;
+        --ok: #1fdd7f;
+        --warn: #f6b21a;
+        --bad: #e35d6a;
+        --btn: #2d333b;
+        --btn-h: #3a424d;
+        --accent: #3b82f6
+    }
+
+    #acc {
+        background: var(--bg);
+        min-height: calc(100vh - 56px);
+        color: var(--txt)
+    }
+
+        #acc .side {
+            width: 260px
+        }
+
+            #acc .side .nav-link {
+                color: var(--txt);
+                border-radius: .5rem;
+                padding: .6rem .8rem;
+                display: flex;
+                align-items: center;
+                gap: .6rem
+            }
+
+                #acc .side .nav-link.active, #acc .side .nav-link:hover {
+                    background: #20262d
+                }
+
+        #acc .card {
+            background: var(--panel);
+            border: 1px solid var(--br);
+            box-shadow: 0 6px 24px rgba(0,0,0,.35)
+        }
+
+        #acc .mut {
+            color: var(--mut) !important
+        }
+
+        #acc a {
+            color: var(--link)
+        }
+
+            #acc a:hover {
+                text-decoration: underline
+            }
+
+    .badge-pill {
+        border-radius: 999px;
+        padding: .3rem .6rem;
+        font-weight: 700;
+        font-size: .82rem
+    }
+
+    .badge-ok {
+        background: #133a2a;
+        color: #7fffc1;
+        border: 1px solid #2ea36e
+    }
+
+    .badge-warn {
+        background: #3d2e12;
+        color: #ffd66e;
+        border: 1px solid #a57a12
+    }
+
+    .badge-bad {
+        background: #432028;
+        color: #ffb3be;
+        border: 1px solid #b34a5a
+    }
+
+    .sec-ring {
+        display: block
+    }
+
+        .sec-ring .bg {
+            fill: none;
+            stroke: #233;
+            stroke-width: 6
+        }
+
+        .sec-ring .fg {
+            fill: none;
+            stroke: var(--ok);
+            stroke-linecap: round;
+            stroke-width: 6;
+            transition: stroke-dashoffset .4s ease
+        }
+
+        .sec-ring .txt {
+            fill: var(--txt);
+            font: 700 8px system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+            text-anchor: middle
+        }
+
+    .btn-ph {
+        background: var(--btn);
+        border: 1px solid var(--br);
+        color: #fff;
+        font-weight: 600
+    }
+
+        .btn-ph:hover {
+            background: var(--btn-h);
+            color: #fff
+        }
+
+    .btn-accent {
+        background: var(--accent);
+        border-color: #3468d6
+    }
+
+        .btn-accent:hover {
+            filter: brightness(1.05)
+        }
+
+    .table-dark thead th {
+        border-color: var(--br) !important
+    }
+
+    .table-dark td, .table-dark th {
+        border-color: #2a313a !important
+    }
+
+    #uploadsGrid .upload-item {
+        position: relative;
+        width: 64px;
+        height: 64px
+    }
+
+        #uploadsGrid .upload-item img {
+            width: 64px;
+            height: 64px;
+            object-fit: cover
+        }
+
+    .upload-remove {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 22px;
+        height: 22px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        border-radius: 50%;
+        border: 1px solid #ffffff33;
+        background: #00000080;
+        color: #fff;
+        font-weight: 700
+    }
+
+        .upload-remove:hover {
+            background: #000000cc
+        }
+
+    .actions-vertical {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 280px
+    }
+
+        .actions-vertical .btn-ph {
+            width: 100%;
+            justify-content: flex-start
+        }
+
+    .form-control, .form-select {
+        background: var(--panel2);
+        color: var(--txt);
+        border-color: var(--br)
+    }
+
+        .form-control::placeholder {
+            color: #9aa3af
+        }
+
+    .ph-modal .modal-content {
+        background: var(--panel);
+        color: var(--txt);
+        border: 1px solid var(--br);
+        box-shadow: 0 12px 40px rgba(0,0,0,.5)
+    }
+
+    .ph-modal .modal-header {
+        border-bottom: 1px solid var(--br)
+    }
+
+    .ph-modal .modal-footer {
+        border-top: 1px solid var(--br)
+    }
+
+    .ph-modal .btn-close {
+        filter: invert(1) opacity(.7)
+    }
+
+        .ph-modal .btn-close:hover {
+            opacity: 1
+        }
+
+    .redeem-title {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        margin: 0
+    }
+
+    .redeem-icon {
+        width: 22px;
+        height: 22px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: 900
+    }
+
+    .redeem-success .redeem-icon {
+        background: #133a2a;
+        color: #7fffc1;
+        border: 1px solid #2ea36e
+    }
+
+    .redeem-warning .redeem-icon {
+        background: #3d2e12;
+        color: #ffd66e;
+        border: 1px solid #a57a12
+    }
+
+    .redeem-error .redeem-icon {
+        background: #432028;
+        color: #ffb3be;
+        border: 1px solid #b34a5a
+    }
+</style>
+
+<div id="acc">
+    <div class="container-xxl py-4">
+        <h2 class="mb-4">Account Overview</h2>
+        <div class="row g-4">
+            @await Html.PartialAsync("~/Views/Shared/_AccountSideNav.cshtml")
+
+            <section class="col-12 col-lg-9">
+                <div class="row g-4">
+                    <div class="col-md-7">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="mb-3">Redeem a code</h5>
+                                <form id="redeemForm" method="post" action="@redeemEndpoint" class="d-flex gap-2">
+                                    @Html.AntiForgeryToken()
+                                    <input id="redeemInput" name="code" class="form-control" placeholder="XXXX-XXXX-XXXX-XXXX" />
+                                    <button class="btn btn-accent" type="submit">Redeem Code</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-5">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-3">Balance</h5>
+                                    <a href="@Url.Action("PaymentMethods", "Account")" class="small">Payment Methods</a>
+                                </div>
+                                <div class="display-6 fw-bold mb-0">@Curr()@balance.ToString("0.00")</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="mb-3">Your Information</h5>
+                                <dl class="row small mb-0">
+                                    <dt class="col-5">Name</dt>
+                                    <dd class="col-7">@Display(me?.FullName)</dd>
+                                    <dt class="col-5">Username</dt>
+                                    <dd class="col-7">@me?.UserName</dd>
+                                    <dt class="col-5">Email</dt>
+                                    <dd class="col-7">@me?.Email</dd>
+                                    <dt class="col-5">Phone</dt>
+                                    <dd class="col-7">@Display(me?.PhoneNumber)</dd>
+                                </dl>
+                                <div class="mt-3"><a href="@Url.Action("AccountDetails", "Account")" class="small">Account Details</a></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body d-flex align-items-start justify-content-between">
+                                <div class="pe-3">
+                                    <h5 class="mb-3">Security Checkup</h5>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div><span class="badge-pill @(me?.EmailConfirmed == true ? "badge-ok" : "badge-warn")">Email @(me?.EmailConfirmed == true ? "Verified" : "Not Verified")</span></div>
+                                        <div><span class="badge-pill @(me?.TwoFactorEnabled == true ? "badge-ok" : "badge-warn")">Authenticator @(me?.TwoFactorEnabled == true ? "Attached" : "Not Attached")</span></div>
+                                        <div><span class="badge-pill @(me?.PhoneNumberConfirmed == true ? "badge-ok" : "badge-warn")">Phone Number @(me?.PhoneNumberConfirmed == true ? "Verified" : "Not Verified")</span></div>
+                                    </div>
+                                    <div class="mt-2"><a href="@Url.Action("Settings", "Account")" class="small">Security</a></div>
+                                    @if (securityTips.Any())
+                                    {
+                                        <ul class="small mut mt-2 mb-0">
+                                            @foreach (var tip in securityTips)
+                                            {
+                                                <li>@tip</li>
+                                            }
+                                        </ul>
+                                    }
+                                </div>
+                                <svg class="sec-ring ms-3" viewBox="0 0 42 42" width="120" height="120" role="img" aria-label="Security score">
+                                    <circle class="bg" cx="21" cy="21" r="18" />
+                                    <circle class="fg" cx="21" cy="21" r="18" pathLength="100" style="stroke-dasharray:100; stroke-dashoffset:@(100 - securityScore);" />
+                                    <text class="txt" x="21" y="23">@securityScore%</text>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="mb-0">Subscriptions & Game Time</h5>
+                                    <a class="small" href="@Url.Action("Index", "Subscriptions")">Games & Subscriptions</a>
+                                </div>
+                                <div class="mut small">You don't have active subscriptions.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="mb-3">Your uploads</h5>
+                                <div class="row row-cols-4 g-2 mb-3" id="uploadsGrid">
+                                    @foreach (var u in uploads)
+                                    {
+                                        <div class="col">
+                                            <div class="upload-item">
+                                                <button type="button" class="btn p-0 border-0 pick-upload" data-path="@u" style="background:none;">
+                                                    <img src="@u" class="rounded border" alt="uploaded" />
+                                                </button>
+                                                <button type="button" class="upload-remove" data-path="@u" title="Remove" aria-label="Remove">&times;</button>
+                                            </div>
+                                        </div>
+                                    }
+                                    @if (!uploads.Any())
+                                    {
+                                        <div class="mut small">No uploads yet.</div>
+                                    }
+                                </div>
+
+                                <h6 class="mb-2">Upload your own</h6>
+                                <div id="dropzone" class="p-4 border rounded text-center" style="background:#20262d;border-color:var(--br)">
+                                    <div class="mb-2">Drag & drop an image here</div>
+                                    <div class="small mut">or</div>
+                                    <div class="mt-2">
+                                        <label class="btn btn-sm btn-ph mb-0" for="fileInput">Choose a file</label>
+                                        <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp" class="d-none" />
+                                    </div>
+                                    <div id="uploadStatus" class="small mt-2 mut"></div>
+                                </div>
+
+                                <h6 class="mt-4 mb-2">Choose a default avatar</h6>
+                                <div class="row row-cols-6 g-2">
+                                    @foreach (var f in defaults)
+                                    {
+                                        <div class="col">
+                                            <form method="post" action="@Url.Action("SetDefaultAvatar","Account")" class="m-0">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="file" value="@f" />
+                                                <button type="submit" class="btn p-0 border-0" title="Use @f" style="background:none;">
+                                                    <img src="/images/avatars/@f" class="rounded border" width="64" height="64" alt="avatar @f" />
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="mb-3">Actions</h5>
+                                <div class="actions-vertical">
+                                    <a class="btn btn-ph" href='@Url.Action("ChangePassword", "Account", new { username = me?.Email })'>Change Password</a>
+                                    <a class="btn btn-ph" href='@Url.Action("Overview", "Account")'>Transaction History</a>
+                                    <a class="btn btn-ph" href='@Url.Action("Settings", "Account")'>Settings</a>
+                                    <form id="logoutForm" method="post" action='@Url.Action("Logout","Account")'>
+                                        @Html.AntiForgeryToken()
+                                        <button class="btn btn-ph">Logout</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="mb-0">Recent Transactions</h5>
+                                    <a class="small" href='@Url.Action("Overview", "Account")'>View All</a>
+                                </div>
+
+                                @if (recent.Any())
+                                {
+                                    <div class="table-responsive">
+                                        <table class="table table-dark align-middle">
+                                            <thead>
+                                                <tr><th style="width:180px;">Date</th><th>Title</th><th style="width:140px;">Amount</th><th style="width:120px;">Status</th></tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var t in recent)
+                                                {
+                                                    var badge = t.Status switch
+                                                    {
+                                                        TransactionStatus.Complete => ("badge-ok", "Complete"),
+                                                        TransactionStatus.Pending => ("badge-warn", "Pending"),
+                                                        TransactionStatus.Failed => ("badge-bad", "Failed"),
+                                                        TransactionStatus.Refunded => ("badge-warn", "Refunded"),
+                                                        _ => ("badge-warn", t.Status.ToString())
+                                                    };
+                                                    <tr>
+                                                        <td>@t.CreatedAtUtc.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                                                        <td>@t.PurchaseTitle</td>
+                                                        <td>@Curr()@t.Amount.ToString("0.00")</td>
+                                                        <td><span class="badge-pill @badge.Item1">@badge.Item2</span></td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a class="btn btn-ph btn-sm @(currentPage <= 1 ? "disabled" : null)" href='@Url.Action("Overview", "Account", new { page = currentPage - 1 })'>Previous</a>
+                                        <span class="btn btn-warning btn-sm disabled">@(currentPage)</span>
+                                        <a class="btn btn-ph btn-sm @(currentPage >= totalPages ? "disabled" : null)" href='@Url.Action("Overview", "Account", new { page = currentPage + 1 })'>Next</a>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="mut">No transactions yet.</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="modal fade ph-modal" id="redeemResultModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 id="redeemModalTitle" class="redeem-title">
+                        <span id="redeemModalIcon" class="redeem-icon">!</span>
+                        <span id="redeemModalTitleText">Notice</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div id="redeemModalBody" class="modal-body"></div>
+                <div class="modal-footer"><button type="button" class="btn btn-ph" data-bs-dismiss="modal">Ok</button></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const redeemForm = document.getElementById('redeemForm');
+            const redeemInput = document.getElementById('redeemInput');
+
+            function showRedeemModal(kind, title, message) {
+                const modalEl = document.getElementById('redeemResultModal');
+                const titleText = document.getElementById('redeemModalTitleText');
+                const iconEl = document.getElementById('redeemModalIcon');
+                const bodyEl = document.getElementById('redeemModalBody');
+                modalEl.classList.remove('redeem-success', 'redeem-warning', 'redeem-error');
+                if (kind === 'success') modalEl.classList.add('redeem-success');
+                else if (kind === 'warning') modalEl.classList.add('redeem-warning');
+                else modalEl.classList.add('redeem-error');
+                titleText.textContent = title; bodyEl.textContent = message;
+                iconEl.textContent = kind === 'success' ? '✓' : (kind === 'warning' ? '!' : '×');
+                new bootstrap.Modal(modalEl).show();
+            }
+
+            if (redeemForm) {
+                redeemForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    const code = (redeemInput?.value || '').trim();
+                    if (!code) return;
+                    const fd = new FormData(redeemForm);
+                    try {
+                        const resp = await fetch('@redeemEndpoint', { method: 'POST', body: fd, credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                        const ct = resp.headers.get('content-type') || '';
+                        const res = ct.includes('application/json') ? await resp.json() : { ok: resp.ok, reason: resp.ok ? 'success' : 'invalid' };
+                        if (res.ok === true) { showRedeemModal('success', 'Code Applied', 'Your code has been successfully applied.'); redeemInput.value = ''; return; }
+                        if (res.reason === 'already-used' || res.reason === 'already') { showRedeemModal('warning', 'Code Already Used', 'This code has already been redeemed on your account.'); return; }
+                        if (res.reason === 'invalid' || res.reason === 'empty' || res.reason === 'expired' || res.reason === 'disabled') { showRedeemModal('error', 'Invalid Code', 'The code is invalid, expired or inactive.'); return; }
+                        showRedeemModal('error', 'Something Went Wrong', 'Please try again in a moment.');
+                    } catch { showRedeemModal('error', 'Network Error', 'Could not contact the server. Please try again.'); }
+                });
+            }
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            const headers = token ? { 'X-Requested-With': 'XMLHttpRequest', 'RequestVerificationToken': token } : { 'X-Requested-With': 'XMLHttpRequest' };
+            const dz = document.getElementById('dropzone');
+            const fi = document.getElementById('fileInput');
+            const status = document.getElementById('uploadStatus');
+            const grid = document.getElementById('uploadsGrid');
+
+            function setStatus(msg, ok) { status.textContent = msg || ''; status.classList.toggle('text-success', !!ok); status.classList.toggle('text-danger', ok === false); }
+
+            async function upload(file) {
+                if (!file) return; setStatus('Uploading...');
+                const fd = new FormData(); fd.append('file', file); if (token) fd.append('__RequestVerificationToken', token);
+                try {
+                    const r = await fetch('@uploadEndpoint', { method: 'POST', body: fd, credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                    const d = await r.json(); if (!d.ok) throw new Error(d.msg || 'Upload failed'); setStatus('');
+                    const col = document.createElement('div'); col.className = 'col';
+                    col.innerHTML = `<div class="upload-item">
+                        <button type="button" class="btn p-0 border-0 pick-upload" data-path="${d.path}" style="background:none;">
+                          <img src="${d.path}" class="rounded border" alt="uploaded" />
+                        </button>
+                        <button type="button" class="upload-remove" data-path="${d.path}" title="Remove">&times;</button>
+                      </div>`;
+                    grid.classList.remove('d-none'); grid.prepend(col); bindUploadItem(col);
+                } catch (e) { setStatus(e.message, false); }
+            }
+
+            dz?.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('ph-dropzone--over'); });
+            dz?.addEventListener('dragleave', () => dz.classList.remove('ph-dropzone--over'));
+            dz?.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('ph-dropzone--over'); upload(e.dataTransfer.files?.[0]); });
+            fi?.addEventListener('change', () => upload(fi.files?.[0]));
+
+            function bindUploadItem(root) {
+                root.querySelector('.pick-upload')?.addEventListener('click', async (e) => {
+                    const path = e.currentTarget.getAttribute('data-path');
+                    const fd = new FormData(); fd.append('path', path); if (token) fd.append('__RequestVerificationToken', token);
+                    await fetch('@setUploadedEndpoint', { method: 'POST', body: fd, credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                });
+                root.querySelector('.upload-remove')?.addEventListener('click', async (e) => {
+                    const path = e.currentTarget.getAttribute('data-path');
+                    const r = await fetch('@deleteUploadEndpoint?path=' + encodeURIComponent(path), { method: 'POST', credentials: 'same-origin', headers });
+                    if (r.ok) { root.remove(); }
+                });
+            }
+            document.querySelectorAll('#uploadsGrid .col').forEach(bindUploadItem);
+        })();
+    </script>
+}

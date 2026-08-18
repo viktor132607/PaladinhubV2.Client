@@ -1,0 +1,77 @@
+@using PaladinHub.Data.Entities
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<User> UserManager
+@{
+    ViewData["Title"] = "Account Details";
+    var me = await UserManager.GetUserAsync(User);
+}
+<div class="container py-4">
+    <div class="row g-4">
+        <aside class="col-12 col-lg-3">
+            @await Html.PartialAsync("_AccountNav", "details")
+        </aside>
+
+        <main class="col-12 col-lg-9">
+            <h2 class="mb-3">Account Details</h2>
+
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between">
+                    <strong>Personal Information</strong>
+                    <a asp-action="EditProfile" class="text-decoration-none">Update</a>
+                </div>
+                <div class="card-body">
+                    <div class="row small">
+                        <div class="col-4 text-muted">Name</div>
+                        <div class="col-8">@(!string.IsNullOrWhiteSpace(me?.FullName) ? me!.FullName : "—")</div>
+                        <div class="col-4 text-muted mt-2">Country / Region</div>
+                        <div class="col-8 mt-2">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between">
+                    <strong>Email</strong>
+                    <a asp-action="EditEmail" class="text-decoration-none">Update</a>
+                </div>
+                <div class="card-body small">@me?.Email</div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between">
+                    <strong>Phone Number</strong>
+                    <a asp-action="EditPhone" class="text-decoration-none">Update</a>
+                </div>
+                <div class="card-body d-flex justify-content-between small">
+                    <span>@(string.IsNullOrWhiteSpace(me?.PhoneNumber) ? "—" : me!.PhoneNumber)</span>
+                    @if (!string.IsNullOrWhiteSpace(me?.PhoneNumber))
+                    {
+                        <a asp-action="RemovePhone" class="text-decoration-none">Remove</a>
+                    }
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between">
+                    <strong>BattleTag</strong>
+                    <a asp-action="EditBattleTag" class="text-decoration-none">Update</a>
+                </div>
+                <div class="card-body small">
+                    @(me?.UserName ?? "—")
+                    <span class="ms-2"><a href="#" class="text-decoration-none">BattleTag Checker</a></span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <strong>Address Book</strong>
+                    <a asp-action="AddAddress" class="text-decoration-none">Add New Address</a>
+                </div>
+                <div class="card-body small d-flex justify-content-between">
+                    <span>Primary</span>
+                    <a asp-action="EditAddress" class="text-decoration-none">Update</a>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>

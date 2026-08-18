@@ -1,0 +1,301 @@
+@inherits PaladinHub.Helpers.SpellsAndItemsView
+@model PaladinHub.Models.CombinedViewModel
+@{
+	ViewData["Title"] = "Protection Paladin Consumables";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@*<link rel="stylesheet" href="~/css/Protection/ProtectionOverview.css" />*@
+
+<body>
+	<div class="outer-wrapper">
+		<div class="page-container">
+
+			<div class="main-wrapper">
+
+
+					<h2>War Within Season 2</h2>
+
+					<p>Protection Paladin remains a powerhouse healer in both dungeons and raids. Our strengths lie in high throughput, extremely durable survivability, and strong utility offerings. In The War Within, we're looking at a very solid toolkit with minor talent shifts but the core gameplay remains familiar and strong.</p>
+
+				<div class="content-columns">
+					<div>
+						<h2>Strengths</h2>
+						<ul>
+							<li>Very strong single-target and group healing output.</li>
+							<li>Excellent defensives and personal survivability.</li>
+							<li>High mobility through Divine Steed and instant casts.</li>
+							<li>Powerful utility tools like Lay on Hands, Blessing of Freedom, and Cleanse.</li>
+							<li>Beacon healing makes damage patterns more manageable.</li>
+						</ul>
+					</div>
+					<div>
+						<h2>Weaknesses</h2>
+						<ul>
+							<li>Somewhat reliant on good positioning and being in melee range.</li>
+							<li>Resource (Protection Power) management is important and can be punishing if neglected.</li>
+							<li>Limited raid-wide cooldowns compared to some other healers.</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="separator-container">
+					<img src="~/images/Separators/D3.png" alt="Separator 3" class="separator" />
+				</div>
+
+				<h2>Protection Paladin Talent Builds</h2>
+				<h2 class="hero-talents-title">Hero Talents</h2>
+
+				<div class="content-columns">
+					<div class="hero-talent-entry">
+						<img src="~/images/Herald.jpg" alt="Herald of the Sun" />
+						<h2>Herald Of The Sun</h2>
+						<ul>
+							<li>Strong Beacon synergy.</li>
+							<li>Excellent spot healing burst.</li>
+							<li>Boosts Protection Shock uptime and value.</li>
+						</ul>
+					</div>
+					<div class="hero-talent-entry">
+						<img src="~/images/Lightsmith.jpg" alt="Lightsmith" />
+						<h2>Lightsmith</h2>
+						<ul>
+							<li>Empowers group healing & shielding.</li>
+							<li>More forgiving ranged options.</li>
+							<li>Excellent raid-wide mitigation tools.</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="separator-container">
+					<img src="~/images/Separators/D4.png" alt="Separator 4" class="separator" />
+				</div>
+
+				<h2>Playstyle Overview</h2>
+				<p>Protection Paladins focus on generating Protection Power through abilities like Protection Shock and Crusader Strike, and spending it on powerful finishers like Word of Glory or Light of Dawn. Melee uptime is key for maximizing your generation and efficiency, but you have strong ranged options when needed.</p>
+
+				<div class="separator-container">
+					<img src="~/images/Separators/D5.png" alt="Separator 5" class="separator" />
+				</div>
+
+				<h2>Protection Paladin Changes in Patch 11.1.5</h2>
+				<p>Protection Paladins saw some talent reworks and minor tuning in 11.1.5, but their playstyle remains largely intact. Daybreak, Infusion, and Beacon interactions are even more emphasized, rewarding smart Protection Power management.</p>
+
+				<div class="separator-container">
+					<img src="~/images/Separators/D1.png" alt="Separator 1" class="separator" />
+				</div>
+				<h2>Key Talents and Changes</h2>
+				<ul>
+					<li><strong>Infusion of Light</strong> procs are crucial for free and empowered heals.</li>
+					<li><strong>Barrier of Faith</strong> remains a strong tool for focused healing targets.</li>
+					<li><strong>Daybreak</strong> lets you reset your Beacon healing, adding burst power during key moments.</li>
+					<li><strong>Hand of Divinity</strong> improves your healing rotation significantly.</li>
+				</ul>
+
+				<div class="separator-container">
+					<img src="~/images/Separators/D1.png" alt="Separator 1" class="separator" />
+				</div>
+
+				<h2>Stat Priority</h2>
+				<p><strong>Primary Stat:</strong> Intellect</p>
+				<p><strong>Secondary Stats:</strong> Haste &gt; Crit &gt; Versatility &gt; Mastery</p>
+
+				<h2>Summary</h2>
+				<p>Overall, Protection Paladin is in a very strong spot in <em>The War Within</em>. It's a top-tier option for players who enjoy a mobile, aggressive healing style with a ton of clutch playmaking potential through smart cooldown use and positioning.</p>
+
+				<div class="separator-container">
+					<img src="~/images/Separators/D2.png" alt="Separator 2" class="separator" />
+				</div>
+
+				<h1>Core Build - The Faithful Martyr</h1>
+				<h2>Raiding & Mythic+ Protection Builds for The War Within Season 2</h2>
+
+				<p>The Faithful Martyr is an aggressive, powerful instant cast-focused build that will usher in a new golden age for Protection Paladins in Season 2. In Mythic+, you spend Protection Power on Eternal Flame for healing and Shield of the Righteous for damage, while in raid you'll use both Eternal Flame and Light of Dawn depending on if you want AoE or spot healing.</p>
+
+				<div class="separator-container">
+					<img src="~/images/Separators/D1.png" alt="Separator 1" class="separator" />
+				</div>
+
+				<h2>Mythic+ Version</h2>
+				<p>In Mythic+ you will spend Protection Power on Eternal Flame for healing and Shield of the Righteous for damage. Here is what your talent priority will look like:</p>
+
+				<div class="build-images">
+					<img src="~/images/TalentBuildsProtection/the-faithful-martyr-mplus-s2-v1.jpg" alt="Mythic+ Build" />
+				</div>
+
+				<div class="content-columns">
+					<div>
+						<ul>
+							<li>1. Divine Toll</li>
+							<li>2. Protection Prism</li>
+							<li>3. Spend Protection Power (don’t overcap)</li>
+							<li>4. Protection Shock (2 Charges)</li>
+							<li>5. Judgment</li>
+						</ul>
+					</div>
+					<div>
+						<ul>
+							<li>6. Hammer of Wrath</li>
+							<li>7. Protection Shock (1 Charge)</li>
+							<li>8. Crusader Strike</li>
+							<li>9. Keep your Consecration down at all times</li>
+							<li>10. Protection Light with Divine Favor for spot healing</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="separator-container">
+					<img src="~/images/Separators/D2.png" alt="Separator 2" class="separator" />
+				</div>
+
+				<h2>Raid Version</h2>
+				<p>In raid, this build plays very similar to Mythic+, and your beacons should similarly go on either high HPS requirement tanks like Brewmasters, or squishy ranged like hunters/evokers/mages.</p>
+
+				<div class="build-images">
+					<img src="~/images/TalentBuildsProtection/the-faithful-martyr-raid-s2-v2.jpg" alt="Raid Build" />
+				</div>
+
+				<div class="content-columns">
+					<div>
+						<ul>
+							<li>1. Protection Prism</li>
+							<li>2. Spend Protection Power (don’t overcap)</li>
+							<li>3. Protection Shock</li>
+							<li>4. Judgment</li>
+						</ul>
+					</div>
+					<div>
+						<ul>
+							<li>5. Crusader Strike</li>
+							<li>6. Protection Light w/ Infusion (if needed for spot healing)</li>
+							<li>7. Hammer of Wrath</li>
+							<li>8. Consecration</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="separator-container">
+					<img src="~/images/Separators/D3.png" alt="Separator 3" class="separator" />
+				</div>
+
+				<div class="tier-set-section">
+					<h3>Season 2 Tier Set Bonuses</h3>
+					<ul class="tier-set-list">
+						<li><img src="~/images/TierSets/undermine-tier-helm.png" alt="Helmet" class="tier-set-img" />Helmet</li>
+						<li><img src="~/images/TierSets/undermine-tier-shoulders.png" alt="Shoulders" class="tier-set-img" />Shoulders</li>
+						<li><img src="~/images/TierSets/undermine-tier-chest.png" alt="Chestplate" class="tier-set-img" />Chestplate</li>
+						<li><img src="~/images/TierSets/undermine-tier-gloves.png" alt="Gloves" class="tier-set-img" />Gloves</li>
+						<li><img src="~/images/TierSets/undermine-tier-pants.png" alt="Pants" class="tier-set-img" />Pants</li>
+					</ul>
+				</div>
+
+				<div class="separator-container">
+					<img src="~/images/Separators/D4.png" alt="Separator 4" class="separator" />
+				</div>
+
+				<h2>Protection Paladin Gear Cheat Sheet</h2>
+
+
+
+				<section>
+					<div class="gear-container">
+						<div class="talent-wrapper">
+
+							<div class="talent-header">
+								<div class="spec-title">
+									<img src="path-to-paladin-icon.png" alt="Protection Paladin Icon" class="spec-icon">
+									<span>Protection Paladin</span>
+								</div>
+								<div class="talent-modes">
+									<button class="mode-button">Raid</button>
+									<button class="mode-button active">Mythic+</button>
+									<button class="mode-button">Delves</button>
+
+
+
+								</div>
+							</div>
+						</div>
+
+						<div class="stat-priority">
+							<strong>Stat Priority:</strong>
+							<span class="strength">Strength</span> >
+							<span class="haste">Haste</span> >
+							<span class="mastery">Mastery</span> >
+							<span class="crit">Crit</span> =
+							<span class="vers">Versatility</span>
+						</div>
+
+						<div class="gear-section">
+							<div class="section-title">Weapons</div>
+							<div class="gear-split">
+								<div>
+									<div class="label">Best in Slot</div>
+									<img src="path-to-icon1.png" alt="Weapon 1">
+									<img src="path-to-icon2.png" alt="Weapon 2">
+									<img src="path-to-icon3.png" alt="Weapon 3">
+								</div>
+								<div>
+									<div class="label">Alternatives</div>
+									<img src="path-to-icon4.png" alt="Alt Weapon 1">
+									<img src="path-to-icon5.png" alt="Alt Weapon 2">
+								</div>
+							</div>
+						</div>
+
+						<div class="gear-section">
+							<div class="section-title">Trinkets</div>
+							<div class="gear-split">
+								<div>
+									<div class="label">Best in Slot</div>
+									<img src="path-to-trinket1.png" alt="Trinket 1">
+									<img src="path-to-trinket2.png" alt="Trinket 2">
+								</div>
+								<div>
+									<div class="label">Alternatives</div>
+									<img src="path-to-trinket3.png" alt="Trinket 3">
+									<img src="path-to-trinket4.png" alt="Trinket 4">
+								</div>
+							</div>
+						</div>
+
+						<div class="gear-section">
+							<div class="section-title">Consumables</div>
+							<div class="gear-split">
+								<img src="path-to-consumable1.png" alt="Potion 1">
+								<img src="path-to-consumable2.png" alt="Flask">
+								<img src="path-to-consumable3.png" alt="Food">
+							</div>
+						</div>
+
+						<div class="gear-section">
+							<div class="section-title">Corruption</div>
+							<div class="gear-split">
+								<div class="label">Best in Slot</div>
+								<img src="path-to-corruption1.png" alt="Corruption 1">
+								<img src="path-to-corruption2.png" alt="Corruption 2">
+							</div>
+						</div>
+
+						<div class="gear-section">
+							<div class="section-title">Tier</div>
+							<div class="gear-split">
+								<div class="label">Best in Slot</div>
+								<img src="path-to-tier1.png" alt="Tier 1">
+								<img src="path-to-tier2.png" alt="Tier 2">
+								<img src="path-to-tier3.png" alt="Tier 3">
+								<img src="path-to-tier4.png" alt="Tier 4">
+								<img src="path-to-tier5.png" alt="Tier 5">
+							</div>
+						</div>
+
+						<div class="tier-bonus">
+							<strong>2 Set:</strong> Each time you take damage you have a chance to activate Luck of the Draw / causing you to cast Guardian of Ancient Kings for 4.0 sec. Your damage done is increased by 15% for 10 sec after Luck of the Draw! activates.<br><br>
+							<strong>4 Set:</strong> While you have Luck of the Draw / Shield of the Righteous refunds 1-3 Protection Power and extends the duration of Luck of the Draw! by 0.5 sec, up to 10 sec.
+						</div>
+					</div>
+				</section>
+
+			</div>
+		</div>
+	</div>
+</body>

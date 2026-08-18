@@ -1,0 +1,15 @@
+@model dynamic
+@{
+    var id = (string)(Model?.SectionId ?? $"block-buildmenu-{Guid.NewGuid():N}");
+    var treeKey = (string)(Model?.TreeKey ?? "paladin");
+    var builds = (IEnumerable<dynamic>)(Model?.Builds ?? new List<dynamic>()); // { Name, IsDefault }
+    var selected = (string)(Model?.Selected ?? "");
+}
+<section id="@id" class="build-tabs" data-tree-key="@treeKey">
+    @foreach (var b in builds)
+    {
+        string name = b?.Name ?? "Build";
+        bool isSel = !string.IsNullOrEmpty(selected) ? string.Equals(name, selected, StringComparison.OrdinalIgnoreCase) : (bool)(b?.IsDefault ?? false);
+        <a href="?build=@name" class="build-tab @(isSel ? "active" : "")" data-build-name="@name">@name</a>
+    }
+</section>

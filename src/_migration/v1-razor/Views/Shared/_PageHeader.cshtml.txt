@@ -1,0 +1,135 @@
+@model PaladinHub.Models.CombinedViewModel
+
+<div class="outer-wrapper">
+    <div class="page-container">
+
+        @* COVER IMAGE *@
+        @if (!string.IsNullOrEmpty(Model.CoverImage))
+        {
+            <div class="image-cover-container">
+                <img src="@Model.CoverImage" alt="Cover" class="image-cover" />
+            </div>
+        }
+
+        <div class="main-wrapper">
+            @if (User.IsInRole("Admin") && ViewData["EditPageUrl"] is string editUrl)
+            {
+                <style>
+                    .edit-overlay {
+                        position: fixed;
+                        inset: 0;
+                        background: rgba(0,0,0,.7);
+                        display: none;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 999999;
+                    }
+
+                        .edit-overlay img {
+                            max-height: 80vh;
+                            max-width: 80vw;
+                            border-radius: 8px;
+                            box-shadow: 0 10px 25px rgba(0,0,0,.6);
+                        }
+
+                    .edit-close {
+                        position: fixed;
+                        top: 20px;
+                        right: 30px;
+                        font-size: 2rem;
+                        color: #fff;
+                        cursor: pointer;
+                        user-select: none;
+                    }
+                </style>
+
+                <div class="position-fixed" style="left:80px; bottom:80px; z-index:1050;">
+                    <a id="btnEditPopup" href="#" class="btn btn-warning btn-todo-hover">
+                        <i class="fa fa-pen me-1"></i>Edit Page
+                    </a>
+                </div>
+
+                <div id="editOverlay" class="edit-overlay" aria-hidden="true">
+                    <span class="edit-close" id="editClose">×</span>
+                    <img id="editImg" src="@Url.Content("~/images/WorkInProgress.jpg")" alt="Work in progress">
+                </div>
+
+                <script>
+                    (function(){
+                        const btn = document.getElementById('btnEditPopup');
+                        const ovl = document.getElementById('editOverlay');
+                        const img = document.getElementById('editImg');
+                        const closeBtn = document.getElementById('editClose');
+
+                        function show(){ ovl.style.display = 'flex'; ovl.setAttribute('aria-hidden','false'); }
+                        function hide(){ ovl.style.display = 'none'; ovl.setAttribute('aria-hidden','true'); }
+
+                        btn.addEventListener('click', function(e){ e.preventDefault(); show(); });
+                        closeBtn.addEventListener('click', hide);
+                        ovl.addEventListener('click', hide);
+                        img.addEventListener('click', function(e){ e.stopPropagation(); }); // да не затваря при клик върху самата снимка
+                        document.addEventListener('keydown', function(e){ if(e.key === 'Escape') hide(); });
+                    })();
+                </script>
+            }
+
+            <br>
+            @if (!string.IsNullOrEmpty(Model.PageTitle))
+            {
+                <h1 class="page-title">@Model.PageTitle</h1>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.PageText))
+            {
+                <p class="page-text">@Model.PageText</p>
+            }
+
+            @if (Model.CurrentSectionButtons?.Any() == true)
+            {
+                <div class="section-title" style="font-size: 1.8em;text-align: center;  color: white;">Current Sections :
+                </div>
+                <div class="section-grid">
+                    @foreach (var btn in Model.CurrentSectionButtons)
+                    {
+                        <a href="@btn.Url" class="section-cell">
+                            <span class="icon" style="background-image: url('@btn.Icon');"></span>
+                            <span>@btn.Text</span>
+                        </a>
+                    }
+                </div>
+            }
+
+            @if (Model.OtherSectionButtons?.Any() == true)
+            {
+                <div class="section-title" style="font-size: 1.8em;text-align: center;  color: white;">Other Sections :
+                </div>
+                <div class="section-grid">
+                    @foreach (var btn in Model.OtherSectionButtons)
+                    {
+                        <a href="@btn.Url" class="section-cell">
+                            <span class="icon" style="background-image: url('@btn.Icon');"></span>
+                            <span>@btn.Text</span>
+                        </a>
+                    }
+                </div>
+            }
+
+            <div class="separator-container">
+                <img src="~/images/Separators/D4.png" alt="Separator 4" class="separator" />
+            </div>
+            <br>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const currentHash = window.location.hash;
+        if (!currentHash) return;
+
+        document.querySelectorAll(".section-cell").forEach(el => {
+            if (el.getAttribute("href") === currentHash) {
+                el.classList.add("active");
+            }
+        });
+    });
+</script>

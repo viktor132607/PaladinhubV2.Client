@@ -1,0 +1,16 @@
+@model dynamic
+@{
+    var id = (string)(Model?.SectionId ?? $"block-cols-{Guid.NewGuid():N}");
+    int cols = (int?)(Model?.Columns) ?? 2; cols = Math.Clamp(cols, 2, 4);
+    var parts = (IEnumerable<string>)(Model?.MarkdownPerColumn ?? new List<string>());
+}
+<section id="@id" class="columns-text columns-@cols">
+    <div class="columns-wrapper">
+        @foreach (var md in parts)
+        {
+            <div class="col">
+                @Html.SafeHtml(md ?? "")
+            </div>
+        }
+    </div>
+</section>

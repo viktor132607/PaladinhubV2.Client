@@ -1,0 +1,205 @@
+@model PaladinHub.Models.TransactionHistoryViewModel
+@{
+    ViewData["Title"] = "Transaction History";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Същите токени/тема като в Connections */
+    #acc {
+        --bg: #0f1216;
+        --panel: #1a1f24;
+        --panel2: #20262d;
+        --br: #313a45;
+        --txt: #e9ecef;
+        --mut: #a8b0bd;
+        --link: #8ab4ff
+    }
+
+    #acc {
+        background: var(--bg);
+        min-height: calc(100vh - 56px);
+        color: var(--txt)
+    }
+
+        #acc .card {
+            background: var(--panel);
+            border: 1px solid var(--br)
+        }
+
+        #acc .mut {
+            color: var(--mut) !important
+        }
+
+    /* Нав табове и таблица в тъмна тема */
+    .tabs-dark .nav-link {
+        color: #cfd6df;
+    }
+
+        .tabs-dark .nav-link.active {
+            background: #1b2127;
+            border-color: #2f3842 #2f3842 #1b2127;
+            color: #fff;
+        }
+
+    .tx-table thead th {
+        border-color: #2a323c !important;
+        background: #171c21;
+        color: #cfd6df;
+        font-weight: 600;
+    }
+
+    .tx-table tbody td {
+        border-color: #262e38 !important;
+        vertical-align: middle;
+    }
+
+    .tx-table .badge {
+        font-weight: 700;
+        padding: .35rem .6rem;
+        border-radius: .5rem;
+        border: 1px solid transparent;
+    }
+
+    .tx-badge-complete {
+        background: #163620;
+        color: #7dff9a;
+        border-color: #265b39
+    }
+
+    .tx-badge-pending {
+        background: #3a3009;
+        color: #ffd66e;
+        border-color: #8a6d10
+    }
+
+    .tx-badge-failed {
+        background: #3a1212;
+        color: #ff8e8e;
+        border-color: #7a2b2b
+    }
+
+    .tx-badge-refunded {
+        background: #2c2f36;
+        color: #cfd6df;
+        border-color: #4a515b
+    }
+
+    .pagination .page-link {
+        background: #151a1f;
+        border-color: #2c343d;
+        color: #cfd6df;
+    }
+
+    .pagination .page-item.active .page-link {
+        background: #284b7a;
+        border-color: #3a5c8a;
+        color: #fff;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        background: #0f1216;
+        color: #6c757d;
+    }
+</style>
+
+<div id="acc">
+    <div class="container-xxl py-4">
+        <h2 class="mb-3">Transaction History</h2>
+
+        <div class="row g-4">
+            @await Html.PartialAsync("~/Views/Shared/_AccountSideNav.cshtml")
+
+            <section class="col-12 col-lg-9">
+                <ul class="nav nav-tabs mb-3 tabs-dark">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Purchases</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" tabindex="-1" aria-disabled="true">Gift Claims</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" tabindex="-1" aria-disabled="true">Virtual Wallet</a>
+                    </li>
+                    <li class="ms-auto nav-item">
+                        <form method="get" asp-action="TransactionHistory" asp-controller="Account" class="d-flex align-items-center gap-2">
+                            <label class="mut">Region</label>
+                            <select name="region" class="form-select form-select-sm" style="width:auto" onchange="this.form.submit()">
+                                <option value="Europe" selected="@(Model.Region == "Europe")">Europe</option>
+                                <option value="Americas" selected="@(Model.Region == "Americas")">Americas</option>
+                                <option value="Asia" selected="@(Model.Region == "Asia")">Asia</option>
+                                <option value="All" selected="@(Model.Region == "All")">All</option>
+                            </select>
+                            <input type="hidden" name="page" value="1" />
+                        </form>
+                    </li>
+                </ul>
+
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table mb-0 tx-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 18%">Date</th>
+                                        <th>Purchase</th>
+                                        <th style="width: 14%">Total</th>
+                                        <th style="width: 14%">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Items.Count == 0)
+                                    {
+                                        <tr><td colspan="4" class="text-center py-4 mut">No transactions yet.</td></tr>
+                                    }
+                                    else
+                                    {
+                                        foreach (var x in Model.Items)
+                                        {
+                                            <tr>
+                                                <td>@x.DateUtc.ToLocalTime().ToString("d MMM yyyy")</td>
+                                                <td>@x.Purchase</td>
+                                                <td>@x.Total</td>
+                                                <td>
+                                                    @{
+                                                        var s = (x.Status ?? "").Trim();
+                                                        var cls = s switch
+                                                        {
+                                                            "Complete" => "tx-badge-complete",
+                                                            "Pending" => "tx-badge-pending",
+                                                            "Failed" => "tx-badge-failed",
+                                                            "Refunded" => "tx-badge-refunded",
+                                                            _ => "badge"
+                                                        };
+                                                    }
+                                                    <span class="badge @cls">@s</span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <nav class="mt-3">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="TransactionHistory" asp-route-region="@Model.Region" asp-route-page="@(Model.Page - 1)">Previous</a>
+                        </li>
+                        @for (int p = 1; p <= Model.TotalPages; p++)
+                        {
+                            <li class="page-item @(Model.Page == p ? "active" : "")">
+                                <a class="page-link" asp-action="TransactionHistory" asp-route-region="@Model.Region" asp-route-page="@p">@p</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="TransactionHistory" asp-route-region="@Model.Region" asp-route-page="@(Model.Page + 1)">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </section>
+        </div>
+    </div>
+</div>

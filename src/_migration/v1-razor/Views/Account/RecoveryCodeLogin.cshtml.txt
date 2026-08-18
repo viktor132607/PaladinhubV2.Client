@@ -1,0 +1,15 @@
+@{
+	ViewData["Title"] = "Recovery Code Login";
+	var returnUrl = Context.Request.Query["returnUrl"].ToString();
+}
+<div class="container py-5" style="max-width:480px;">
+	<h2 class="mb-3">Use a recovery code</h2>
+	<form method="post" asp-action="RecoveryCodeLogin" asp-route-returnUrl="@returnUrl">
+		@Html.AntiForgeryToken()
+		<div class="mb-3">
+			<label class="form-label">Recovery code</label>
+			<input name="recoveryCode" class="form-control" />
+		</div>
+		<button class="btn btn-warning w-100" type="submit">Continue</button>
+	</form>
+</div>

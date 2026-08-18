@@ -1,0 +1,91 @@
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model dynamic
+@{
+    var id = (string)(Model?.SectionId ?? $"block-generic-{Guid.NewGuid():N}");
+    var title = (string)(Model?.Title ?? "");
+    var columns = (IEnumerable<dynamic>)(Model?.Columns ?? new List<dynamic>()); // [{ Key, Title, Kind }]
+    var rows = (IEnumerable<dynamic>)(Model?.Rows ?? new List<dynamic>());
+}
+
+@functions {
+    static object GetValue(object row, string key)
+    {
+        if (row == null || string.IsNullOrWhiteSpace(key)) return null;
+
+        if (row is System.Collections.Generic.IDictionary<string, object> dict)
+        {
+            dict.TryGetValue(key, out var v);
+            return v;
+        }
+
+        var t = row.GetType();
+        var p = t.GetProperty(key);
+        if (p != null) return p.GetValue(row);
+
+        // Lower/upper fallback
+        p = t.GetProperty(key, System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+        if (p != null) return p.GetValue(row);
+
+        return null;
+    }
+
+    static string GetString(object v) => v?.ToString() ?? "";
+}
+
+<section id="@id" class="table-generic">
+    @if (!string.IsNullOrWhiteSpace(title))
+    {
+        <h3>@title</h3>
+    }
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                @foreach (var c in columns)
+                {
+                    string header = c?.Title?.ToString() ?? c?.title?.ToString() ?? c?.Key?.ToString() ?? c?.key?.ToString() ?? "";
+                    <th>@header</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in rows)
+            {
+                <tr>
+                    @foreach (var c in columns)
+                    {
+                        string key = c?.Key?.ToString() ?? c?.key?.ToString() ?? "";
+                        string kind = (c?.Kind?.ToString() ?? c?.kind?.ToString() ?? "text").ToLowerInvariant();
+                        var valObj = GetValue(row, key);
+
+                        <td>
+                            @if (kind == "item" || kind == "spell")
+                            {
+                                if (valObj is int iv)
+                                {
+                                    <span data- @kind-id ="@iv">@iv</span>
+                                }
+                                else if (valObj is long lv)
+                                {
+                                    <span data- @kind-id ="@lv">@lv</span>
+                                }
+                                else
+                                {
+                                    var name = GetString(valObj);
+                                    <span class="@kind-name">@name</span>
+                                }
+                            }
+                            else if (kind == "html")
+                            {
+                                @PaladinHub.Infrastructure.SafeHtmlExtensions.SafeHtml((IHtmlHelper)Html, GetString(valObj))
+                            }
+                            else
+                            {
+                                @PaladinHub.Infrastructure.SafeHtmlExtensions.SafeHtml((IHtmlHelper)Html, GetString(valObj))
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</section>

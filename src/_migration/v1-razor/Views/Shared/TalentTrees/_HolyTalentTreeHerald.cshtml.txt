@@ -1,0 +1,374 @@
+@inherits PaladinHub.Helpers.SpellsAndItemsView
+@*
+<div class="trees-container">
+
+
+	<section paladin>
+		<h2 style="text-align:center;margin-top: 20px">Paladin</h2>
+		<div class="paladin-tree-container">
+			<br>
+			<!-- Row 1 -->
+			@SpellNode("Lay on Hands", 2, 1, "square")
+			@SpellNode("Auras of the Resolute", 4, 1, "square")
+			@SpellNode("Hammer of Wrath", 6, 1, "square")
+
+			<!-- Row 2 -->
+			@SpellNode("Improved Cleanse", 1, 2)
+			@SpellNode("Empyreal Ward", 2, 2)
+			@SpellNode("Fist of Justice", 3, 2)
+			@SpellNode("Blinding Light", 5, 2, "hexagon")
+			@SpellNode("Turn Evil", 7, 2, "square")
+
+			<!-- Row 3 -->
+			@SpellNode("A Just Reward", 1, 3)
+			@SpellNode("Afterimage", 2, 3)
+			@SpellNode("Divine Steed", 4, 3, "square")
+			@SpellNode("Light's Countenance", 5, 3)
+			@SpellNode("Greater Judgment", 6, 3)
+			@SpellNode("Wrench Evil", 7, 3, "hexagon")
+
+			<!-- Row 4 -->
+			@SpellNode("Holy Reprieve", 1, 4)
+			@SpellNode("Cavalier", 3, 4)
+			@SpellNode("Divine Spurs", 4, 4)
+			@SpellNode("Blessing of Freedom", 5, 4, "hexagon")
+			@SpellNode("Rebuke", 7, 4, "square")
+
+			<!-- Row 5 -->
+			@SpellNode("Obduracy", 2, 5)
+			@SpellNode("Divine Toll", 4, 5, "square")
+			@SpellNode("Echoing Blessings", 5, 5, "hexagon")
+			@SpellNode("Sanctified Plates", 6, 5)
+			@SpellNode("Punishment", 7, 5)
+
+			<!-- Row 6 -->
+			@SpellNode("Divine Reach", 1, 6)
+			@SpellNode("Blessing of Sacrifice", 3, 6, "square")
+			@SpellNode("Quickened Invocation", 4, 6, "hexagon")
+			@SpellNode("Blessing of Protection", 5, 6, "square")
+			@SpellNode("Consecrated Ground", 7, 6)
+
+			<!-- Row 7 -->
+			@SpellNode("Holy Aegis", 2, 7)
+			@SpellNode("Sacrifice of the Just", 3, 7, "hexagon")
+			@SpellNode("Divine Purpose", 4, 7)
+			@SpellNode("Improved Blessing of Protection", 5, 7)
+			@SpellNode("Unbreakable Spirit", 6, 7)
+
+			<!-- Row 8 -->
+			@SpellNode("Lightforged Blessing", 1, 8)
+			@SpellNode("Lead the Charge", 2, 8)
+			@SpellNode("Righteous Protection", 3, 8, "hexagon")
+			@SpellNode("Holy Ritual", 4, 8)
+			@SpellNode("Blessed Calling", 5, 8)
+			@SpellNode("Inspired Guard", 6, 8)
+			@SpellNode("Judgment of Light", 7, 8)
+
+			<!-- Row 9 -->
+			@SpellNode("Faith's Armor", 1, 9)
+			@SpellNode("Stoicism", 2, 9)
+			@SpellNode("Seal of Might", 3, 9)
+			@SpellNode("Seal of the Crusader", 4, 9)
+			@SpellNode("Vengeful Wrath", 5, 9)
+			@SpellNode("Eye for an Eye", 6, 9)
+			@SpellNode("Golden Path", 7, 9, "hexagon")
+
+			<!-- Row 10 -->
+			@SpellNode("Of Dusk and Dawn", 2, 10)
+			@SpellNode("Lightbearer", 4, 10)
+			@SpellNode("Light's Revocation", 6, 10)
+
+
+			@Line(2, 1, 1, 2)
+			@Line(2, 1, 2, 2)
+			@Line(2, 1, 3, 2)
+			@Line(4, 1, 3, 2)
+			@Line(4, 1, 5, 2)
+			@Line(4, 1, 4, 3)
+			@Line(6, 1, 5, 2)
+			@Line(6, 1, 7, 2)
+			@Line(6, 1, 6, 3)
+
+			@Line(1, 2, 1, 3)
+			@Line(1, 2, 2, 3)
+			@Line(2, 2, 2, 3)
+			@Line(3, 2, 2, 3)
+			@Line(3, 2, 4, 3)
+			@Line(5, 2, 4, 3)
+			@Line(5, 2, 5, 3)
+			@Line(5, 2, 6, 3)
+			@Line(7, 2, 7, 3)
+
+			@Line(1, 3, 1, 4)
+			@Line(2, 3, 1, 4)
+			@Line(2, 3, 2, 5)
+			@Line(4, 3, 3, 4)
+			@Line(4, 3, 4, 4)
+			@Line(4, 3, 5, 4)
+			@Line(6, 3, 6, 5)
+			@Line(6, 3, 7, 4)
+			@Line(7, 3, 7, 4)
+
+			@Line(1, 4, 2, 5)
+			@Line(1, 4, 1, 6)
+			@Line(3, 4, 2, 5)
+			@Line(3, 4, 4, 5)
+			@Line(3, 4, 3, 6)
+			@Line(5, 4, 4, 5)
+			@Line(5, 4, 5, 5)
+			@Line(5, 4, 6, 5)
+			@Line(7, 4, 6, 5)
+			@Line(7, 4, 7, 5)
+
+			@Line(2, 5, 1, 6)
+			@Line(2, 5, 3, 6)
+			@Line(2, 5, 2, 7)
+			@Line(4, 5, 3, 6)
+			@Line(4, 5, 4, 6)
+			@Line(4, 5, 5, 6)
+			@Line(5, 5, 5, 6)
+			@Line(6, 5, 5, 6)
+			@Line(6, 5, 7, 6)
+			@Line(6, 5, 6, 7)
+			@Line(7, 5, 7, 6)
+
+			@Line(1, 6, 2, 7)
+			@Line(1, 6, 1, 8)
+			@Line(3, 6, 2, 7)
+			@Line(3, 6, 3, 7)
+			@Line(3, 6, 4, 7)
+			@Line(5, 6, 5, 7)
+			@Line(5, 6, 6, 7)
+			@Line(5, 6, 4, 7)
+			@Line(7, 6, 6, 7)
+			@Line(7, 6, 7, 8)
+
+			@Line(2, 7, 1, 8)
+			@Line(2, 7, 2, 8)
+			@Line(3, 7, 2, 8)
+			@Line(3, 7, 3, 8)
+			@Line(3, 7, 4, 8)
+			@Line(4, 7, 4, 8)
+			@Line(4, 7, 5, 8)
+			@Line(5, 7, 5, 8)
+			@Line(5, 7, 6, 8)
+			@Line(6, 7, 6, 8)
+			@Line(6, 7, 7, 8)
+
+			@Line(1, 8, 1, 9)
+			@Line(2, 8, 1, 9)
+			@Line(2, 8, 2, 9)
+			@Line(2, 8, 3, 9)
+			@Line(3, 8, 3, 9)
+			@Line(4, 8, 3, 9)
+			@Line(4, 8, 4, 9)
+			@Line(4, 8, 5, 9)
+			@Line(5, 8, 5, 9)
+			@Line(6, 8, 5, 9)
+			@Line(6, 8, 6, 9)
+			@Line(6, 8, 7, 9)
+			@Line(7, 8, 7, 9)
+
+			@Line(1, 9, 2, 10)
+			@Line(2, 9, 2, 10)
+			@Line(3, 9, 2, 10)
+			@Line(3, 9, 4, 10)
+			@Line(4, 9, 4, 10)
+			@Line(5, 9, 4, 10)
+			@Line(5, 9, 6, 10)
+			@Line(6, 9, 6, 10)
+			@Line(7, 9, 6, 10)
+
+		</div>
+
+	</section>
+	<section herald>
+		<h2 style="text-align:center;margin-top: 20px">Herald of the Sun</h2>
+		<div class="hero-tree-container">
+			<!-- Row 1 -->
+			@SpellNode("Dawnlight", 2, 1)
+
+			<!-- Row 2 -->
+			@SpellNode("Gleaming Rays", 1, 2)
+			@SpellNode("Eternal Flame", 2, 2)
+			@SpellNode("Luminosity", 3, 2)
+
+			<!-- Row 3 -->
+			@SpellNode("Will of the Dawn", 1, 3, "square")
+			@SpellNode("Blessing of An'she", 2, 3, "hexagon")
+			@SpellNode("Sun Sear", 3, 3)
+
+			<!-- Row 4 -->
+			@SpellNode("Aurora", 1, 4)
+			@SpellNode("Solar Grace", 2, 4)
+			@SpellNode("Second Sunrise", 3, 4)
+
+			<!-- Row 5 -->
+			@SpellNode("Sun's Avatar", 2, 5)
+
+			@Line(2, 1, 1, 2)
+			@Line(2, 1, 2, 2)
+			@Line(2, 1, 3, 2)
+			@Line(1, 2, 1, 3)
+			@Line(2, 2, 2, 3)
+			@Line(3, 2, 3, 3)
+			@Line(1, 3, 1, 4)
+			@Line(2, 3, 2, 4)
+			@Line(3, 3, 3, 4)
+			@Line(1, 4, 2, 5)
+			@Line(2, 4, 2, 5)
+			@Line(3, 4, 2, 5)
+
+		</div>
+	</section>
+	<section holy>
+		<h2 style="text-align:center;margin-top: 20px">Holy</h2>
+		<div class="holy-tree-container">
+			<br>
+			<!-- Row 1 -->
+			@SpellNode("Holy Shock", 5, 1, "square")
+
+			<!-- Row 2 -->
+			@SpellNode("Extrication", 4, 2)
+			@SpellNode("Light of Dawn", 6, 2, "square")
+
+			<!-- Row 3 -->
+			@SpellNode("Light's Conviction", 3, 3)
+			@SpellNode("Aura Mastery", 5, 3, "square")
+			@SpellNode("Beacon of the Lightbringer", 7, 3)
+
+			<!-- Row 4 -->
+			@SpellNode("Tower of Radiance", 2, 4)
+			@SpellNode("Tirion's Devotion", 4, 4)
+			@SpellNode("Unending Light", 6, 4)
+			@SpellNode("Awestruck", 8, 4)
+
+			<!-- Row 5 -->
+			@SpellNode("Moment of Compassion", 1, 5, "hexagon")
+			@SpellNode("Holy Prism", 3, 5, "hexagon")
+			@SpellNode("Protection of Tyr", 5, 5, "hexagon")
+			@SpellNode("Imbued Infusions", 7, 5)
+			@SpellNode("Light of the Martyr", 9, 5)
+
+			<!-- Row 6 -->
+			@SpellNode("Righteous Judgment", 2, 6)
+			@SpellNode("Divine Favor", 3, 6, "hexagon")
+			@SpellNode("Saved by the Light", 4, 6)
+			@SpellNode("Light's Protection", 6, 6)
+			@SpellNode("Overflowing Light", 7, 6)
+			@SpellNode("Shining Righteousness", 8, 6)
+
+			<!-- Row 7 -->
+			@SpellNode("Liberation", 1, 7)
+			@SpellNode("Commanding Light", 3, 7)
+			@SpellNode("Glistening Radiance", 4, 7)
+			@SpellNode("Breaking Dawn", 5, 7)
+			@SpellNode("Divine Revelations", 6, 7)
+			@SpellNode("Divine Glimpse", 7, 7)
+			@SpellNode("Bestow Light", 9, 7)
+
+			<!-- Row 8 -->
+			@SpellNode("Beacon of Faith", 2, 8, "hexagon")
+			@SpellNode("Empyrean Legacy", 3, 8)
+			@SpellNode("Veneration", 4, 8)
+			@SpellNode("Avenging Wrath", 6, 8, "hexagon")
+			@SpellNode("Power of the Silver Hand", 7, 8)
+			@SpellNode("Tyr's Deliverance", 8, 8, "square")
+
+			<!-- Row 9 -->
+			@SpellNode("Truth Prevails", 1, 9)
+			@SpellNode("Crusader's Might", 3, 9)
+			@SpellNode("Awakening", 5, 9, "hexagon")
+			@SpellNode("Reclamation", 7, 9)
+			@SpellNode("Relentless Inquisitor", 9, 9)
+
+			<!-- Row 10 -->
+			@SpellNode("Rising Sunlight", 2, 10)
+			@SpellNode("Glorious Dawn", 4, 10)
+			@SpellNode("Blessing of Summer", 5, 10, "hexagon")
+			@SpellNode("Inflorescence of the Sunwell", 6, 10)
+			@SpellNode("Boundless Salvation", 8, 10)
+
+
+			@Line(5, 1, 4, 2)
+			@Line(5, 1, 6, 2)
+			@Line(4, 2, 3, 3)
+			@Line(4, 2, 5, 3)
+			@Line(6, 2, 5, 3)
+			@Line(6, 2, 7, 3)
+
+			@Line(3, 3, 2, 4)
+			@Line(3, 3, 4, 4)
+			@Line(3, 3, 3, 5)
+			@Line(5, 3, 5, 5)
+			@Line(7, 3, 6, 4)
+			@Line(7, 3, 8, 4)
+			@Line(7, 3, 7, 5)
+
+			@Line(2, 4, 1, 5)
+			@Line(2, 4, 2, 6)
+			@Line(4, 4, 4, 6)
+			@Line(6, 4, 6, 6)
+			@Line(8, 4, 9, 5)
+			@Line(8, 4, 8, 6)
+
+			@Line(1, 5, 1, 7)
+			@Line(3, 5, 2, 6)
+			@Line(3, 5, 3, 6)
+			@Line(3, 5, 4, 6)
+			@Line(5, 5, 4, 6)
+			@Line(5, 5, 6, 6)
+			@Line(7, 5, 6, 6)
+			@Line(7, 5, 7, 6)
+			@Line(7, 5, 8, 6)
+			@Line(9, 5, 9, 7)
+
+			@Line(2, 6, 1, 7)
+			@Line(2, 6, 3, 7)
+			@Line(3, 6, 3, 7)
+			@Line(4, 6, 3, 7)
+			@Line(4, 6, 4, 7)
+			@Line(4, 6, 5, 7)
+			@Line(6, 6, 5, 7)
+			@Line(6, 6, 6, 7)
+			@Line(6, 6, 7, 7)
+			@Line(7, 6, 7, 7)
+			@Line(8, 6, 7, 7)
+
+			@Line(1, 7, 2, 8)
+			@Line(3, 7, 2, 8)
+			@Line(3, 7, 3, 8)
+			@Line(3, 7, 4, 8)
+			@Line(4, 7, 4, 8)
+			@Line(5, 7, 4, 8)
+			@Line(5, 7, 6, 8)
+			@Line(6, 7, 6, 8)
+			@Line(7, 7, 6, 8)
+			@Line(7, 7, 7, 8)
+			@Line(7, 7, 8, 8)
+			@Line(9, 7, 8, 8)
+
+			@Line(2, 8, 1, 9)
+			@Line(2, 8, 3, 9)
+			@Line(2, 8, 2, 10)
+			@Line(3, 8, 3, 9)
+			@Line(4, 8, 3, 9)
+			@Line(6, 8, 5, 9)
+			@Line(6, 8, 7, 9)
+			@Line(7, 8, 7, 9)
+
+			@Line(8, 8, 7, 9)
+			@Line(8, 8, 8, 10)
+			@Line(8, 8, 9, 9)
+
+			@Line(3, 9, 4, 10)
+			@Line(5, 9, 4, 10)
+			@Line(5, 9, 5, 10)
+			@Line(5, 9, 6, 10)
+			@Line(7, 9, 6, 10)
+
+		</div>
+	</section>
+
+</div>
+*@

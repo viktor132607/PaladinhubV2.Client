@@ -1,0 +1,4 @@
+
+export type TierItem = { id?: string | number; name?: string; type?: "item" | "spell" };
+export type TierListBlockProps = { id?: string; title?: string; tiers?: string[]; itemsByTier?: Record<string, TierItem[]> };
+export default function TierListBlock({ id, title = "Tier List", tiers = ["S", "A", "B", "C"], itemsByTier = {} }: TierListBlockProps) { return <section id={id} className="tier-list"><h3>{title}</h3>{tiers.map((tier) => <div key={tier} className="tier-row flex border-b border-slate-700"><div className="tier-label w-16 shrink-0 p-3 text-center font-bold">{tier}</div><div className="tier-items flex flex-wrap gap-2 p-3">{(itemsByTier[tier] ?? []).map((item, index) => <span key={item.id ?? `${item.name}-${index}`} className={`tier-item ${item.type ?? "item"}`}>{item.name ?? item.id ?? "Entry"}</span>)}</div></div>)}</section>; }

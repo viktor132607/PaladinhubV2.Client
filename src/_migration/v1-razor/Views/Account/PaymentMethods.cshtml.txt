@@ -1,0 +1,186 @@
+@using PaladinHub.Data.Entities
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Payment Methods";
+    ViewBag.Active = "PaymentMethods";
+
+    var balance = (decimal?)ViewBag.Balance ?? 0m;
+    var methods = (IEnumerable<PaymentMethod>?)ViewBag.PaymentMethods ?? Enumerable.Empty<PaymentMethod>();
+}
+
+<style>
+    #acc {
+        --bg: #0f1216;
+        --panel: #1a1f24;
+        --br: #313a45;
+        --txt: #e9ecef;
+        --mut: #a8b0bd;
+        background: var(--bg);
+        min-height: calc(100vh - 56px);
+        color: var(--txt);
+    }
+
+        #acc .card {
+            background: var(--panel);
+            border: 1px solid var(--br);
+        }
+
+    .method {
+        border-top: 1px solid #26303a;
+        padding: .9rem 0;
+    }
+
+        .method:first-child {
+            border-top: 0;
+        }
+
+    .mut {
+        color: var(--mut) !important;
+    }
+
+    .btn-linkish {
+        color: #8ab4ff;
+        text-decoration: none;
+        background: transparent;
+        border: 0;
+        padding: 0;
+        font: inherit;
+        cursor: pointer;
+    }
+
+        .btn-linkish:hover {
+            text-decoration: underline;
+        }
+
+    .disabled {
+        opacity: .6;
+        pointer-events: none;
+    }
+</style>
+
+<div id="acc">
+    <div class="container-xxl py-4">
+        <h2 class="mb-4">Payment Methods</h2>
+
+        <div class="row g-4">
+            @await Html.PartialAsync("~/Views/Shared/_AccountSideNav.cshtml")
+
+            <section class="col-12 col-lg-9">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-3">Wallet Balance</h5>
+                            <div class="small d-flex gap-3">
+                                <a class="btn-linkish" href="@Url.Action("Overview", "Account")">Redeem a code</a>
+                            </div>
+                        </div>
+                        <div class="display-6 fw-bold">$@balance.ToString("0.00")</div>
+
+                        <hr class="my-4" />
+
+                        <h6 class="mb-2">Add Funds</h6>
+                        <form class="row g-2" method="post" action="@Url.Action("DevTopUp","Account")">
+                            @Html.AntiForgeryToken()
+                            <div class="col-auto">
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" name="amount" step="0.01" min="0.01" class="form-control" placeholder="Amount (USD)" required />
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-primary" type="submit">Add Funds</button>
+                            </div>
+                        </form>
+                        <div class="small mut mt-2">Funds are stored as USD. Card charging integration can be connected later.</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-3">Your Payment Methods</h5>
+                            <a class="small btn-linkish" href="@Url.Action("AddPaymentMethod", "Account")">+ Add a new Payment Method</a>
+                        </div>
+
+                        @if (!methods.Any())
+                        {
+                            <div class="mut">You have no saved payment methods yet.</div>
+                        }
+                        else
+                        {
+                            foreach (var m in methods)
+                            {
+                                <div class="method d-flex justify-content-between align-items-center" data-row="@m.Id">
+                                    <div>
+                                        <strong>@m.Brand **** @m.Last4</strong>
+                                        <div class="small mut">@(!string.IsNullOrWhiteSpace(m.Label) ? m.Label : "Payment Method")</div>
+                                    </div>
+                                    <div class="small d-flex align-items-center">
+                                        @if (m.IsDefault)
+                                        {
+                                            <span class="text-success me-3 badge bg-transparent p-0">Default</span>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn-linkish me-3 btn-set-default" data-id="@m.Id">Set as default</button>
+                                        }
+                                        <button type="button" class="btn-linkish text-danger btn-remove" data-href="@Url.Action("RemovePaymentMethod", "Account", new { id = m.Id })">Remove</button>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<form id="af-token" class="d-none">@Html.AntiForgeryToken()</form>
+
+<script>
+    (function () {
+        const token = document.querySelector('#af-token input[name="__RequestVerificationToken"]')?.value || '';
+
+        const on = (sel, evt, fn) => document.addEventListener(evt, e => {
+            const t = e.target.closest(sel);
+            if (t) fn(e, t);
+        });
+
+        on('.btn-set-default', 'click', async (e, btn) => {
+            e.preventDefault();
+            if (btn.classList.contains('disabled')) return;
+            btn.classList.add('disabled');
+            try {
+                const id = btn.getAttribute('data-id');
+                const body = new URLSearchParams({ id });
+                await fetch('@Url.Action("SetDefaultPaymentMethod", "Account")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'RequestVerificationToken': token
+                    },
+                    body
+                });
+                location.reload();
+            } catch {
+                btn.classList.remove('disabled');
+                alert('Failed to set default.');
+            }
+        });
+
+        on('.btn-remove', 'click', async (e, btn) => {
+            e.preventDefault();
+            if (!confirm('Remove this payment method?')) return;
+            btn.classList.add('disabled');
+            try {
+                const href = btn.getAttribute('data-href');
+                await fetch(href, { method: 'GET', headers: { 'Accept': 'text/html' } });
+                location.reload();
+            } catch {
+                btn.classList.remove('disabled');
+                alert('Failed to remove.');
+            }
+        });
+    })();
+</script>

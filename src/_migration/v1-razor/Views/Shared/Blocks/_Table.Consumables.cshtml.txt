@@ -1,0 +1,118 @@
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model dynamic
+@{
+    var id = (string)(Model?.SectionId ?? $"block-consumables-{Guid.NewGuid():N}");
+    var title = (string)(Model?.Title ?? "Best Consumables");
+    // Очаквана структура: { Type, Best: { Id|Name }|int, Alt: { Id|Name }|int }
+    var rows = (IEnumerable<dynamic>)(Model?.Rows ?? new List<dynamic>());
+}
+
+<section id="@id" class="consumables-table">
+    <h3 style="text-align:left">@title</h3>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th style="width:25%">Type</th>
+                <th>Best</th>
+                <th>Alternative</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in rows)
+            {
+                string type = r?.Type?.ToString() ?? "";
+
+                // --- Best ---
+                int? bId = null;
+                string bName = null;
+                var best = r?.Best;
+
+                if (best is int bi) bId = bi;
+                else if (best is long bl) bId = (int)bl;
+                else if (best != null)
+                {
+                    try
+                    {
+                        var t = best.GetType();
+                        var idProp = t.GetProperty("Id", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
+                        var nameProp = t.GetProperty("Name", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
+                        var idVal = idProp?.GetValue(best);
+
+                        if (idVal is int) bId = (int)idVal;
+                        else if (idVal is long) bId = (int)(long)idVal;
+                        else if (idVal != null)
+                        {
+                            int parsed;
+                            if (int.TryParse(idVal.ToString(), out parsed)) bId = parsed;
+                        }
+
+                        bName = nameProp?.GetValue(best)?.ToString();
+                    }
+                    catch { }
+                }
+
+                // --- Alt ---
+                int? aId = null;
+                string aName = null;
+                var alt = r?.Alt;
+
+                if (alt is int ai) aId = ai;
+                else if (alt is long al) aId = (int)al;
+                else if (alt != null)
+                {
+                    try
+                    {
+                        var t = alt.GetType();
+                        var idProp = t.GetProperty("Id", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
+                        var nameProp = t.GetProperty("Name", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
+                        var idVal = idProp?.GetValue(alt);
+
+                        if (idVal is int) aId = (int)idVal;
+                        else if (idVal is long) aId = (int)(long)idVal;
+                        else if (idVal != null)
+                        {
+                            int parsed;
+                            if (int.TryParse(idVal.ToString(), out parsed)) aId = parsed;
+                        }
+
+                        aName = nameProp?.GetValue(alt)?.ToString();
+                    }
+                    catch { }
+                }
+
+                <tr>
+                    <td>@type</td>
+
+                    <td>
+                        @if (bId.HasValue)
+                        {
+                            <span class="item" data-item-id="@bId">@bId</span>
+                        }
+                        else
+                        {
+                            @PaladinHub.Infrastructure.SafeHtmlExtensions.SafeHtml(
+                            (IHtmlHelper)Html,
+                                        string.IsNullOrWhiteSpace(bName) ? "--" : bName
+                                        )
+                                        }
+                    </td>
+
+                    <td>
+                        @if (aId.HasValue)
+                        {
+                            <span class="item" data-item-id="@aId">@aId</span>
+                        }
+                        else
+                        {
+                            @PaladinHub.Infrastructure.SafeHtmlExtensions.SafeHtml(
+                            (IHtmlHelper)Html,
+                                        string.IsNullOrWhiteSpace(aName) ? "--" : aName
+                                        )
+                                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</section>

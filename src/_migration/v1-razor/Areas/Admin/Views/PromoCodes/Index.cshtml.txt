@@ -1,0 +1,59 @@
+@model IEnumerable<PaladinHub.Data.Entities.PromoCode>
+@{
+    ViewData["Title"] = "Promo Codes";
+}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Promo Codes</h2>
+        <a class="btn btn-primary" asp-action="Create">New Code</a>
+    </div>
+
+    @if (TempData["Msg"] != null)
+    {
+        <div class="alert alert-success">@TempData["Msg"]</div>
+    }
+    @if (TempData["Err"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Err"]</div>
+    }
+
+    <table class="table table-dark table-striped">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Type</th>
+                <th>Value</th>
+                <th>Currency</th>
+                <th>Max Uses</th>
+                <th>Used</th>
+                <th>Expires</th>
+                <th>Active</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>@p.Code</td>
+                    <td>@p.Type</td>
+                    <td>@p.Value</td>
+                    <td>@p.Currency</td>
+                    <td>@(p.MaxUses?.ToString() ?? "—")</td>
+                    <td>@p.UsedCount</td>
+                    <td>@(p.ExpiresAtUtc?.ToString("yyyy-MM-dd") ?? "—")</td>
+                    <td>@(p.IsActive ? "Yes" : "No")</td>
+                    <td class="text-end">
+                        @if (p.IsActive)
+                        {
+                            <form asp-action="Deactivate" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@p.Id" />
+                                <button class="btn btn-sm btn-warning">Deactivate</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

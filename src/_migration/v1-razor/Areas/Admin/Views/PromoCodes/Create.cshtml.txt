@@ -1,0 +1,51 @@
+@model PaladinHub.Data.Entities.PromoCode
+@{
+    ViewData["Title"] = "Create Promo Code";
+}
+<div class="container mt-4">
+    <h2>Create Promo Code</h2>
+    <form method="post" asp-action="Create" class="mt-3">
+        <div class="mb-3">
+            <label class="form-label">Code</label>
+            <input asp-for="Code" class="form-control" placeholder="PROMO-2025" />
+            <span asp-validation-for="Code" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Type</label>
+            <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<PaladinHub.Data.Entities.PromoCodeType>()"></select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Value</label>
+            <input asp-for="Value" class="form-control" placeholder="10 (EUR) / 10 (%)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Currency (for Balance)</label>
+            <input asp-for="Currency" class="form-control" placeholder="EUR or USD (optional)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Max Uses (optional)</label>
+            <input asp-for="MaxUses" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Expires At (UTC, optional)</label>
+            <input asp-for="ExpiresAtUtc" type="date" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Notes</label>
+            <input asp-for="Notes" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Create</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Back</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

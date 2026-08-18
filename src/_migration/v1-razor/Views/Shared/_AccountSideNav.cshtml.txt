@@ -1,0 +1,23 @@
+@{
+    var active = (string?)ViewBag.Active ?? "";
+    Func<string, string> a = key => key.Equals(active, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+<style>
+    #acc .side{width:260px}
+    #acc .side .nav-link{color:#e9ecef;border-radius:.5rem;padding:.6rem .8rem;display:flex;align-items:center;gap:.6rem}
+    #acc .side .nav-link.active,#acc .side .nav-link:hover{background:#20262d}
+</style>
+<aside class="col-12 col-lg-3 side">
+    <div class="card">
+        <div class="card-body p-3">
+            <nav class="nav flex-column">
+                <a class="nav-link @a("Overview")" href="@Url.Action("Overview", "Account")"><i class="fa fa-house"></i> Account Overview</a>
+                <a class="nav-link @a("Security")" href="@Url.Action("Security", "Account")"><i class="fa fa-shield-halved"></i> Security</a>
+                <a class="nav-link @a("Privacy")" href="@Url.Action("Privacy", "Account")"><i class="fa fa-lock"></i> Privacy & Communication</a>
+                <a class="nav-link @a("Connections")" href="@Url.Action("Connections", "Account")"><i class="fa fa-link"></i> Connections</a>
+                <a class="nav-link @a("PaymentMethods")" href="@Url.Action("PaymentMethods", "Account")"><i class="fa fa-credit-card"></i> Payment Methods</a>
+                <a class="nav-link @a("TransactionHistory")" href="@Url.Action("TransactionHistory", "Account")"><i class="fa fa-receipt"></i> Transaction History</a>
+            </nav>
+        </div>
+    </div>
+</aside>

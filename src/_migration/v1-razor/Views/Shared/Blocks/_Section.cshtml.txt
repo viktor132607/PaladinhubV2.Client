@@ -1,0 +1,10 @@
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model dynamic
+@{
+    var id = (string)(Model?.SectionId ?? $"block-section-{Guid.NewGuid():N}");
+    var css = (string)(Model?.CssClass ?? "");
+    var html = (string)(Model?.Html ?? "");
+}
+<section id="@id" class="@css">
+    @PaladinHub.Infrastructure.SafeHtmlExtensions.SafeHtml((IHtmlHelper)Html, html)
+</section>

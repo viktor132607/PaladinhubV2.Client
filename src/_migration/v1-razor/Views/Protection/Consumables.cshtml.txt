@@ -1,0 +1,308 @@
+@inherits PaladinHub.Helpers.SpellsAndItemsView
+@model PaladinHub.Models.CombinedViewModel
+
+@{
+	ViewData["Title"] = "Protection Paladin Consumables";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@*
+<link rel="stylesheet" href="~/css//Protection/ProtectionConsumables.css" />
+*@
+
+<div class="outer-wrapper">
+	<div class="page-container">
+		<div class="main-wrapper">
+
+			<section id="enchants">
+				<h2 class="section-header">
+					<img src="/images/itemIcons/inv_misc_enchantedscroll.jpg" alt="Trinkets Icon" class="section-icon">
+					BEST Protection PALADIN ENCHANTS IN THE WAR WITHIN SEASON
+				</h2>
+
+				<p>
+					Below is a list of the recommended enchants to use on your gear during The War Within Season 2.
+				</p>
+
+				<br>
+
+				<table style="width: 100%; border-collapse: collapse; color: #ccc;">
+					<thead>
+						<tr style="background-color: #333;">
+							<th style="padding: 8px; border: 1px solid #555;">Type</th>
+							<th style="padding: 8px; border: 1px solid #555;">Best Enchants</th>
+							<th style="padding: 8px; border: 1px solid #555;">Cheaper Version</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td style="padding: 8px; border: 1px solid #555;">
+								Head
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Greater Rune of the Void Ritual")
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Lesser Rune of the Void Ritual")
+							</td>
+						</tr>
+						<tr>
+							<td style="padding: 8px; border: 1px solid #555;">
+								Weapon
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Enchant Weapon - Authority of Fiery Resolve")
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Enchant Weapon - Stonebound Artistry")
+							</td>
+						</tr>
+						<tr>
+							<td style="padding: 8px; border: 1px solid #555;">
+								Cloak
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Enchant Cloak - Chant of Leeching Fangs")
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Enchant Cloak - Whisper of Silken Leech")
+							</td>
+						</tr>
+						<tr>
+							<td style="padding: 8px; border: 1px solid #555;">Chest</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Enchant Chest - Crystalline Radiance")
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								-
+							</td>
+						</tr>
+						<tr>
+							<td style="padding: 8px; border: 1px solid #555;">Bracers</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Enchant Bracer - Chant of Armored Leech")
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Enchant Bracer - Whisper of Armored Leech")
+							</td>
+						</tr>
+						<tr>
+							<td style="padding: 8px; border: 1px solid #555;">Legs</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Daybreak Spellthread")
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Weavercloth Spellthread")
+							</td>
+						</tr>
+						<tr>
+							<td style="padding: 8px; border: 1px solid #555;">Boots</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Enchant Boots - Defender's March")
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								-
+							</td>
+						</tr>
+						<tr>
+							<td style="padding: 8px; border: 1px solid #555;">Ring</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Enchant Ring - Radiant Haste")
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Enchant Ring - Glimmering Haste")
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<br />
+				<p>Cursed Ring Enchants are not recommended as they are simply not worth it.</p>
+
+				<h2 class="section-header" style="text-align: left;">
+					<img src="/images/icons/inv_eyeofnzothpet.jpg" alt="Crafting Icon" class="section-icon small-icon">
+					Protection Paladin Head Enchant in The War Within Season 2
+				</h2>
+
+				<p>@Item("Greater Rune of the Void Ritual") will be your corruption of choice as it is the only option that provides a healing increase. You can use @Item("Lesser Rune of the Void Ritual") until you unlock its greater version.</p>
+			</section>
+
+			<div class="separator-container">
+				<img src="~/images/Separators/D2.png" alt="Separator 2" class="separator" />
+			</div>
+
+			<section id="consumables">
+				<h2 class="section-header">
+					<img src="/images/itemIcons/inv_potion_green.jpg" alt="Trinkets Icon" class="section-icon">
+					BEST Protection PALADIN CONSUMABLES IN THE WAR WITHIN SEASON 2
+				</h2>
+
+				<p>There are many consumables that players can use in combat in The War Within Season 2. Here are the best phials, potions, and weapon buffs that Protection Paladins can use in PvE content.</p>
+
+				<h2 class="section-header" style="text-align: left;">
+					<img src="/images/itemIcons/inv_potion_24.jpg" alt="Crafting Icon" class="section-icon small-icon">
+					Best Consumables for Protection Paladin
+				</h2>
+
+
+				<table style="width: 100%; border-collapse: collapse; color: #ccc;">
+					<thead>
+						<tr style="background-color: #333;">
+							<th style="padding: 8px; border: 1px solid #555;">Slot</th>
+							<th style="padding: 8px; border: 1px solid #555;">Best Enchant</th>
+							<th style="padding: 8px; border: 1px solid #555;">Cheaper Version</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td style="padding: 8px; border: 1px solid #555;">Flask</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Flask of Tempered Swiftness")
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Flask of Tempered Mastery")
+							</td>
+						</tr>
+						<tr>
+							<td style="padding: 8px; border: 1px solid #555;">Mana Potion</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Algari Mana Potion")
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Slumbering Soul Serum")
+							</td>
+						</tr>
+						<tr>
+							<td style="padding: 8px; border: 1px solid #555;">Health Potion</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Algari Healing Potion")
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">-</td>
+						</tr>
+						<tr>
+							<td style="padding: 8px; border: 1px solid #555;">Weapon Buff</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+
+								@Item("Algari Mana Oil") as Herald<br>
+								@Spell("Rite of Sanctification") as Lightsmith
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">-</td>
+						</tr>
+						<tr>
+							<td style="padding: 8px; border: 1px solid #555;">Augment Rune</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Crystallized Augment Rune")
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;"></td>
+						</tr>
+						<tr>
+							<td style="padding: 8px; border: 1px solid #555;">Food</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Feast of the Divine Day")
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Jester's Board")
+							</td>
+						</tr>
+						<tr>
+							<td style="padding: 8px; border: 1px solid #555;">Diamond</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Elusive Blasphemite")
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">-</td>
+						</tr>
+						<tr>
+							<td style="padding: 8px; border: 1px solid #555;">Other Gems</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Quick Onyx")
+							</td>
+							<td style="padding: 8px; border: 1px solid #555;">
+								@Item("Deadly Emerald")
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<br />
+				<h2 class="section-header" style="text-align: left;">
+					<img src="/images/itemIcons/inv_flask_green.jpg" alt="Crafting Icon" class="section-icon small-icon">
+					Protection Paladin Phials in The War Within Season 2
+				</h2>
+
+				<p>The best phial for Protection Paladin is @Item("Flask of Tempered Swiftness") for both Raiding and Mythic+</p>
+
+				<h2 class="section-header" style="text-align: left;">
+					<img src="/images/itemIcons/inv_flask_blue.jpg" alt="Crafting Icon" class="section-icon small-icon">
+					Protection Paladin Combat Potions in The War Within Season 2
+				</h2>
+				There are a couple different potions that have different useful scenarios for Protection Paladin:
+				<ul>
+					<li>
+						<strong>Best Mana Potion:</strong> @Item("Algari Mana Potion"), or @Item("Slumbering Soul Serum") if you are able to find a good time to use it.
+					</li>
+					<li>
+						<strong>Best Throughput Potion:</strong> @Item("Tempered Potion").
+					</li>
+				</ul>
+				<br>
+				<h2 class="section-header" style="text-align: left;">
+					<img src="/images/itemIcons/inv_flask_red.jpg" alt="Crafting Icon" class="section-icon small-icon">
+					Protection Paladin Health Potions in The War Within Season 2
+				</h2>
+
+				<p>The best healing potion is @Item("Algari Healing Potion").</p>
+				<br>
+				<h2 class="section-header" style="text-align: left;">
+					<img src="/images/itemIcons/trade_alchemy_potiond1.jpg" alt="Crafting Icon" class="section-icon small-icon">
+					Protection Paladin Weapon Buff in The War Within Season 2
+				</h2>
+
+				<p>@Item("Algari Mana Oil") is the best weapon buff to use in all scenarios as Herald of the Sun, and  Rite of Sanctification as Lightsmith.</p>
+
+				<br>
+
+				<h2 class="section-header" style="text-align: left;">
+					<img src="/images/itemIcons/inv_10_enchanting_crystal_color5.jpg" alt="Crafting Icon" class="section-icon small-icon">
+					Protection Paladin Augment Rune in The War Within Season 2
+				</h2>
+
+				<p>@Item("Crystallized Augment Rune") is the best augment rune for Protection Paladin.</p>
+				<br>
+			</section>
+
+			<div class="separator-container">
+				<img src="~/images/Separators/D2.png" alt="Separator 2" class="separator" />
+			</div>
+
+			<section id="food">
+				<h2 class="section-header">
+					<img src="/images/itemIcons/inv_misc_food_03.jpg" alt="Trinkets Icon" class="section-icon">
+					BEST Protection PALADIN FOOD IN THE WAR WITHIN SEASON 2
+				</h2>
+
+				<ul>
+					<li>Feast: @Item("Feast of the Divine Day") or @Item("Feast of the Midnight Masquerade").</li>
+					<li>Personal Food: @Item("Jester's Board"), @Item("Outsider's Provisions"), @Item("Empress' Farewell"), or @Item("Beledar's Bounty").</li>
+				</ul>
+
+				<p>All of the Personal Food options grant the same buff, but @Item("Feast of the Divine Day") or @Item("Feast of the Midnight Masquerade") are the best option.</p>
+			</section>
+
+			<div class="separator-container">
+				<img src="~/images/Separators/D2.png" alt="Separator 2" class="separator" />
+			</div>
+
+			<section id="gems">
+				<h2 class="section-header">
+					<img src="/images/itemIcons/inv_10_jewelcrafting_gem3primal_cut_red.jpg" alt="Trinkets Icon" class="section-icon">
+					BEST Protection PALADIN GEMS IN THE WAR WITHIN SEASON 2
+				</h2>
+
+
+				<p>The best Algari Diamond is @Item("Elusive Blasphemite")  as it gives a bit of movement speed. @Item("Culminating Blasphemite") provides more direct throughput increase, but it is <strong>extremely</strong> minor as it's just weak and the crit effect increase is halved for healing effects.</p>
+				<p>To maximize the effect of @Item("Elusive Blasphemite"), it is recommended you use at least four different gem colours in the rest of your sockets. @Item("Quick Onyx") is the best gem for Raiding, but you should use <strong>one each</strong> of the following too; @Item("Masterful Emerald") , @Item("Masterful Ruby"), and @Item("Masterful Sapphire")". This will grant you 8% extra movement speed permanently.</p>
+				<p>@Item("Deadly Emerald") is the best gem for Mythic+, and you should use one each of the following too; @Item("Quick Onyx"), @Item("Quick Sapphire"), and @Item("Quick Ruby").</p>
+			</section>
+		</div>
+	</div>
+</div>
+

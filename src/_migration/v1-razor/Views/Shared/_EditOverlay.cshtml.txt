@@ -1,0 +1,285 @@
+@model dynamic
+@using Microsoft.AspNetCore.Routing
+
+@{
+    bool isAdminCreate =
+        (ViewContext.RouteData.Values.TryGetValue("area", out var a) && string.Equals(a?.ToString(), "Admin", StringComparison.OrdinalIgnoreCase)) &&
+        (ViewContext.RouteData.Values.TryGetValue("controller", out var c) && string.Equals(c?.ToString(), "PageBuilder", StringComparison.OrdinalIgnoreCase)) &&
+        (ViewContext.RouteData.Values.TryGetValue("action", out var act) && string.Equals(act?.ToString(), "Create", StringComparison.OrdinalIgnoreCase));
+
+    string initialJson = (string)(Model?.JsonLayout ?? (ViewBag?.JsonLayout ?? "[]"));
+}
+
+<style>
+    /* тъмен, леко “матов” панел */
+    .pb-panel.card {
+        background: #2b2f33; /* сиво вместо бяло */
+        border-color: #3a3f45;
+        color: #e6e6e6;
+    }
+
+    .pb-panel .card-header {
+        background: #262a2e;
+        border-bottom-color: #3a3f45;
+    }
+
+    .pb-panel .form-text {
+        color: #b8c0c8;
+    }
+
+    .pb-panel.sticky-top {
+        top: 1rem;
+        z-index: 1020;
+    }
+
+    /* GRID за подравняване на бутоните */
+    .pb-toolbar {
+        display: grid;
+        grid-template-columns: repeat(auto-fill,minmax(150px,1fr));
+        gap: .5rem;
+        margin-bottom: .75rem;
+    }
+
+        .pb-toolbar .btn {
+            width: 100%;
+        }
+
+    /* текстовото поле */
+    .pb-textarea {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+        min-height: 360px;
+        resize: vertical;
+        line-height: 1.35;
+        background: #1f2327;
+        color: #f3f5f7;
+        border-color: #3a3f45;
+    }
+
+    #pb-msg .alert {
+        padding: .375rem .75rem;
+        margin-bottom: 0;
+    }
+</style>
+
+@if (User.IsInRole("Admin"))
+{
+    <section class="pb-panel card shadow-sm sticky-top">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge text-bg-dark">Builder</span>
+                <strong>@(isAdminCreate ? "Create Page" : "Edit Page")</strong>
+            </div>
+
+            <div class="btn-group btn-group-sm">
+                <button id="pb-btn-reset" class="btn btn-warning" type="button">Reset</button>
+                <button id="pb-btn-preview" class="btn btn-warning" type="button">Preview</button>
+                <button id="pb-btn-save" class="btn btn-success" type="button">Save</button> @* зелено *@
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- GRID инструмент-бутони (всички жълти) -->
+            <div class="pb-toolbar" role="toolbar" aria-label="Builder toolbar">
+                <button class="btn btn-warning" data-tpl="heading" type="button">+ Heading</button>
+                <button class="btn btn-warning" data-tpl="callout" type="button">+ Callout</button>
+                <button class="btn btn-warning" data-tpl="divider" type="button">+ Divider</button>
+                <button class="btn btn-warning" data-tpl="markdown" type="button">+ Markdown</button>
+                <button class="btn btn-warning" data-tpl="tabs" type="button">+ Tabs</button>
+
+                <button class="btn btn-warning" data-tpl="table.generic" type="button">+ Generic table</button>
+                <button class="btn btn-warning" data-tpl="table.gear" type="button">+ Gear table</button>
+                <button class="btn btn-warning" data-tpl="table.consumables" type="button">+ Consumables table</button>
+
+                <button class="btn btn-warning" data-tpl="talenttree" type="button">+ Talent tree</button>
+                <button class="btn btn-warning" data-tpl="talentbuildmenu" type="button">+ Talent menu</button>
+
+                <button class="btn btn-warning" data-tpl="itemgrid" type="button">+ Item grid</button>
+                <button class="btn btn-warning" data-tpl="spelllist" type="button">+ Spell list</button>
+                <button class="btn btn-warning" data-tpl="rotationcard" type="button">+ Rotation card</button>
+            </div>
+
+            <div class="form-text mb-2">
+                Type JSON or use the buttons above. Live preview updates automatically; you can also click <em>Preview</em>.
+            </div>
+
+            <textarea id="pb-json" class="form-control form-control-sm pb-textarea">@initialJson</textarea>
+
+            <div class="d-flex align-items-center gap-2 mt-3">
+                <button id="pb-save" class="btn btn-success" type="button"><i class="bi bi-save"></i> Save layout</button> @* зелено *@
+                <button id="pb-preview" class="btn btn-warning" type="button">Preview</button>
+                <div id="pb-msg" class="ms-auto"></div>
+            </div>
+
+            <div id="pb-preview-holder" class="mt-3"></div>
+        </div>
+    </section>
+}
+
+<script>
+    // ---- RowVersion (Edit mode) ----
+    const __pb_pageId = document.querySelector('section.container')?.dataset.pageId;
+    let __pb_rowVersionBase64 = null;
+    async function __pb_initRowVersion(){
+        if(!__pb_pageId) return;
+        try{
+            const r = await fetch(`/Admin/api/pages/${__pb_pageId}/head`);
+            if(r.ok){
+                const j = await r.json();
+                __pb_rowVersionBase64 = j.rowVersionBase64 || null;
+            }
+        }catch(e){ console.warn('rowVersion init failed', e); }
+    }
+    __pb_initRowVersion();
+
+    // мини-тост
+    function __pb_toast(html, cls="alert-info"){
+        const box = document.getElementById('pb-msg');
+        if(!box) return;
+        box.innerHTML = `<div class="alert ${cls} mb-0 py-1 px-2">${html}</div>`;
+        setTimeout(()=>box.innerHTML="", 2200);
+    }
+
+    // live preview
+    let __pb_previewTimer = null;
+    function __pb_debouncePreview(){
+        if(__pb_previewTimer) clearTimeout(__pb_previewTimer);
+        __pb_previewTimer = setTimeout(__pb_renderPreview, 300);
+    }
+
+    async function __pb_renderPreview(){
+        const holder = document.getElementById('pb-json');
+        const target = document.getElementById('pb-preview-holder');
+        if(!holder || !target) return;
+
+        let parsed;
+        try{
+            const txt = holder.value?.trim() || "[]";
+            parsed = JSON.parse(txt);
+            if(!Array.isArray(parsed)) throw new Error("Layout JSON must be an array.");
+        }catch(e){
+            target.innerHTML = '<div class="alert alert-danger">Invalid JSON: '+ (e?.message||e) +'</div>';
+            return;
+        }
+
+        if(parsed.length===0){ target.innerHTML=''; return; }
+
+        const blocks = parsed.filter(b=>b && typeof b==='object' && !Array.isArray(b));
+        if(blocks.some(b=>!('type' in b))){
+            target.innerHTML = '<div class="alert alert-warning">Some blocks are missing a <code>type</code>.</div>';
+            return;
+        }
+
+        target.innerHTML =
+          '<div class="d-flex align-items-center gap-2 text-muted">' +
+          '<div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>' +
+          'Rendering preview…</div>';
+
+        try{
+            const htmlPieces = [];
+            for(const block of blocks){
+                const res = await fetch('/api/blocks/render',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify(block)
+                });
+                if(!res.ok){
+                    const txt = await res.text();
+                    htmlPieces.push('<div class="alert alert-danger">Block render failed:<br>'+ txt.replace(/</g,'&lt;') +'</div>');
+                }else{
+                    htmlPieces.push(await res.text());
+                }
+            }
+            target.innerHTML = htmlPieces.join('\n');
+        }catch(err){
+            target.innerHTML = '<div class="alert alert-danger">Preview error: '+ (err?.message||err) +'</div>';
+        }
+    }
+
+    // wiring
+    (function(){
+        const holder = document.getElementById('pb-json');
+        if(!holder) return;
+
+        const hidden = document.getElementById('jsonLayout'); // за Create форма
+
+        document.querySelector('.pb-toolbar')?.addEventListener('click', e=>{
+            const btn = e.target.closest('[data-tpl]');
+            if(!btn) return;
+            e.preventDefault();
+            addTemplate(btn.getAttribute('data-tpl'));
+        });
+
+        // header actions
+        document.getElementById('pb-btn-preview')?.addEventListener('click', e=>{ e.preventDefault(); __pb_renderPreview(); });
+        document.getElementById('pb-btn-save')?.addEventListener('click',    e=>{ e.preventDefault(); doSave(holder, hidden); });
+        document.getElementById('pb-btn-reset')?.addEventListener('click',   e=>{ e.preventDefault(); holder.value="[]"; __pb_debouncePreview(); });
+
+        // bottom actions
+        document.getElementById('pb-preview')?.addEventListener('click', e=>{ e.preventDefault(); __pb_renderPreview(); });
+        document.getElementById('pb-save')?.addEventListener('click',    async e=>{ e.preventDefault(); await doSave(holder, hidden); __pb_debouncePreview(); });
+
+        holder.addEventListener('input', __pb_debouncePreview);
+        __pb_debouncePreview();
+    })();
+
+    // темплейти
+    function addTemplate(kind){
+        const T = {
+            "heading":          { type:"heading",         Text:"Section title", Level:"h2" },
+            "markdown":         { type:"markdown",        Markdown:"# Title\n\nSome **markdown** text." },
+            "divider":          { type:"divider" },
+            "tabs":             { type:"tabs",            Tabs:[ { Title:"Tab 1", Blocks:[ { type:"markdown", Markdown:"Tab 1 **content**" } ] }, { Title:"Tab 2", Blocks:[] } ] },
+            "table.gear":       { type:"table.gear",      Rows:[ { Slot:"Head", Item:{ Name:"Item name" }, Source:"Drop/Shop" } ] },
+            "table.consumables":{ type:"table.consumables", Rows:[ { Type:"Flask", Best:{ Name:"Best item" }, Alternative:{ Name:"Alt" } } ] },
+            "table.generic":    { type:"table.generic",   Columns:[ { Key:"col1", Title:"Column 1", Kind:"text" } ], Rows:[ { col1:"Value" } ] },
+            "tierlist":         { type:"tierlist",        Tiers:["S","A","B","C"], ItemsByTier:{ "S":[ { Type:"item", Name:"Example" } ] } },
+            "columnstext":      { type:"columnstext",     Columns:2, MarkdownPerColumn:[ "Left **markdown**", "Right _markdown_" ] },
+            "talenttree":       { type:"talenttree",      TreeKey:"paladin", Build:null },
+            "talentbuildmenu":  { type:"talentbuildmenu", TreeKey:"paladin", Builds:[ { Name:"Default", IsDefault:true } ], Selected:"Default" },
+            "itemgrid":         { type:"itemgrid",        Columns:4, Items:[ { Name:"Item 1" }, { Name:"Item 2" } ] },
+            "spelllist":        { type:"spelllist",       Spells:[ { Name:"Spell 1", Note:"" } ] },
+            "callout":          { type:"callout",         Variant:"info", Text:"Callout text" },
+            "rotationcard":     { type:"rotationcard",    Sequence:[ { Name:"Spell A" }, { Name:"Spell B" } ] },
+            "section":          { type:"section",         CssClass:"mb-4", Html:"<p>Section content</p>" }
+        };
+
+        const holder = document.getElementById('pb-json');
+        let arr;
+        try{ const parsed = JSON.parse(holder.value || "[]"); arr = Array.isArray(parsed) ? parsed : []; }
+        catch{ arr = []; }
+
+        arr = arr.filter(x => x && typeof x==='object' && !Array.isArray(x));
+        arr.push(T[kind] || { type:"callout", Variant:"warning", Text:`Unknown tpl: ${kind}` });
+        holder.value = JSON.stringify(arr, null, 2);
+        __pb_toast("Block added", "alert-success");
+        __pb_debouncePreview();
+    }
+
+    async function doSave(holder, hidden){
+        const pageId = document.querySelector('section.container')?.dataset.pageId;
+
+        // Edit – бекенд API
+        if(pageId){
+            try{
+                const res = await fetch(`/Admin/api/pages/${pageId}/layout`,{
+                    method:'PUT',
+                    headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({ JsonLayout: holder?.value || "[]", RowVersionBase64: (__pb_rowVersionBase64||'') })
+                });
+                if(res.ok){
+                    try{ const d = await res.json(); __pb_rowVersionBase64 = d.rowVersionBase64 || __pb_rowVersionBase64; }catch{}
+                    __pb_toast('Saved', 'alert-success');
+                }else if(res.status===409){
+                    __pb_toast('Conflict: page changed by someone else. Refresh.', 'alert-danger');
+                }else{
+                    __pb_toast('Save failed', 'alert-danger');
+                }
+            }catch{ __pb_toast('Save failed', 'alert-danger'); }
+            return;
+        }
+
+        // Create – само синхронизираме към скритото поле във формата
+        if(hidden){ hidden.value = holder?.value || "[]"; __pb_toast('Layout synced to form', 'alert-success'); }
+        else      { __pb_toast('Hidden field #jsonLayout not found', 'alert-danger'); }
+    }
+</script>

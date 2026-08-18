@@ -1,0 +1,101 @@
+@model PaladinHub.Models.Checkout.CheckoutState
+@{
+    ViewData["Title"] = "Overview";
+    var paymentError = TempData["PaymentError"] as string;
+    var disablePlace = !string.IsNullOrWhiteSpace(paymentError);
+}
+<div id="checkout-review">
+    <style>
+        #checkout-review {
+            --ph-surface: #23272b;
+            --ph-border: #3a4047;
+            --ph-text: #e9ecef;
+            --ph-muted: #b8c0cc;
+            --ph-accent: #8ab4ff;
+        }
+
+            #checkout-review, #checkout-review p, #checkout-review label {
+                color: var(--ph-text);
+            }
+
+                #checkout-review .page-title {
+                    color: var(--ph-accent);
+                    text-align: center;
+                    margin-bottom: 1.5rem;
+                }
+
+                #checkout-review .section-title {
+                    color: var(--ph-muted);
+                    margin-top: 1.25rem;
+                    margin-bottom: .5rem;
+                }
+
+                #checkout-review .card {
+                    background: var(--ph-surface);
+                    border: 1px solid var(--ph-border);
+                    color: var(--ph-text);
+                }
+
+                #checkout-review .total {
+                    font-weight: 700;
+                    font-size: 1.1rem;
+                }
+
+                #checkout-review button[disabled] {
+                    opacity: .7;
+                    cursor: not-allowed;
+                }
+    </style>
+
+    <h2 class="page-title">Overview</h2>
+
+    @if (!string.IsNullOrWhiteSpace(paymentError))
+    {
+        <div class="alert alert-warning">@paymentError</div>
+    }
+
+    <h5 class="section-title">Shipping</h5>
+    <div class="card p-3 mb-3">
+        @if (Model.Shipping != null)
+        {
+            <div>@Model.Shipping.FullName</div>
+            <div>@Model.Shipping.Address</div>
+            <div>@Model.Shipping.PostalCode @Model.Shipping.City, @Model.Shipping.Country</div>
+            <div>Phone: @Model.Shipping.Phone</div>
+            @if (!string.IsNullOrWhiteSpace(Model.Shipping.Email))
+            {
+                <div>Email: @Model.Shipping.Email</div>
+            }
+        }
+        else
+        {
+            <div class="text-warning">Missing shipping details.</div>
+        }
+    </div>
+
+    <h5 class="section-title">Payment</h5>
+    <div class="d-flex align-items-center gap-3 mb-2">
+        <p class="mb-0">@Model.PaymentMethod</p>
+        <a asp-controller="Checkout" asp-action="Payment" class="btn btn-sm btn-outline-light">Change payment</a>
+    </div>
+
+    <h5 class="section-title">Total</h5>
+    <p class="total">$@Model.Total.ToString("F2")</p>
+
+    <form asp-controller="Checkout" asp-action="PlaceOrder" method="post" id="place-order-form">
+        @Html.AntiForgeryToken()
+        <button class="btn btn-success" id="place-order-btn" type="submit" @(disablePlace ? "disabled" : null)>
+            @(disablePlace ? "Resolve payment issue" : "Place order")
+        </button>
+        <a asp-controller="Checkout" asp-action="Shipping" class="btn btn-outline-secondary">Back</a>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('place-order-form')?.addEventListener('submit', function () {
+            const b = document.getElementById('place-order-btn');
+            if (b && !b.hasAttribute('disabled')) { b.setAttribute('disabled', 'disabled'); b.textContent = 'Processing...'; }
+        });
+    </script>
+}

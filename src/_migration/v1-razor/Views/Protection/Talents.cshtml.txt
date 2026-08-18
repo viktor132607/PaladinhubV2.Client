@@ -1,0 +1,41 @@
+@inherits PaladinHub.Helpers.SpellsAndItemsView
+@model PaladinHub.Models.CombinedViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Protection Paladin Talents";
+}
+
+<body>
+    <div class="outer-wrapper">
+        <div class="page-container">
+            <div class="main-wrapper">
+
+                <section class="mb-4" id="talent-tree-1">
+                    <h2 style="text-align:center;margin-top: 10px">Protection + Lightsmith</h2>
+                    @await Html.PartialAsync(
+                        "~/Views/Shared/TalentTrees/_SectionTalentTrees.cshtml",
+                        Model,
+                        new ViewDataDictionary(ViewData) {
+                            ["keys"] = new[] { "paladin", "protection-lightsmith", "protection" }
+                        })
+                </section>
+
+                <div class="separator-container">
+                    <img src="~/images/Separators/D1.png" alt="Separator 1" class="separator" />
+                </div>
+
+                <section class="mb-4" id="talent-tree-2">
+                    <h2 style="text-align:center;margin-top: 10px">Protection + Templar</h2>
+                    @await Html.PartialAsync(
+                        "~/Views/Shared/TalentTrees/_SectionTalentTrees.cshtml",
+                        Model,
+                        new ViewDataDictionary(ViewData) {
+                            ["keys"] = new[] { "paladin", "protection-templar", "protection" }
+                        })
+                </section>
+
+            </div>
+        </div>
+    </div>
+</body>
