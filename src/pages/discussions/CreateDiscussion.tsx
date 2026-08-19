@@ -5,128 +5,11 @@ import {
   type FormEvent,
 } from "react";
 import { useAuth } from "@/auth/AuthContext";
-import {
-  backendEndpoints,
-  fetchBackend,
-} from "@/config/api";
+import { createDiscussion } from "@/features/discussions/api";
 import {
   Link,
   useNavigate,
 } from "@/router/nextCompat";
-
-const CREATE_DISCUSSION_ENDPOINT =
-  "/Discussions/Create";
-
-type ApiError = {
-  message?: string;
-  title?: string;
-  error?: string;
-  errors?: Record<
-    string,
-    string[] | string
-  >;
-};
-
-async function readErrorMessage(
-  response: Response,
-): Promise<string> {
-  const fallback =
-    `Request failed with status ${response.status}.`;
-
-  const text =
-    await response.text().catch(
-      () => "",
-    );
-
-  if (!text.trim()) {
-    return fallback;
-  }
-
-  const contentType =
-    response.headers.get(
-      "content-type",
-    ) ?? "";
-
-  if (
-    contentType.includes(
-      "application/json",
-    )
-  ) {
-    try {
-      const payload =
-        JSON.parse(text) as ApiError;
-
-      if (payload.errors) {
-        const validationErrors =
-          Object.values(
-            payload.errors,
-          )
-            .flatMap((value) =>
-              Array.isArray(value)
-                ? value
-                : [value],
-            )
-            .map((value) =>
-              value.trim(),
-            )
-            .filter(Boolean);
-
-        if (
-          validationErrors.length > 0
-        ) {
-          return validationErrors.join(
-            " ",
-          );
-        }
-      }
-
-      return (
-        payload.message ||
-        payload.title ||
-        payload.error ||
-        fallback
-      );
-    } catch {
-      return fallback;
-    }
-  }
-
-  try {
-    const documentNode =
-      new DOMParser().parseFromString(
-        text,
-        "text/html",
-      );
-
-    const validationMessages =
-      Array.from(
-        documentNode.querySelectorAll(
-          ".validation-summary-errors li, .field-validation-error",
-        ),
-      )
-        .map((node) =>
-          node.textContent?.trim(),
-        )
-        .filter(
-          (
-            message,
-          ): message is string =>
-            Boolean(message),
-        );
-
-    if (
-      validationMessages.length > 0
-    ) {
-      return Array.from(
-        new Set(validationMessages),
-      ).join(" ");
-    }
-  } catch {
-    // The response was not readable HTML.
-  }
-
-  return fallback;
-}
 
 export default function CreateDiscussion() {
   const navigate = useNavigate();
@@ -159,11 +42,8 @@ export default function CreateDiscussion() {
 
     setError(null);
 
-    const cleanTitle =
-      title.trim();
-
-    const cleanContent =
-      content.trim();
+    const cleanTitle = title.trim();
+    const cleanContent = content.trim();
 
     if (!cleanTitle) {
       setError("Title is required.");
@@ -178,61 +58,21 @@ export default function CreateDiscussion() {
     }
 
     if (!cleanContent) {
-      setError(
-        "Content is required.",
-      );
+      setError("Content is required.");
       return;
     }
 
     setSaving(true);
 
     try {
-      const response =
-        await fetchBackend(
-          CREATE_DISCUSSION_ENDPOINT,
-          {
-            method: "POST",
-            cache: "no-store",
-            redirect: "follow",
+      await createDiscussion({
+        title: cleanTitle,
+        content: cleanContent,
+      });
 
-            headers: {
-              Accept:
-                "application/json, text/html;q=0.9",
-
-              "Content-Type":
-                "application/x-www-form-urlencoded;charset=UTF-8",
-            },
-
-            body: new URLSearchParams({
-              Title: cleanTitle,
-              Content: cleanContent,
-            }),
-          },
-        );
-
-      if (!response.ok) {
-        throw new Error(
-          await readErrorMessage(
-            response,
-          ),
-        );
-      }
-
-      if (!response.redirected) {
-        throw new Error(
-          await readErrorMessage(
-            response,
-          ),
-        );
-      }
-
-      navigate(
-        backendEndpoints.discussions
-          .index,
-        {
-          replace: true,
-        },
-      );
+      navigate("/Discussions/Index", {
+        replace: true,
+      });
     } catch (caught) {
       setError(
         caught instanceof Error
@@ -261,8 +101,7 @@ export default function CreateDiscussion() {
           </h1>
 
           <p className="mt-3 text-slate-300">
-            You must be logged in to
-            start a discussion.
+            You must be logged in to start a discussion.
           </p>
 
           <Link
@@ -316,9 +155,7 @@ export default function CreateDiscussion() {
           name="Title"
           value={title}
           onChange={(event) => {
-            setTitle(
-              event.target.value,
-            );
+            setTitle(event.target.value);
           }}
           maxLength={120}
           required
@@ -343,9 +180,7 @@ export default function CreateDiscussion() {
           name="Content"
           value={content}
           onChange={(event) => {
-            setContent(
-              event.target.value,
-            );
+            setContent(event.target.value);
           }}
           rows={10}
           required
@@ -369,10 +204,7 @@ export default function CreateDiscussion() {
           </button>
 
           <Link
-            to={
-              backendEndpoints.discussions
-                .index
-            }
+            to="/Discussions/Index"
             className="rounded border border-slate-500 px-4 py-2 text-slate-200 hover:bg-slate-800"
           >
             <i

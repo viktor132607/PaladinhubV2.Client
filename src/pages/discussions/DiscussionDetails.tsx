@@ -8,821 +8,79 @@ import {
 } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import {
-  backendEndpoints,
-  fetchBackend,
-  readApiJson,
-} from "@/config/api";
+  addDiscussionComment,
+  deleteDiscussion,
+  getDiscussion,
+  toggleDiscussionCommentLike,
+  toggleDiscussionLike,
+  type DiscussionDetails as DiscussionDetailsModel,
+} from "@/features/discussions/api";
 import {
   Link,
   useNavigate,
   useParams,
 } from "@/router/nextCompat";
 
-type JsonRecord = Record<string, unknown>;
-
-type DiscussionComment = {
-  id: string;
-  authorId: string;
-  authorName: string;
-  content: string;
-  createdOn: string;
-  likes: number;
-  likedByCurrentUser: boolean;
-};
-
-type DiscussionPost = {
-  id: string;
-  title: string;
-  content: string;
-  authorId: string;
-  authorName: string;
-  createdOn: string;
-  likes: number;
-  likedByCurrentUser: boolean;
-  comments: DiscussionComment[];
-  deleteAllowed?: boolean;
-};
-
-type CsrfResponse = {
-  token?: string;
-};
-
-type ApiError = {
-  message?: string;
-  title?: string;
-  error?: string;
-  errors?: Record<string, string[] | string>;
-};
-
-function asRecord(value: unknown): JsonRecord {
-  return value !== null &&
-    typeof value === "object" &&
-    !Array.isArray(value)
-    ? (value as JsonRecord)
-    : {};
-}
-
-function text(value: unknown): string {
-  return value === null || value === undefined
-    ? ""
-    : String(value).trim();
-}
-
-function number(value: unknown): number {
-  const parsed = Number(value);
-
-  return Number.isFinite(parsed)
-    ? parsed
-    : 0;
-}
-
-function bool(value: unknown): boolean {
-  return (
-    value === true ||
-    value === "true" ||
-    value === 1 ||
-    value === "1"
-  );
-}
-
-function timestamp(value: string): number {
-  const parsed = new Date(value).getTime();
-
-  return Number.isNaN(parsed)
-    ? 0
-    : parsed;
-}
-
-function formatDate(value: string): string {
-  if (!value) {
-    return "Unknown date";
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return date.toLocaleString();
-}
-
-function normalizeComment(
-  value: unknown,
-  index: number,
-): DiscussionComment {
-  const source = asRecord(value);
-  const author = asRecord(
-    source.author ??
-      source.Author,
-  );
-
-  return {
-    id:
-      text(
-        source.id ??
-          source.Id,
-      ) || `comment-${index}`,
-
-    authorId: text(
-      source.authorId ??
-        source.AuthorId,
-    ),
-
-    authorName:
-      text(
-        source.authorName ??
-          source.AuthorName ??
-          author.userName ??
-          author.UserName ??
-          author.username ??
-          author.Username,
-      ) || "Unknown user",
-
-    content: text(
-      source.content ??
-        source.Content,
-    ),
-
-    createdOn: text(
-      source.createdOn ??
-        source.CreatedOn,
-    ),
-
-    likes: Math.max(
-      0,
-      number(
-        source.likes ??
-          source.Likes,
-      ),
-    ),
-
-    likedByCurrentUser: bool(
-      source.likedByCurrentUser ??
-        source.LikedByCurrentUser ??
-        source.alreadyLiked ??
-        source.AlreadyLiked,
-    ),
-  };
-}
-
-function normalizePost(
-  value: unknown,
-  requestedId: string,
-): DiscussionPost {
-  const wrapper = asRecord(value);
-
-  const source = asRecord(
-    wrapper.post ??
-      wrapper.Post ??
-      value,
-  );
-
-  const author = asRecord(
-    source.author ??
-      source.Author,
-  );
-
-  const rawComments =
-    source.comments ??
-    source.Comments;
-
-  const deleteValue =
-    wrapper.canDelete ??
-    wrapper.CanDelete ??
-    source.canDelete ??
-    source.CanDelete;
-
-  return {
-    id:
-      text(
-        source.id ??
-          source.Id,
-      ) || requestedId,
-
-    title: text(
-      source.title ??
-        source.Title,
-    ),
-
-    content: text(
-      source.content ??
-        source.Content,
-    ),
-
-    authorId: text(
-      source.authorId ??
-        source.AuthorId,
-    ),
-
-    authorName:
-      text(
-        source.authorName ??
-          source.AuthorName ??
-          author.userName ??
-          author.UserName ??
-          author.username ??
-          author.Username,
-      ) || "Unknown user",
-
-    createdOn: text(
-      source.createdOn ??
-        source.CreatedOn,
-    ),
-
-    likes: Math.max(
-      0,
-      number(
-        source.likes ??
-          source.Likes,
-      ),
-    ),
-
-    likedByCurrentUser: bool(
-      source.likedByCurrentUser ??
-        source.LikedByCurrentUser ??
-        wrapper.alreadyLikedPost ??
-        wrapper.AlreadyLikedPost,
-    ),
-
-    comments: Array.isArray(rawComments)
-      ? rawComments
-          .map(normalizeComment)
-          .sort(
-            (left, right) =>
-              timestamp(right.createdOn) -
-              timestamp(left.createdOn),
-          )
-      : [],
-
-    deleteAllowed:
-      deleteValue === undefined
-        ? undefined
-        : bool(deleteValue),
-  };
-}
-
-function actionContains(
-  form: HTMLFormElement,
-  actionName: string,
-): boolean {
-  const action =
-    form.getAttribute("action") ??
-    "";
-
-  return action
-    .toLowerCase()
-    .includes(
-      `/discussions/${actionName.toLowerCase()}`,
-    );
-}
-
-function extractActionId(
-  action: string | null,
-): string {
-  if (!action) {
-    return "";
-  }
-
-  try {
-    const url = new URL(
-      action,
-      "http://paladinhub.local",
-    );
-
-    const queryId =
-      url.searchParams.get("id");
-
-    if (queryId) {
-      return queryId;
-    }
-
-    const segments =
-      url.pathname
-        .split("/")
-        .filter(Boolean);
-
-    return segments.at(-1) ?? "";
-  } catch {
-    return "";
-  }
-}
-
-function parseLikes(
-  value: string,
-): number {
-  const match = value.match(/\d+/);
-
-  return match
-    ? Number(match[0])
-    : 0;
-}
-
-function parseDiscussionHtml(
-  html: string,
-  requestedId: string,
-): DiscussionPost {
-  const documentNode =
-    new DOMParser().parseFromString(
-      html,
-      "text/html",
-    );
-
-  const article =
-    documentNode.querySelector<HTMLElement>(
-      ".discussion-item",
-    );
-
-  if (!article) {
-    throw new Error(
-      "The server returned a page without discussion data.",
-    );
-  }
-
-  const title =
-    article
-      .querySelector("h1, h2, h3")
-      ?.textContent
-      ?.trim() ?? "";
-
-  if (!title) {
-    throw new Error(
-      "The server returned an invalid discussion.",
-    );
-  }
-
-  const meta =
-    article.querySelector<HTMLElement>(
-      ".discussion-meta",
-    );
-
-  const authorName =
-    meta
-      ?.querySelector<HTMLElement>(
-        ".highlight",
-      )
-      ?.textContent
-      ?.trim() ||
-    "Unknown user";
-
-  const metaText =
-    meta?.textContent?.trim() ?? "";
-
-  const dateSeparator =
-    metaText.lastIndexOf("•");
-
-  const createdOn =
-    dateSeparator >= 0
-      ? metaText
-          .slice(dateSeparator + 1)
-          .trim()
-      : "";
-
-  const content =
-    article
-      .querySelector<HTMLElement>(
-        "p.mt-2",
-      )
-      ?.textContent
-      ?.trim() ??
-    article
-      .querySelector<HTMLElement>("p")
-      ?.textContent
-      ?.trim() ??
-    "";
-
-  const articleForms =
-    Array.from(
-      article.querySelectorAll<HTMLFormElement>(
-        "form",
-      ),
-    );
-
-  const likeForm =
-    articleForms.find((form) =>
-      actionContains(form, "Like"),
-    );
-
-  const likeButtonText =
-    likeForm
-      ?.querySelector("button")
-      ?.textContent
-      ?.trim() ?? "";
-
-  const deleteAllowed =
-    Array.from(
-      documentNode.querySelectorAll<HTMLFormElement>(
-        "form",
-      ),
-    ).some((form) =>
-      actionContains(form, "Delete"),
-    );
-
-  const commentsHeading =
-    Array.from(
-      documentNode.querySelectorAll<HTMLElement>(
-        "h1, h2, h3, h4, h5",
-      ),
-    ).find((heading) =>
-      heading.textContent
-        ?.trim()
-        .toLowerCase()
-        .startsWith("comments"),
-    );
-
-  const commentsContainer =
-    commentsHeading?.nextElementSibling;
-
-  const commentElements =
-    commentsContainer
-      ? Array.from(
-          commentsContainer.children,
-        ).filter(
-          (
-            element,
-          ): element is HTMLElement =>
-            element instanceof HTMLElement,
-        )
-      : [];
-
-  const comments =
-    commentElements
-      .map(
-        (
-          element,
-          index,
-        ): DiscussionComment | null => {
-          const header =
-            Array.from(
-              element.children,
-            ).find(
-              (child) =>
-                child.querySelector(
-                  "b, strong",
-                ) !== null &&
-                child.querySelector(
-                  "small",
-                ) !== null,
-            );
-
-          if (!header) {
-            return null;
-          }
-
-          const commentLikeForm =
-            element.querySelector<HTMLFormElement>(
-              "form",
-            );
-
-          const commentLikeButtonText =
-            commentLikeForm
-              ?.querySelector("button")
-              ?.textContent
-              ?.trim() ?? "";
-
-          const contentElement =
-            Array.from(
-              element.children,
-            ).find(
-              (child) =>
-                child !== header &&
-                child.tagName.toLowerCase() ===
-                  "div",
-            );
-
-          return {
-            id:
-              extractActionId(
-                commentLikeForm?.getAttribute(
-                  "action",
-                ) ?? null,
-              ) ||
-              `comment-${index}`,
-
-            authorId: "",
-
-            authorName:
-              header
-                .querySelector(
-                  "b, strong",
-                )
-                ?.textContent
-                ?.trim() ||
-              "Unknown user",
-
-            createdOn:
-              header
-                .querySelector("small")
-                ?.textContent
-                ?.trim() ?? "",
-
-            content:
-              contentElement
-                ?.textContent
-                ?.trim() ?? "",
-
-            likes: parseLikes(
-              commentLikeButtonText,
-            ),
-
-            likedByCurrentUser:
-              commentLikeButtonText
-                .toLowerCase()
-                .includes("unlike"),
-          };
-        },
-      )
-      .filter(
-        (
-          comment,
-        ): comment is DiscussionComment =>
-          comment !== null,
-      );
-
-  return {
-    id: requestedId,
-    title,
-    content,
-    authorId: "",
-    authorName,
-    createdOn,
-    likes: parseLikes(
-      likeButtonText,
-    ),
-    likedByCurrentUser:
-      likeButtonText
-        .toLowerCase()
-        .includes("unlike"),
-    comments,
-    deleteAllowed,
-  };
-}
-
-async function getCsrfToken(): Promise<string> {
-  const response = await fetchBackend(
-    backendEndpoints.auth.csrf,
-    {
-      cache: "no-store",
-    },
-  );
-
-  const payload =
-    await readApiJson<CsrfResponse>(
-      response,
-    );
-
-  if (!payload?.token) {
-    throw new Error(
-      "The server did not return a CSRF token.",
-    );
-  }
-
-  return payload.token;
-}
-
-async function readResponseError(
-  response: Response,
-  fallback: string,
-): Promise<string> {
-  const responseText =
-    await response.text().catch(
-      () => "",
-    );
-
-  if (!responseText.trim()) {
-    return fallback;
-  }
-
-  const contentType =
-    response.headers.get(
-      "content-type",
-    ) ?? "";
-
-  if (
-    contentType.includes(
-      "application/json",
-    )
-  ) {
-    try {
-      const payload =
-        JSON.parse(
-          responseText,
-        ) as ApiError;
-
-      if (payload.errors) {
-        const errors =
-          Object.values(
-            payload.errors,
-          )
-            .flatMap((value) =>
-              Array.isArray(value)
-                ? value
-                : [value],
-            )
-            .map((value) =>
-              value.trim(),
-            )
-            .filter(Boolean);
-
-        if (errors.length > 0) {
-          return errors.join(" ");
-        }
-      }
-
-      return (
-        payload.message ||
-        payload.title ||
-        payload.error ||
-        fallback
-      );
-    } catch {
-      return fallback;
-    }
-  }
-
-  try {
-    const documentNode =
-      new DOMParser().parseFromString(
-        responseText,
-        "text/html",
-      );
-
-    const validationMessages =
-      Array.from(
-        documentNode.querySelectorAll(
-          ".validation-summary-errors li, .field-validation-error",
-        ),
-      )
-        .map((element) =>
-          element.textContent?.trim(),
-        )
-        .filter(
-          (
-            value,
-          ): value is string =>
-            Boolean(value),
-        );
-
-    if (
-      validationMessages.length > 0
-    ) {
-      return Array.from(
-        new Set(validationMessages),
-      ).join(" ");
-    }
-
-    const pageTitle =
-      documentNode
-        .querySelector("title")
-        ?.textContent
-        ?.trim();
-
-    if (
-      pageTitle &&
-      !pageTitle
-        .toLowerCase()
-        .includes("paladinhub")
-    ) {
-      return pageTitle;
-    }
-  } catch {
-    return fallback;
-  }
-
-  return fallback;
-}
-
-async function loadDiscussion(
-  id: string,
-  signal?: AbortSignal,
-): Promise<DiscussionPost> {
-  const response = await fetchBackend(
-    backendEndpoints.discussions.details(
-      id,
-    ),
-    {
-      method: "GET",
-      cache: "no-store",
-      signal,
-      headers: {
-        Accept:
-          "application/json, text/html;q=0.9",
-      },
-    },
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      await readResponseError(
-        response,
-        response.status === 404
-          ? "Discussion not found."
-          : `The discussion could not be loaded (${response.status}).`,
-      ),
-    );
-  }
-
-  const contentType =
-    response.headers.get(
-      "content-type",
-    ) ?? "";
-
-  if (
-    contentType.includes(
-      "application/json",
-    )
-  ) {
-    const post = normalizePost(
-      await response.json(),
-      id,
-    );
-
-    if (!post.id || !post.title) {
-      throw new Error(
-        "The server returned an invalid discussion.",
-      );
-    }
-
-    return post;
-  }
-
-  return parseDiscussionHtml(
-    await response.text(),
-    id,
-  );
-}
-
-function isAbortError(
-  error: unknown,
-): boolean {
+function isAbortError(error: unknown): boolean {
   return (
     error instanceof DOMException &&
     error.name === "AbortError"
   );
 }
 
-export default function DiscussionDetails() {
-  const { id = "" } =
-    useParams<{ id: string }>();
+function formatDate(value: string): string {
+  const date = new Date(value);
 
+  return Number.isNaN(date.getTime())
+    ? value || "Unknown date"
+    : date.toLocaleString();
+}
+
+export default function DiscussionDetails() {
   const navigate = useNavigate();
+  const { id = "" } = useParams<{
+    id?: string;
+  }>();
 
   const {
-    user,
     isAuthenticated,
     loading: authLoading,
-    hasRole,
   } = useAuth();
 
   const [post, setPost] =
-    useState<DiscussionPost | null>(
-      null,
-    );
+    useState<DiscussionDetailsModel | null>(null);
 
-  const [comment, setComment] =
+  const [newComment, setNewComment] =
     useState("");
 
   const [loading, setLoading] =
     useState(true);
 
-  const [working, setWorking] =
-    useState<string | null>(null);
-
   const [error, setError] =
     useState<string | null>(null);
 
+  const [working, setWorking] =
+    useState<string | null>(null);
+
   const load = useCallback(
-    async (
-      signal?: AbortSignal,
-      showLoading = true,
-    ): Promise<void> => {
+    async (signal?: AbortSignal): Promise<void> => {
       if (!id) {
         setPost(null);
-        setError(
-          "The discussion identifier is missing.",
-        );
+        setError("Discussion not found.");
         setLoading(false);
         return;
       }
 
-      if (showLoading) {
-        setLoading(true);
-      }
-
+      setLoading(true);
       setError(null);
 
       try {
-        const result =
-          await loadDiscussion(
-            id,
-            signal,
-          );
+        const loadedPost =
+          await getDiscussion(id, signal);
 
-        if (signal?.aborted) {
-          return;
+        if (!signal?.aborted) {
+          setPost(loadedPost);
         }
-
-        setPost(result);
       } catch (caught) {
         if (
           signal?.aborted ||
@@ -832,17 +90,13 @@ export default function DiscussionDetails() {
         }
 
         setPost(null);
-
         setError(
           caught instanceof Error
             ? caught.message
             : "The discussion could not be loaded.",
         );
       } finally {
-        if (
-          showLoading &&
-          !signal?.aborted
-        ) {
+        if (!signal?.aborted) {
           setLoading(false);
         }
       }
@@ -854,240 +108,154 @@ export default function DiscussionDetails() {
     const controller =
       new AbortController();
 
-    void load(
-      controller.signal,
-      true,
-    );
+    void load(controller.signal);
 
     return () => {
       controller.abort();
     };
   }, [load]);
 
-  const performAction =
-    async (
-      key: string,
-      path: string,
-      body?: URLSearchParams,
-    ): Promise<boolean> => {
-      if (working !== null) {
-        return false;
-      }
+  const remove = async (): Promise<void> => {
+    if (!post || working !== null) {
+      return;
+    }
 
-      setWorking(key);
-      setError(null);
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this discussion?",
+      )
+    ) {
+      return;
+    }
 
-      try {
-        const csrfToken =
-          await getCsrfToken();
+    setWorking("delete");
+    setError(null);
 
-        const response =
-          await fetchBackend(
-            path,
-            {
-              method: "POST",
-              cache: "no-store",
-              redirect: "follow",
+    try {
+      await deleteDiscussion(post.id);
+      navigate("/Discussions/Index", {
+        replace: true,
+      });
+    } catch (caught) {
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "The discussion could not be deleted.",
+      );
+      setWorking(null);
+    }
+  };
 
-              headers: {
-                Accept:
-                  "application/json, text/html;q=0.9",
+  const togglePostLike = async (): Promise<void> => {
+    if (!post || working !== null) {
+      return;
+    }
 
-                "Content-Type":
-                  "application/x-www-form-urlencoded;charset=UTF-8",
+    setWorking("post-like");
+    setError(null);
 
-                "X-CSRF-TOKEN":
-                  csrfToken,
-              },
+    try {
+      setPost(
+        await toggleDiscussionLike(post.id),
+      );
+    } catch (caught) {
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "The like could not be updated.",
+      );
+    } finally {
+      setWorking(null);
+    }
+  };
 
-              body:
-                body ??
-                new URLSearchParams(),
-            },
-          );
+  const toggleCommentLike = async (
+    commentId: string,
+  ): Promise<void> => {
+    if (!post || working !== null) {
+      return;
+    }
 
-        if (!response.ok) {
-          throw new Error(
-            await readResponseError(
-              response,
-              `The action could not be completed (${response.status}).`,
-            ),
-          );
-        }
+    setWorking(`comment-like:${commentId}`);
+    setError(null);
 
-        await load(
-          undefined,
-          false,
-        );
+    try {
+      setPost(
+        await toggleDiscussionCommentLike(
+          post.id,
+          commentId,
+        ),
+      );
+    } catch (caught) {
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "The comment like could not be updated.",
+      );
+    } finally {
+      setWorking(null);
+    }
+  };
 
-        return true;
-      } catch (caught) {
-        setError(
-          caught instanceof Error
-            ? caught.message
-            : "The action could not be completed.",
-        );
-
-        return false;
-      } finally {
-        setWorking(null);
-      }
-    };
-
-  const canDelete = Boolean(
-    post &&
-      isAuthenticated &&
-      (
-        post.deleteAllowed !==
-        undefined
-          ? post.deleteAllowed
-          : hasRole("Admin") ||
-            user?.id ===
-              post.authorId
-      ),
-  );
-
-  const addComment = async (
+  const submitComment = async (
     event: FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     event.preventDefault();
 
-    if (!post) {
+    if (!post || working !== null) {
       return;
     }
 
-    const cleanComment =
-      comment.trim();
+    const content = newComment.trim();
 
-    if (!cleanComment) {
-      setError(
-        "Comment is required.",
-      );
+    if (!content) {
       return;
     }
 
-    const succeeded =
-      await performAction(
-        "comment",
-        `/Discussions/AddComment?id=${encodeURIComponent(
+    setWorking("add-comment");
+    setError(null);
+
+    try {
+      setPost(
+        await addDiscussionComment(
           post.id,
-        )}`,
-        new URLSearchParams({
-          NewComment:
-            cleanComment,
-        }),
+          content,
+        ),
       );
-
-    if (succeeded) {
-      setComment("");
+      setNewComment("");
+    } catch (caught) {
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "The comment could not be added.",
+      );
+    } finally {
+      setWorking(null);
     }
   };
 
-  const deleteDiscussion =
-    async (): Promise<void> => {
-      if (
-        !post ||
-        working !== null
-      ) {
-        return;
-      }
-
-      const confirmed =
-        window.confirm(
-          "Are you sure you want to delete this discussion?",
-        );
-
-      if (!confirmed) {
-        return;
-      }
-
-      setWorking("delete");
-      setError(null);
-
-      try {
-        const csrfToken =
-          await getCsrfToken();
-
-        const response =
-          await fetchBackend(
-            `/Discussions/Delete?id=${encodeURIComponent(
-              post.id,
-            )}`,
-            {
-              method: "POST",
-              cache: "no-store",
-              redirect: "follow",
-
-              headers: {
-                Accept:
-                  "application/json, text/html;q=0.9",
-
-                "Content-Type":
-                  "application/x-www-form-urlencoded;charset=UTF-8",
-
-                "X-CSRF-TOKEN":
-                  csrfToken,
-              },
-
-              body:
-                new URLSearchParams(),
-            },
-          );
-
-        if (!response.ok) {
-          throw new Error(
-            await readResponseError(
-              response,
-              `The discussion could not be deleted (${response.status}).`,
-            ),
-          );
-        }
-
-        navigate(
-          "/discussions",
-          {
-            replace: true,
-          },
-        );
-      } catch (caught) {
-        setError(
-          caught instanceof Error
-            ? caught.message
-            : "The discussion could not be deleted.",
-        );
-
-        setWorking(null);
-      }
-    };
-
-  if (loading) {
-    return (
-      <main className="mx-auto max-w-5xl px-4 py-12 text-slate-200">
-        Loading discussion…
-      </main>
-    );
-  }
-
   return (
     <main className="mx-auto max-w-5xl px-4 py-10 text-slate-100">
-      <div className="mb-4 flex flex-wrap gap-3">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <Link
-          to="/discussions"
-          className="rounded border border-blue-400 px-4 py-2 text-blue-300 hover:bg-blue-500/10"
+          to="/Discussions/Index"
+          className="rounded border border-slate-500 px-3 py-2 text-slate-200 hover:bg-slate-800"
         >
-          ← Back to Discussions
+          <i
+            className="fa-solid fa-arrow-left"
+            aria-hidden="true"
+          />{" "}
+          Back
         </Link>
 
-        {canDelete ? (
+        {post?.canDelete ? (
           <button
             type="button"
             onClick={() => {
-              void deleteDiscussion();
+              void remove();
             }}
-            disabled={
-              working !== null
-            }
-            className="rounded border border-red-500 px-4 py-2 text-red-300 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={working !== null}
+            className="rounded border border-red-500 px-3 py-2 font-semibold text-red-300 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <i
               className="fa-solid fa-trash"
@@ -1095,14 +263,14 @@ export default function DiscussionDetails() {
             />{" "}
             {working === "delete"
               ? "Deleting…"
-              : "Delete Discussion"}
+              : "Delete"}
           </button>
         ) : null}
       </div>
 
       {error ? (
         <div
-          className="mb-4 rounded border border-red-500/60 bg-red-950/40 p-3 text-red-200"
+          className="mb-5 rounded border border-red-500/60 bg-red-950/40 p-3 text-red-200"
           role="alert"
         >
           <p>{error}</p>
@@ -1114,7 +282,7 @@ export default function DiscussionDetails() {
                 void load();
               }}
               disabled={loading}
-              className="mt-3 rounded border border-red-300/40 px-3 py-2 font-semibold hover:bg-red-900/40 disabled:opacity-50"
+              className="mt-3 rounded border border-red-300/40 px-3 py-2 font-semibold hover:bg-red-900/40 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Try again
             </button>
@@ -1122,186 +290,166 @@ export default function DiscussionDetails() {
         </div>
       ) : null}
 
-      {!post ? (
-        <div className="rounded border border-slate-700 bg-slate-950 p-6">
-          Discussion not found.
-        </div>
-      ) : (
+      {loading ? (
+        <p className="text-slate-300">
+          Loading discussion…
+        </p>
+      ) : null}
+
+      {!loading && post ? (
         <>
-          <article className="rounded-lg border border-amber-400 bg-[#1a1a1a] p-5 shadow-lg">
-            <h1 className="text-3xl font-bold">
+          <article className="rounded-lg border border-amber-400 bg-[#1a1a1a] p-5 shadow-xl">
+            <h1 className="text-3xl font-bold text-amber-100">
               {post.title}
             </h1>
 
-            <p className="mt-1 text-sm text-slate-400">
+            <p className="mt-2 text-sm text-slate-400">
               by{" "}
               <span className="font-semibold text-amber-300">
                 {post.authorName}
               </span>{" "}
-              •{" "}
-              {formatDate(
-                post.createdOn,
-              )}
+              • {formatDate(post.createdOn)}
             </p>
 
-            <p className="mt-5 whitespace-pre-wrap break-words text-slate-100">
+            <div className="my-5 h-px bg-amber-400/50" />
+
+            <p className="whitespace-pre-wrap break-words text-slate-100">
               {post.content}
             </p>
 
-            {isAuthenticated ? (
-              <button
-                type="button"
-                onClick={() => {
-                  void performAction(
-                    "like-post",
-                    `/Discussions/Like?id=${encodeURIComponent(
-                      post.id,
-                    )}`,
-                  );
-                }}
-                disabled={
-                  working !== null
-                }
-                className="mt-5 rounded border border-red-500 px-4 py-2 text-red-300 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                ❤️ {post.likes}{" "}
-                {post.likedByCurrentUser
-                  ? "Unlike"
-                  : "Like"}
-              </button>
-            ) : null}
+            <div className="mt-5 flex items-center gap-3 text-sm text-slate-300">
+              {!authLoading && isAuthenticated ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    void togglePostLike();
+                  }}
+                  disabled={working !== null}
+                  className="rounded border border-pink-500/70 px-3 py-1.5 font-semibold text-pink-300 hover:bg-pink-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {post.likedByCurrentUser
+                    ? "Unlike"
+                    : "Like"}{" "}
+                  ❤️ {post.likes}
+                </button>
+              ) : (
+                <span>❤️ {post.likes}</span>
+              )}
+            </div>
           </article>
 
-          <h2 className="mt-8 text-2xl font-bold">
-            Comments (
-            {post.comments.length})
-          </h2>
+          <section className="mt-8">
+            <h2 className="text-2xl font-bold">
+              Comments ({post.comments.length})
+            </h2>
 
-          <div className="mt-4 space-y-4">
-            {post.comments.map(
-              (
-                entry,
-                index,
-              ) => (
+            <div className="mt-4 space-y-3">
+              {post.comments.length === 0 ? (
+                <div className="rounded border border-slate-700 bg-slate-950 p-4 text-slate-400">
+                  No comments yet.
+                </div>
+              ) : null}
+
+              {post.comments.map((comment) => (
                 <article
-                  key={`${entry.id}-${index}`}
-                  className="rounded-lg border border-amber-400 bg-[#1a1a1a] p-4"
+                  key={comment.id}
+                  className="rounded-lg border border-slate-700 bg-[#171717] p-4"
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <p>
-                      <strong>
-                        {entry.authorName}
-                      </strong>{" "}
-                      •{" "}
-                      <span className="text-sm text-slate-400">
-                        {formatDate(
-                          entry.createdOn,
-                        )}
-                      </span>
-                    </p>
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold text-amber-300">
+                        {comment.authorName}
+                      </p>
 
-                    {isAuthenticated &&
-                    !entry.id.startsWith(
-                      "comment-",
-                    ) ? (
+                      <p className="text-xs text-slate-500">
+                        {formatDate(comment.createdOn)}
+                      </p>
+                    </div>
+
+                    {!authLoading && isAuthenticated ? (
                       <button
                         type="button"
                         onClick={() => {
-                          void performAction(
-                            `comment-like-${entry.id}`,
-                            `/Discussions/LikeComment?id=${encodeURIComponent(
-                              entry.id,
-                            )}`,
+                          void toggleCommentLike(
+                            comment.id,
                           );
                         }}
-                        disabled={
-                          working !==
-                          null
-                        }
-                        className="rounded border border-red-500 px-3 py-1 text-sm text-red-300 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+                        disabled={working !== null}
+                        className="rounded border border-pink-500/50 px-2.5 py-1 text-sm text-pink-300 hover:bg-pink-500/10 disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        ❤️ {entry.likes}{" "}
-                        {entry.likedByCurrentUser
+                        {comment.likedByCurrentUser
                           ? "Unlike"
-                          : "Like"}
+                          : "Like"}{" "}
+                        ❤️ {comment.likes}
                       </button>
-                    ) : null}
+                    ) : (
+                      <span className="text-sm text-slate-400">
+                        ❤️ {comment.likes}
+                      </span>
+                    )}
                   </div>
 
                   <p className="mt-3 whitespace-pre-wrap break-words text-slate-200">
-                    {entry.content}
+                    {comment.content}
                   </p>
                 </article>
-              ),
-            )}
+              ))}
+            </div>
+          </section>
 
-            {post.comments.length ===
-            0 ? (
-              <p className="text-slate-400">
-                No comments yet.
-              </p>
+          <section className="mt-8">
+            {!authLoading && isAuthenticated ? (
+              <form
+                onSubmit={submitComment}
+                className="rounded-lg border border-amber-400/60 bg-[#1a1a1a] p-4"
+              >
+                <label
+                  htmlFor="new-comment"
+                  className="mb-2 block font-bold"
+                >
+                  Add a comment
+                </label>
+
+                <textarea
+                  id="new-comment"
+                  value={newComment}
+                  onChange={(event) => {
+                    setNewComment(event.target.value);
+                  }}
+                  rows={5}
+                  disabled={working !== null}
+                  className="w-full resize-y rounded border border-slate-600 bg-[#2c2c2c] px-3 py-2 text-white outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-300 disabled:cursor-not-allowed disabled:opacity-60"
+                />
+
+                <button
+                  type="submit"
+                  disabled={
+                    working !== null ||
+                    !newComment.trim()
+                  }
+                  className="mt-3 rounded border border-emerald-500 px-4 py-2 font-semibold text-emerald-300 hover:bg-emerald-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {working === "add-comment"
+                    ? "Posting…"
+                    : "Post comment"}
+                </button>
+              </form>
             ) : null}
-          </div>
 
-          {authLoading ? (
-            <div className="mt-5 rounded border border-slate-700 bg-slate-950 p-4 text-slate-400">
-              Checking your account…
-            </div>
-          ) : isAuthenticated ? (
-            <form
-              onSubmit={addComment}
-              className="mt-6 rounded-lg border border-amber-400 bg-[#1a1a1a] p-4"
-            >
-              <label
-                htmlFor="new-comment"
-                className="mb-2 block font-semibold"
-              >
-                Add a comment
-              </label>
-
-              <textarea
-                id="new-comment"
-                name="NewComment"
-                value={comment}
-                onChange={(event) => {
-                  setComment(
-                    event.target.value,
-                  );
-                }}
-                rows={5}
-                required
-                disabled={
-                  working !== null
-                }
-                className="w-full resize-y rounded border border-amber-400 bg-[#151515] px-3 py-2 text-white outline-none focus:ring-2 focus:ring-amber-300 disabled:cursor-not-allowed disabled:opacity-60"
-                placeholder="Write a comment…"
-              />
-
-              <button
-                type="submit"
-                disabled={
-                  working !== null
-                }
-                className="mt-3 rounded border border-blue-400 px-4 py-2 font-semibold text-blue-300 hover:bg-blue-500/10 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {working === "comment"
-                  ? "Posting…"
-                  : "Comment"}
-              </button>
-            </form>
-          ) : (
-            <div className="mt-5 rounded border border-blue-400/50 bg-blue-950/30 p-4 text-blue-100">
-              <Link
-                to="/Account/Login"
-                className="underline"
-              >
-                Log in
-              </Link>{" "}
-              to comment.
-            </div>
-          )}
+            {!authLoading && !isAuthenticated ? (
+              <div className="rounded border border-slate-700 bg-slate-950 p-4 text-slate-300">
+                <Link
+                  to="/Account/Login"
+                  className="text-blue-300 underline"
+                >
+                  Log in
+                </Link>{" "}
+                to comment or like this discussion.
+              </div>
+            ) : null}
+          </section>
         </>
-      )}
+      ) : null}
     </main>
   );
 }
