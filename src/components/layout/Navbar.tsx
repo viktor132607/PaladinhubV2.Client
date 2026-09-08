@@ -2,7 +2,6 @@
 
 import {
   BuildingStorefrontIcon,
-  ChevronDownIcon,
   ShoppingCartIcon,
 } from "@heroicons/react/24/solid";
 
@@ -18,16 +17,6 @@ const guidePages = [
   "Stats",
 ];
 
-const navLinkClass =
-  "flex items-center gap-1 px-2 py-2 text-[1.1rem] font-bold " +
-  "text-[#FFD700] no-underline transition-[color,text-shadow] duration-300 " +
-  "hover:text-[#FFC300] hover:[text-shadow:0_0_4px_#FFD700]";
-
-const dropdownLinkClass =
-  "block whitespace-nowrap px-4 py-1 font-bold text-[#FFD700] no-underline " +
-  "transition-colors duration-300 hover:bg-[#FFD700] hover:text-[#1e1e1e] " +
-  "hover:[text-shadow:none]";
-
 function GuideMenu({
   label,
   section,
@@ -36,42 +25,27 @@ function GuideMenu({
   section: string;
 }) {
   return (
-    <div className="group relative">
+    <li className="nav-item dropdown">
       <Link
         to={`/${section}/Overview`}
-        className={navLinkClass}
+        className="nav-link dropdown-toggle"
       >
-        <span>{label}</span>
-
-        <ChevronDownIcon
-          aria-hidden="true"
-          className="h-3 w-3"
-        />
+        {label}
       </Link>
 
-      <div
-        className="
-          invisible absolute left-0 top-full z-50
-          min-w-[160px]
-          border border-[#FFD700]
-          bg-[#2c2c2c]
-          py-2
-          opacity-0
-          transition-opacity duration-150
-          group-hover:visible group-hover:opacity-100
-        "
-      >
+      <ul className="dropdown-menu">
         {guidePages.map((page) => (
-          <Link
-            key={page}
-            to={`/${section}/${page}`}
-            className={dropdownLinkClass}
-          >
-            {page}
-          </Link>
+          <li key={page}>
+            <Link
+              to={`/${section}/${page}`}
+              className="dropdown-item"
+            >
+              {page}
+            </Link>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </li>
   );
 }
 
@@ -79,88 +53,93 @@ export default function Navbar() {
   const { hasRole } = useAuth();
 
   return (
-    <header
-      className="
-        fixed inset-x-0 top-0 z-[1000]
-        border-b-2 border-[#FFD700]
-        bg-[#1e1e1e]
-        px-4 py-2
-      "
-    >
-      <nav
-        aria-label="Main navigation"
-        className="flex w-full items-center px-3"
-      >
-        <div className="flex items-center">
-          <Link to="/" className={navLinkClass}>
-            Home
-          </Link>
+    <header>
+      <nav className="navbar navbar-expand-sm navbar-toggleable-sm navbar-custom border-bottom box-shadow mb-3 ph-v1-navbar">
+        <div className="container-fluid">
+          <div className="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            <ul className="navbar-nav">
+              <li className="nav-item">
+                <Link to="/" className="nav-link">
+                  Home
+                </Link>
+              </li>
 
-          <GuideMenu
-            label="Holy Paladin"
-            section="Holy"
-          />
+              <GuideMenu
+                label="Holy Paladin"
+                section="Holy"
+              />
 
-          <GuideMenu
-            label="Protection Paladin"
-            section="Protection"
-          />
+              <GuideMenu
+                label="Protection Paladin"
+                section="Protection"
+              />
 
-          <GuideMenu
-            label="Retribution Paladin"
-            section="Retribution"
-          />
+              <GuideMenu
+                label="Retribution Paladin"
+                section="Retribution"
+              />
 
-          <Link
-            to="/Discussions/Index"
-            className={navLinkClass}
-          >
-            Discussion
-          </Link>
+              <li className="nav-item">
+                <Link
+                  to="/Discussions/Index"
+                  className="nav-link"
+                >
+                  Discussion
+                </Link>
+              </li>
 
-          {hasRole("Admin") && (
-            <Link
-              to="/Admin/Database"
-              className={navLinkClass}
-            >
-              Database
-            </Link>
-          )}
+              {hasRole("Admin") && (
+                <li className="nav-item">
+                  <Link
+                    to="/Admin/Database"
+                    className="nav-link"
+                  >
+                    Database
+                  </Link>
+                </li>
+              )}
 
-          <Link
-            to="/Home/Privacy"
-            className={navLinkClass}
-          >
-            Privacy
-          </Link>
-        </div>
+              <li className="nav-item">
+                <Link
+                  to="/Home/Privacy"
+                  className="nav-link"
+                >
+                  Privacy
+                </Link>
+              </li>
+            </ul>
 
-        <div className="ml-auto flex items-center">
-          <Link
-            to="/Merchandise/Merchandise"
-            className={navLinkClass}
-          >
-            <BuildingStorefrontIcon
-              aria-hidden="true"
-              className="h-4 w-4"
-            />
+            <div className="navbar-nav ms-auto">
+              <div className="nav-item">
+                <Link
+                  to="/Merchandise/Merchandise"
+                  className="nav-link"
+                >
+                  <BuildingStorefrontIcon
+                    aria-hidden="true"
+                    className="ph-v1-nav-icon"
+                  />{" "}
+                  Merchandise
+                </Link>
+              </div>
 
-            <span>Merchandise</span>
-          </Link>
+              <div className="nav-item position-relative">
+                <Link
+                  to="/Cart/MyCart"
+                  title="My Cart"
+                  aria-label="My Cart"
+                  className="nav-link position-relative"
+                >
+                  <ShoppingCartIcon
+                    aria-hidden="true"
+                    className="ph-v1-nav-icon"
+                  />
+                </Link>
+              </div>
 
-          <Link
-            to="/Cart/MyCart"
-            title="My Cart"
-            aria-label="My Cart"
-            className={`${navLinkClass} relative`}
-          >
-            <ShoppingCartIcon
-              aria-hidden="true"
-              className="h-5 w-5"
-            />
-          </Link>
-
-          <AuthMenu />
+              <AuthMenu />
+            </div>
+          </div>
         </div>
       </nav>
     </header>
