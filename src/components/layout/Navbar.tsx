@@ -56,7 +56,7 @@ export default function Navbar() {
     <header>
       <nav className="navbar navbar-expand-sm navbar-toggleable-sm navbar-custom border-bottom box-shadow mb-3 ph-v1-navbar">
         <div className="container-fluid">
-          <div className="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+          <div className="navbar-collapse justify-content-between">
             <ul className="navbar-nav">
               <li className="nav-item">
                 <Link to="/" className="nav-link">
