@@ -23,6 +23,9 @@
       }
     ],
     "paths": {
+      "@/pages/*": [
+        "./src/legacy-pages/*"
+      ],
       "@/*": [
         "./src/*"
       ]
