@@ -5,7 +5,6 @@ import { backendEndpoints, fetchBackend } from "@/config/api";
 import { Link } from "@/router/nextCompat";
 
 type CsrfResponse = { token?: string };
-
 type ApiMessage = { message?: string; title?: string; error?: string };
 
 async function readResponseMessage(response: Response): Promise<string> {
@@ -32,19 +31,16 @@ export default function VerifyEmail() {
     event.preventDefault();
     setError("");
     setMessage("");
-
     const normalizedEmail = email.trim();
     if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
       setError("Enter a valid email address.");
       return;
     }
-
     setSubmitting(true);
     try {
       const csrfResponse = await fetchBackend(backendEndpoints.auth.csrf);
       const csrf = await csrfResponse.json() as CsrfResponse;
       if (!csrf.token) throw new Error("CSRF token is missing.");
-
       const response = await fetchBackend("/Account/VerifyEmail", {
         method: "POST",
         headers: {
@@ -55,14 +51,8 @@ export default function VerifyEmail() {
         },
         body: new URLSearchParams({ Email: normalizedEmail }),
       });
-
-      if (!response.ok) {
-        if (response.status === 404 || response.status === 405) throw new Error("The backend VerifyEmail POST action is not implemented yet.");
-        throw new Error((await readResponseMessage(response)) || `Verification request failed with status ${response.status}.`);
-      }
-
-      const responseMessage = await readResponseMessage(response);
-      setMessage(responseMessage || "Verification request accepted. Check your email for the next step.");
+      if (!response.ok) throw new Error((await readResponseMessage(response)) || `Verification request failed with status ${response.status}.`);
+      setMessage((await readResponseMessage(response)) || "Verification request accepted.");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Email verification failed.");
     } finally {
@@ -71,24 +61,22 @@ export default function VerifyEmail() {
   };
 
   return (
-    <main className="flex min-h-[calc(100vh-56px)] items-center justify-center bg-[#0f1216] px-4 py-10 text-[#e9ecef]">
-      <section className="w-full max-w-md rounded-xl border border-[#313a45] bg-[#1a1f24] p-6 shadow-2xl">
-        <h1 className="text-center text-3xl font-semibold">Verify Email</h1>
-        <p className="mt-2 text-center text-sm text-[#a8b0bd]">Enter the email address attached to your PaladinHub account.</p>
-
-        {error ? <div className="mt-5 rounded-lg border border-red-500/50 bg-red-950/40 px-4 py-3 text-sm text-red-200" role="alert">{error}</div> : null}
-        {message ? <div className="mt-5 rounded-lg border border-emerald-500/50 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200" role="status">{message}</div> : null}
-
-        <form onSubmit={(event) => void submit(event)} className="mt-6">
-          <label htmlFor="verifyEmail" className="block text-sm font-medium">Email</label>
-          <input id="verifyEmail" name="Email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} disabled={submitting} className="mt-2 w-full rounded-md border border-[#46515e] bg-[#0f1216] px-3 py-2.5 text-white outline-none focus:border-blue-500" />
-          <button type="submit" disabled={submitting} className="mt-5 w-full rounded-md bg-emerald-600 px-4 py-2.5 font-semibold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60">
-            {submitting ? "Submitting..." : "Verify"}
-          </button>
+    <div className="account-container">
+      <div className="account-box">
+        <h2 className="text-center mb-4">Verify Email</h2>
+        <form onSubmit={(event) => void submit(event)}>
+          {error ? <div className="text-danger">{error}</div> : null}
+          {message ? <div>{message}</div> : null}
+          <div className="mb-3">
+            <label htmlFor="Email" className="form-label">Email</label>
+            <input id="Email" name="Email" type="email" className="form-control" value={email} onChange={(event) => setEmail(event.target.value)} disabled={submitting} />
+          </div>
+          <input type="submit" value="Verify" className="btn btn-success w-100 p-2" disabled={submitting} />
+          <div className="text-center mt-2">
+            <Link to="/" className="text-decoration-none mt-3">Back</Link>
+          </div>
         </form>
-
-        <div className="mt-4 text-center"><Link to="/" className="text-blue-400 hover:underline">Back</Link></div>
-      </section>
-    </main>
+      </div>
+    </div>
   );
 }
