@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import { Link } from "@/router/nextCompat";
 import AuthMenu from "./AuthMenu";
@@ -21,6 +21,31 @@ function GuideMenu({ label, section }: { label: string; section: string }) {
 export default function Navbar() {
   const { hasRole } = useAuth();
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const navbar = document.querySelector<HTMLElement>(".navbar-custom");
+    if (!navbar) return;
+
+    const updateNavbarVisibility = (mouseY: number) => {
+      if (window.scrollY === 0 || mouseY <= 600) {
+        navbar.style.setProperty("top", "0", "important");
+      } else {
+        navbar.style.setProperty("top", "-100px", "important");
+      }
+    };
+
+    const onMouseMove = (event: MouseEvent) => updateNavbarVisibility(event.clientY);
+    const onScroll = () => updateNavbarVisibility(999);
+
+    document.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("scroll", onScroll);
+    updateNavbarVisibility(999);
+
+    return () => {
+      document.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
 
   return (
     <header>
