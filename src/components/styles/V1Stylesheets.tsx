@@ -41,8 +41,18 @@ const isGuidePath = (pathname: string) => {
   );
 };
 
+const isPublicLayoutAdminPath = (pathname: string) =>
+  pathname === "/admin/pagebuilder" ||
+  pathname.startsWith("/admin/pagebuilder/") ||
+  pathname === "/admin/products" ||
+  pathname.startsWith("/admin/products/");
+
 const getRouteStyles = (pathname: string): string[] => {
   const normalized = normalizePath(pathname);
+
+  if (isPublicLayoutAdminPath(normalized)) {
+    return [BOOTSTRAP_STYLE, SITE_STYLE];
+  }
 
   if (normalized === "/admin" || normalized.startsWith("/admin/")) {
     return [BOOTSTRAP_STYLE, SITE_STYLE, `${STYLE_ROOT}/admin/admin.css`];

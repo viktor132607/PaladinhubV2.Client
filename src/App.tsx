@@ -1,11 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-} from "@/router/nextCompat";
+import { BrowserRouter as Router, Route, Routes } from "@/router/nextCompat";
 
 import AdminLayout from "@/components/admin/AdminLayout";
 import Layout from "@/components/layout/Layout";
@@ -34,21 +30,16 @@ import AccountSettings from "@/pages/account/Settings";
 import TransactionHistory from "@/pages/account/TransactionHistory";
 
 import AdminDatabase from "@/pages/admin/database/Database";
-
 import CreateItem from "@/pages/admin/items/CreateItem";
 import DeleteItem from "@/pages/admin/items/DeleteItem";
 import EditItem from "@/pages/admin/items/EditItem";
 import ItemDetails from "@/pages/admin/items/ItemDetails";
-
 import CreatePage from "@/pages/admin/page-builder/CreatePage";
 import DeletePage from "@/pages/admin/page-builder/DeletePage";
-
 import CreateProduct from "@/pages/admin/products/CreateProduct";
 import EditProduct from "@/pages/admin/products/EditProduct";
-
 import CreatePromoCode from "@/pages/admin/promo-codes/CreatePromoCode";
 import PromoCodes from "@/pages/admin/promo-codes/PromoCodes";
-
 import CreateSpell from "@/pages/admin/spells/CreateSpell";
 import DeleteSpell from "@/pages/admin/spells/DeleteSpell";
 import EditSpell from "@/pages/admin/spells/EditSpell";
@@ -76,11 +67,9 @@ import ThanksForPurchasing from "@/pages/checkout/ThanksForPurchasing";
 
 import ContentPage from "@/pages/content/ContentPage";
 import SitePrivacy from "@/pages/content/Privacy";
-
 import CreateDiscussion from "@/pages/discussions/CreateDiscussion";
 import DiscussionDetails from "@/pages/discussions/DiscussionDetails";
 import Discussions from "@/pages/discussions/Discussions";
-
 import ErrorPage from "@/pages/errors/ErrorPage";
 import ServerError from "@/pages/errors/ServerError";
 
@@ -90,14 +79,12 @@ import HolyOverview from "@/pages/guides/holy/Overview";
 import HolyRotation from "@/pages/guides/holy/Rotation";
 import HolyStats from "@/pages/guides/holy/Stats";
 import HolyTalents from "@/pages/guides/holy/Talents";
-
 import ProtectionConsumables from "@/pages/guides/protection/Consumables";
 import ProtectionGear from "@/pages/guides/protection/Gear";
 import ProtectionOverview from "@/pages/guides/protection/Overview";
 import ProtectionRotation from "@/pages/guides/protection/Rotation";
 import ProtectionStats from "@/pages/guides/protection/Stats";
 import ProtectionTalents from "@/pages/guides/protection/Talents";
-
 import RetributionConsumables from "@/pages/guides/retribution/Consumables";
 import RetributionGear from "@/pages/guides/retribution/Gear";
 import RetributionOverview from "@/pages/guides/retribution/Overview";
@@ -109,18 +96,19 @@ function protectedPage(page: ReactNode) {
   return <PrivateRoute>{page}</PrivateRoute>;
 }
 
+function adminPage(page: ReactNode) {
+  return <RoleRoute role="Admin">{page}</RoleRoute>;
+}
+
 export default function App() {
   return (
     <Router>
       <V1Stylesheets />
-
       <Routes>
         <Route element={<Layout />}>
-          {/* HOME */}
           <Route path="/" element={<Home />} />
           <Route path="/Home/Home" element={<Home />} />
 
-          {/* HOLY */}
           <Route path="/Holy/Overview" element={<HolyOverview />} />
           <Route path="/Holy/Gear" element={<HolyGear />} />
           <Route path="/Holy/Talents" element={<HolyTalents />} />
@@ -128,248 +116,83 @@ export default function App() {
           <Route path="/Holy/Rotation" element={<HolyRotation />} />
           <Route path="/Holy/Stats" element={<HolyStats />} />
 
-          {/* PROTECTION */}
-          <Route
-            path="/Protection/Overview"
-            element={<ProtectionOverview />}
-          />
+          <Route path="/Protection/Overview" element={<ProtectionOverview />} />
           <Route path="/Protection/Gear" element={<ProtectionGear />} />
-          <Route
-            path="/Protection/Talents"
-            element={<ProtectionTalents />}
-          />
-          <Route
-            path="/Protection/Consumables"
-            element={<ProtectionConsumables />}
-          />
-          <Route
-            path="/Protection/Rotation"
-            element={<ProtectionRotation />}
-          />
+          <Route path="/Protection/Talents" element={<ProtectionTalents />} />
+          <Route path="/Protection/Consumables" element={<ProtectionConsumables />} />
+          <Route path="/Protection/Rotation" element={<ProtectionRotation />} />
           <Route path="/Protection/Stats" element={<ProtectionStats />} />
 
-          {/* RETRIBUTION */}
-          <Route
-            path="/Retribution/Overview"
-            element={<RetributionOverview />}
-          />
+          <Route path="/Retribution/Overview" element={<RetributionOverview />} />
           <Route path="/Retribution/Gear" element={<RetributionGear />} />
-          <Route
-            path="/Retribution/Talents"
-            element={<RetributionTalents />}
-          />
-          <Route
-            path="/Retribution/Consumables"
-            element={<RetributionConsumables />}
-          />
-          <Route
-            path="/Retribution/Rotation"
-            element={<RetributionRotation />}
-          />
-          <Route
-            path="/Retribution/Stats"
-            element={<RetributionStats />}
-          />
+          <Route path="/Retribution/Talents" element={<RetributionTalents />} />
+          <Route path="/Retribution/Consumables" element={<RetributionConsumables />} />
+          <Route path="/Retribution/Rotation" element={<RetributionRotation />} />
+          <Route path="/Retribution/Stats" element={<RetributionStats />} />
 
-          {/* DISCUSSIONS */}
+          <Route path="/Discussion/Index" element={<Discussions />} />
           <Route path="/Discussions/Index" element={<Discussions />} />
           <Route path="/discussions" element={<Discussions />} />
+          <Route path="/Discussions/Create" element={<CreateDiscussion />} />
+          <Route path="/Discussions/Details/:id" element={<DiscussionDetails />} />
 
-          <Route
-            path="/Discussions/Create"
-            element={<CreateDiscussion />}
-          />
+          <Route path="/Merchandise/Merchandise" element={<Products />} />
+          <Route path="/Merchandise/List" element={<Products />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/Products/Details/:id" element={<ProductDetails />} />
+          <Route path="/products/:id" element={<ProductDetails />} />
+          <Route path="/Products/Create" element={adminPage(<CreateProduct />)} />
+          <Route path="/Products/Edit/:id" element={adminPage(<EditProduct />)} />
 
-          <Route
-            path="/Discussions/Details/:id"
-            element={<DiscussionDetails />}
-          />
-
-          {/* PRODUCTS */}
-          <Route
-            path="/Merchandise/Merchandise"
-            element={<Products />}
-          />
-
-          <Route
-            path="/Merchandise/List"
-            element={<Products />}
-          />
-
-          <Route
-            path="/products"
-            element={<Products />}
-          />
-
-          <Route
-            path="/Products/Details/:id"
-            element={<ProductDetails />}
-          />
-
-          <Route
-            path="/products/:id"
-            element={<ProductDetails />}
-          />
-
-          {/* CART */}
           <Route path="/Cart/MyCart" element={<Cart />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/Cart/Details/:id" element={<CartDetails />} />
           <Route path="/Cart/Archive" element={<CartArchive />} />
           <Route path="/Products/Add/:id" element={<AddProduct />} />
 
-          {/* CHECKOUT */}
           <Route path="/Checkout/Start" element={<Checkout />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/Checkout/Shipping" element={<Shipping />} />
+          <Route path="/Checkout/Payment" element={<CheckoutPayment />} />
+          <Route path="/Checkout/Card" element={<CardPayment />} />
+          <Route path="/Checkout/Review" element={<CheckoutReview />} />
+          <Route path="/Checkout/Registered" element={<RegisteredCheckout />} />
+          <Route path="/Checkout/Success" element={<CheckoutSuccess />} />
+          <Route path="/Checkout/Failure" element={<CheckoutFailure />} />
+          <Route path="/Home/ThanksForPurchasing" element={<ThanksForPurchasing />} />
 
-          <Route
-            path="/Checkout/Shipping"
-            element={<Shipping />}
-          />
-
-          <Route
-            path="/Checkout/Payment"
-            element={<CheckoutPayment />}
-          />
-
-          <Route
-            path="/Checkout/Card"
-            element={<CardPayment />}
-          />
-
-          <Route
-            path="/Checkout/Review"
-            element={<CheckoutReview />}
-          />
-
-          <Route
-            path="/Checkout/Registered"
-            element={<RegisteredCheckout />}
-          />
-
-          <Route
-            path="/Checkout/Success"
-            element={<CheckoutSuccess />}
-          />
-
-          <Route
-            path="/Checkout/Failure"
-            element={<CheckoutFailure />}
-          />
-
-          <Route
-            path="/Home/ThanksForPurchasing"
-            element={<ThanksForPurchasing />}
-          />
-
-          {/* AUTH */}
           <Route path="/Account/Login" element={<Login />} />
           <Route path="/login" element={<Login />} />
-
           <Route path="/Account/Register" element={<Register />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/Account/LoginWith2fa" element={<LoginWith2FA />} />
+          <Route path="/Account/RecoveryCodeLogin" element={<RecoveryCodeLogin />} />
+          <Route path="/Account/VerifyEmail" element={<VerifyEmail />} />
 
-          <Route
-            path="/Account/LoginWith2fa"
-            element={<LoginWith2FA />}
-          />
+          <Route path="/Account/ShowRecoveryCodes" element={protectedPage(<ShowRecoveryCodes />)} />
+          <Route path="/Account/MyAccount" element={protectedPage(<MyAccount />)} />
+          <Route path="/account" element={protectedPage(<MyAccount />)} />
+          <Route path="/Account/AccountDetails" element={protectedPage(<AccountDetails />)} />
+          <Route path="/Account/ChangePassword" element={protectedPage(<ChangePassword />)} />
+          <Route path="/Account/Connections" element={protectedPage(<Connections />)} />
+          <Route path="/Account/Enable2FA" element={protectedPage(<Enable2FA />)} />
+          <Route path="/Account/PaymentMethods" element={protectedPage(<PaymentMethods />)} />
+          <Route path="/Account/AddPaymentMethod" element={protectedPage(<AddPaymentMethod />)} />
+          <Route path="/Account/Privacy" element={protectedPage(<AccountPrivacy />)} />
+          <Route path="/Account/Security" element={protectedPage(<AccountSecurity />)} />
+          <Route path="/Account/Settings" element={protectedPage(<AccountSettings />)} />
+          <Route path="/Account/TransactionHistory" element={protectedPage(<TransactionHistory />)} />
 
-          <Route
-            path="/Account/RecoveryCodeLogin"
-            element={<RecoveryCodeLogin />}
-          />
-
-          <Route
-            path="/Account/VerifyEmail"
-            element={<VerifyEmail />}
-          />
-
-          {/* ACCOUNT */}
-          <Route
-            path="/Account/ShowRecoveryCodes"
-            element={protectedPage(<ShowRecoveryCodes />)}
-          />
-
-          <Route
-            path="/Account/MyAccount"
-            element={protectedPage(<MyAccount />)}
-          />
-
-          <Route
-            path="/account"
-            element={protectedPage(<MyAccount />)}
-          />
-
-          <Route
-            path="/Account/AccountDetails"
-            element={protectedPage(<AccountDetails />)}
-          />
-
-          <Route
-            path="/Account/ChangePassword"
-            element={protectedPage(<ChangePassword />)}
-          />
-
-          <Route
-            path="/Account/Connections"
-            element={protectedPage(<Connections />)}
-          />
-
-          <Route
-            path="/Account/Enable2FA"
-            element={protectedPage(<Enable2FA />)}
-          />
-
-          <Route
-            path="/Account/PaymentMethods"
-            element={protectedPage(<PaymentMethods />)}
-          />
-
-          <Route
-            path="/Account/AddPaymentMethod"
-            element={protectedPage(<AddPaymentMethod />)}
-          />
-
-          <Route
-            path="/Account/Privacy"
-            element={protectedPage(<AccountPrivacy />)}
-          />
-
-          <Route
-            path="/Account/Security"
-            element={protectedPage(<AccountSecurity />)}
-          />
-
-          <Route
-            path="/Account/Settings"
-            element={protectedPage(<AccountSettings />)}
-          />
-
-          <Route
-            path="/Account/TransactionHistory"
-            element={protectedPage(<TransactionHistory />)}
-          />
-
-          {/* PRIVACY */}
           <Route path="/Home/Privacy" element={<SitePrivacy />} />
           <Route path="/privacy" element={<SitePrivacy />} />
-
-          {/* ERRORS */}
           <Route path="/Error/404" element={<NotFound />} />
           <Route path="/Error/500" element={<ServerError />} />
           <Route path="/error" element={<ErrorPage />} />
 
-          {/* ADMIN */}
-          <Route
-            path="/Admin"
-            element={
-              <RoleRoute role="Admin">
-                <AdminLayout />
-              </RoleRoute>
-            }
-          >
+          <Route path="/Admin" element={adminPage(<AdminLayout />)}>
             <Route index element={<AdminDatabase />} />
             <Route path="Database" element={<AdminDatabase />} />
+            <Route path="Database/Index" element={<AdminDatabase />} />
 
             <Route path="Items/Create" element={<CreateItem />} />
             <Route path="Items/Edit/:id" element={<EditItem />} />
@@ -381,44 +204,20 @@ export default function App() {
             <Route path="Spells/Details/:id" element={<SpellDetails />} />
             <Route path="Spells/Delete/:id" element={<DeleteSpell />} />
 
-            <Route
-              path="PageBuilder/Create"
-              element={<CreatePage />}
-            />
+            <Route path="PageBuilder/Create" element={<CreatePage />} />
+            <Route path="PageBuilder/Edit" element={<CreatePage />} />
+            <Route path="PageBuilder/DeleteConfirm" element={<DeletePage />} />
+            <Route path="PageBuilder/Delete" element={<DeletePage />} />
 
-            <Route
-              path="PageBuilder/DeleteConfirm"
-              element={<DeletePage />}
-            />
+            <Route path="Products/Create" element={<CreateProduct />} />
+            <Route path="Products/Edit/:id" element={<EditProduct />} />
 
-            <Route
-              path="Products/Create"
-              element={<CreateProduct />}
-            />
-
-            <Route
-              path="Products/Edit/:id"
-              element={<EditProduct />}
-            />
-
-            <Route
-              path="PromoCodes"
-              element={<PromoCodes />}
-            />
-
-            <Route
-              path="PromoCodes/Create"
-              element={<CreatePromoCode />}
-            />
+            <Route path="PromoCodes" element={<PromoCodes />} />
+            <Route path="PromoCodes/Index" element={<PromoCodes />} />
+            <Route path="PromoCodes/Create" element={<CreatePromoCode />} />
           </Route>
 
-          {/* DYNAMIC CONTENT PAGE */}
-          <Route
-            path="/:section/:slug"
-            element={<ContentPage />}
-          />
-
-          {/* FALLBACK */}
+          <Route path="/:section/:slug" element={<ContentPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
