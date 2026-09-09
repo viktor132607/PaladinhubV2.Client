@@ -34,22 +34,20 @@ const guideStyles: Record<string, Record<string, string>> = {
   },
 };
 
-const normalizePath = (pathname: string) => {
-  const normalized = pathname.toLowerCase().replace(/\/+$/, "");
-  return normalized || "/";
-};
+const normalizePath = (pathname: string) => pathname.toLowerCase().replace(/\/+$/, "") || "/";
 
-const isAccountPath = (pathname: string) =>
-  pathname === "/profile" ||
+const usesAccountLayout = (pathname: string) =>
+  pathname === "/account/login" ||
   pathname === "/login" ||
+  pathname === "/account/register" ||
   pathname === "/register" ||
-  pathname === "/forgot-password" ||
-  pathname === "/reset-password" ||
-  pathname === "/login-with-2fa" ||
-  pathname === "/recovery-code-login" ||
-  pathname === "/verify-email" ||
-  pathname === "/recovery-codes" ||
-  pathname.startsWith("/account");
+  pathname === "/account/verifyemail" ||
+  pathname === "/verify-email";
+
+const isMainAccountPath = (pathname: string) =>
+  pathname === "/profile" ||
+  pathname.startsWith("/account/") ||
+  pathname === "/account";
 
 const isMerchandisePath = (pathname: string) =>
   pathname === "/merchandise/merchandise" ||
@@ -60,11 +58,15 @@ const getRouteStyles = (pathname: string): string[] => {
   const normalized = normalizePath(pathname);
 
   if (normalized === "/" || normalized === "/home/home") {
-    return [SITE_STYLE, `${STYLE_ROOT}/home.css`];
+    return [SITE_STYLE, `${STYLE_ROOT}/home.css`, `${SITE_STYLE}?home-reload=1`];
   }
 
-  if (isAccountPath(normalized)) {
-    return [SITE_STYLE, `${STYLE_ROOT}/account.css`];
+  if (usesAccountLayout(normalized)) {
+    return [`${STYLE_ROOT}/account.css`];
+  }
+
+  if (isMainAccountPath(normalized)) {
+    return [SITE_STYLE];
   }
 
   if (isMerchandisePath(normalized)) {
@@ -78,10 +80,7 @@ const getRouteStyles = (pathname: string): string[] => {
 
   const [section, page = "overview"] = normalized.split("/").filter(Boolean);
   const sectionStyles = guideStyles[section];
-
-  if (!sectionStyles) {
-    return [SITE_STYLE];
-  }
+  if (!sectionStyles) return [SITE_STYLE];
 
   const stylesheet = sectionStyles[page] ?? sectionStyles.overview;
   return [SITE_STYLE, `${STYLE_ROOT}/${stylesheet}`];
@@ -93,25 +92,16 @@ export default function V1Stylesheets() {
   useEffect(() => {
     const requiredStyles = getRouteStyles(pathname);
     const requiredSet = new Set(requiredStyles);
-    const activeLinks = Array.from(
-      document.head.querySelectorAll<HTMLLinkElement>(`link[${STYLE_MARKER}]`),
-    );
+    const activeLinks = Array.from(document.head.querySelectorAll<HTMLLinkElement>(`link[${STYLE_MARKER}]`));
 
     for (const link of activeLinks) {
       const href = link.getAttribute("href");
-      if (!href || !requiredSet.has(href)) {
-        link.remove();
-      }
+      if (!href || !requiredSet.has(href)) link.remove();
     }
 
     for (const href of requiredStyles) {
-      const existing = document.head.querySelector<HTMLLinkElement>(
-        `link[${STYLE_MARKER}][href="${href}"]`,
-      );
-      if (existing) {
-        existing.remove();
-      }
-
+      const existing = document.head.querySelector<HTMLLinkElement>(`link[${STYLE_MARKER}][href="${href}"]`);
+      if (existing) existing.remove();
       const link = document.createElement("link");
       link.rel = "stylesheet";
       link.href = href;
