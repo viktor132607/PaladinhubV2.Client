@@ -1,6 +1,15 @@
-/* Restores browser/default behavior where the V1 source has no overriding rule. */
+/* Restores V1 source behavior where the React compatibility layer differs. */
 
 /* _PageHeader.cshtml renders PageText as a normal <p>; V1 does not use pre-line. */
 .ph-guide-page-header .page-text {
     white-space: normal !important;
+}
+
+/* Exact _Layout.cshtml.css footer contract, scoped to the V2 layout footer. */
+.ph-v1-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px;
 }
