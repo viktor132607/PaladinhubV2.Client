@@ -4,8 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import { Link, useNavigate } from "@/router/nextCompat";
 
-const getErrorMessage = (error: unknown) =>
-  error instanceof Error ? error.message : "Registration failed.";
+const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : "Registration failed.";
 
 export default function Register() {
   const { register, isAuthenticated } = useAuth();
@@ -21,14 +20,11 @@ export default function Register() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
-
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
-
     setSubmitting(true);
-
     try {
       await register({ name, username, email, password, confirmPassword });
       navigate("/Account/MyAccount", { replace: true });
@@ -40,98 +36,45 @@ export default function Register() {
   };
 
   if (isAuthenticated) {
-    return (
-      <main className="ph-auth-page">
-        <section className="ph-auth-card">
-          <h1>Already signed in</h1>
-          <Link to="/Account/MyAccount" className="ph-auth-submit">
-            Open account
-          </Link>
-        </section>
-      </main>
-    );
+    navigate("/Account/MyAccount", { replace: true });
+    return null;
   }
 
   return (
-    <main className="ph-auth-page">
-      <section className="ph-auth-card">
-        <h1>Create account</h1>
-        <p>Your account is stored through ASP.NET Core Identity.</p>
-
-        <form onSubmit={handleSubmit} className="ph-auth-form">
-          {error ? <div className="ph-auth-error">{error}</div> : null}
-
-          <label>
-            <span>Full name</span>
-            <input
-              autoComplete="name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              minLength={2}
-              required
-            />
-          </label>
-
-          <label>
-            <span>Username</span>
-            <input
-              autoComplete="username"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
-              minLength={3}
-              maxLength={32}
-              pattern="[a-zA-Z0-9._-]+"
-              required
-            />
-          </label>
-
-          <label>
-            <span>Email</span>
-            <input
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-            />
-          </label>
-
-          <label>
-            <span>Password</span>
-            <input
-              type="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              minLength={8}
-              maxLength={40}
-              required
-            />
-            <small>
-              At least 8 characters with uppercase, lowercase, number and symbol.
-            </small>
-          </label>
-
-          <label>
-            <span>Confirm password</span>
-            <input
-              type="password"
-              autoComplete="new-password"
-              value={confirmPassword}
-              onChange={(event) => setConfirmPassword(event.target.value)}
-              required
-            />
-          </label>
-
-          <button type="submit" disabled={submitting} className="ph-auth-submit">
-            {submitting ? "Creating account..." : "Register"}
-          </button>
+    <div className="account-container">
+      <div className="account-box">
+        <h2 className="text-center mb-4">Register</h2>
+        <form onSubmit={handleSubmit}>
+          {error ? <div className="text-danger">{error}</div> : null}
+          <div className="mb-3">
+            <label className="form-label" htmlFor="Name">Name</label>
+            <input id="Name" className="form-control" value={name} onChange={(event) => setName(event.target.value)} required />
+          </div>
+          <div className="mb-3">
+            <label className="form-label" htmlFor="Username">Username</label>
+            <input id="Username" className="form-control" value={username} onChange={(event) => setUsername(event.target.value)} required />
+          </div>
+          <div className="mb-3">
+            <label className="form-label" htmlFor="Email">Email</label>
+            <input id="Email" type="email" className="form-control" value={email} onChange={(event) => setEmail(event.target.value)} required />
+          </div>
+          <div className="mb-3">
+            <label className="form-label" htmlFor="Password">Password</label>
+            <input id="Password" type="password" className="form-control" value={password} onChange={(event) => setPassword(event.target.value)} required />
+          </div>
+          <div className="mb-3">
+            <label className="form-label" htmlFor="ConfirmPassword">Confirm password</label>
+            <input id="ConfirmPassword" type="password" className="form-control" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} required />
+          </div>
+          <input type="submit" value="Register" className="btn btn-success w-100 p-2" disabled={submitting} />
+          <p className="text-center mt-2">
+            Already have an account? <Link to="/Account/Login" className="text-decoration-none">Login</Link>
+          </p>
+          <div className="text-center">
+            <Link to="/" className="text-decoration-none mt-3">Back</Link>
+          </div>
         </form>
-
-        <p className="ph-auth-switch">
-          Already registered? <Link to="/Account/Login">Sign in</Link>
-        </p>
-      </section>
-    </main>
+      </div>
+    </div>
   );
 }
