@@ -67,7 +67,10 @@ const getRouteStyles = (pathname: string): string[] => {
   }
 
   if (isMerchandisePath(normalized)) {
-    return [`${STYLE_ROOT}/merchandise.css`];
+    return [
+      `${STYLE_ROOT}/merchandise.css`,
+      `${STYLE_ROOT}/merchandise-exact.css`,
+    ];
   }
 
   const [section, page = "overview"] = normalized.split("/").filter(Boolean);
