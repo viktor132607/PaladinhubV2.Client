@@ -6,6 +6,7 @@ import "../index.css";
 import "../App.css";
 import "../styles/v1-adapter.css";
 import "../styles/v1-navbar-exact.css";
+import "../styles/v1-source-corrections.css";
 
 export const metadata: Metadata = {
   title: "PaladinHub",
