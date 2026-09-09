@@ -12,7 +12,12 @@ export const metadata: Metadata = {
   description:
     "World of Warcraft Paladin guides, builds, discussions and merchandise.",
   icons: {
-    icon: "/favicon.ico",
+    icon: {
+      url: "/images/WoW_icon.svg.png",
+      type: "image/png",
+    },
+    shortcut: "/images/WoW_icon.svg.png",
+    apple: "/images/WoW_icon.svg.png",
   },
 };
 
