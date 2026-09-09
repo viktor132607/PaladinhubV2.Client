@@ -14,7 +14,7 @@ const guides = [
 
 export default function Home() {
   return (
-    <div className="home-v1 outer-wrapper">
+    <div className="outer-wrapper">
       <div className="page-container">
         <div className="main-cover-container">
           <img src="/images/mainHD.jpg" alt="Main Image" className="main-cover" />
@@ -34,7 +34,7 @@ export default function Home() {
             <div className="hero-tree-grid">
               {heroTrees.map(([image, title, specs, text]) => (
                 <div className="hero-tree-card" key={title}>
-                  <img src={image} alt={title} className="hero-tree-img" />
+                  <img src={image} alt={title === "HERALD OF THE SUN" ? "Herald of the Sun" : title === "LIGHTSMITH" ? "Lightsmith" : "Templar"} className="hero-tree-img" />
                   <h3>{title}</h3>
                   <p><em>{specs}</em></p>
                   <p>{text}</p>
@@ -45,22 +45,26 @@ export default function Home() {
 
           <div className="content-wrapper">
             <section className="captions-section">
-              <div className="home-container">
-                <div className="home-row captions-row">
-                  {guides.map(([name]) => <div className="home-col" key={name}><div className="caption">{name}</div></div>)}
+              <div className="container">
+                <div className="row text-center mb-5">
+                  {guides.map(([name]) => (
+                    <div className="col-md-4" key={name}>
+                      <div className="caption">{name}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </section>
 
             <section id="guides">
-              <div className="home-container">
-                <div className="home-row guides-row">
+              <div className="container">
+                <div className="row text-center">
                   {guides.map(([name, image, href]) => (
-                    <div className="home-col guide-col" key={name}>
-                      <div className="card">
-                        <div className="guide-position">
+                    <div className="col-md-4 mb-4 d-flex justify-content-center" key={name}>
+                      <div className="card h-100">
+                        <div className="position-relative">
                           <img src={image} alt={`${name} Paladin`} className="guide-image" />
-                          <div className="guide-link-position">
+                          <div className="position-absolute start-50 translate-middle-x" style={{ bottom: "10px" }}>
                             <Link to={href} className="view-guide-link">View Guide</Link>
                           </div>
                         </div>
