@@ -1,0 +1,255 @@
+/* V2 compatibility layer for the exact V1 site.css import.
+   Keep src/styles/v1-site.css untouched; adapt React/Next structure here. */
+
+/* Bootstrap 5.1 structural primitives used by the V1 Razor layout. */
+.container,
+.container-fluid {
+    width: 100%;
+    padding-right: .75rem;
+    padding-left: .75rem;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+@media (min-width: 576px) { .container { max-width: 540px; } }
+@media (min-width: 768px) { .container { max-width: 720px; } }
+@media (min-width: 992px) { .container { max-width: 960px; } }
+@media (min-width: 1200px) { .container { max-width: 1140px; } }
+@media (min-width: 1400px) { .container { max-width: 1320px; } }
+
+.row {
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 0;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: calc(-1 * var(--bs-gutter-y));
+    margin-right: calc(-.5 * var(--bs-gutter-x));
+    margin-left: calc(-.5 * var(--bs-gutter-x));
+}
+.row > * {
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 100%;
+    padding-right: calc(var(--bs-gutter-x) * .5);
+    padding-left: calc(var(--bs-gutter-x) * .5);
+    margin-top: var(--bs-gutter-y);
+}
+@media (min-width: 768px) { .col-md-4 { flex: 0 0 auto; width: 33.33333333%; } }
+
+.d-flex { display: flex !important; }
+.d-inline { display: inline !important; }
+.flex-column { flex-direction: column !important; }
+.align-items-center { align-items: center !important; }
+.justify-content-center { justify-content: center !important; }
+.justify-content-between { justify-content: space-between !important; }
+.position-relative { position: relative !important; }
+.position-absolute { position: absolute !important; }
+.position-fixed { position: fixed !important; }
+.start-50 { left: 50% !important; }
+.translate-middle-x { transform: translateX(-50%) !important; }
+.rounded-circle { border-radius: 50% !important; }
+.border { border: 1px solid #dee2e6 !important; }
+.border-bottom { border-bottom: 1px solid #dee2e6 !important; }
+.box-shadow { box-shadow: 0 .25rem .75rem rgba(0,0,0,.05); }
+.ms-auto { margin-left: auto !important; }
+.me-1 { margin-right: .25rem !important; }
+.mb-3 { margin-bottom: 1rem !important; }
+.mb-4 { margin-bottom: 1.5rem !important; }
+.mb-5 { margin-bottom: 3rem !important; }
+.pb-5 { padding-bottom: 3rem !important; }
+.px-0 { padding-right: 0 !important; padding-left: 0 !important; }
+.px-3 { padding-right: 1rem !important; padding-left: 1rem !important; }
+.gap-2 { gap: .5rem !important; }
+.text-center { text-align: center !important; }
+.text-warning { color: #ffc107 !important; }
+.w-100 { width: 100% !important; }
+.h-100 { height: 100% !important; }
+
+/* Navbar: map the V2 React markup back to the Bootstrap/V1 layout contract. */
+.navbar {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+}
+.navbar > .container-fluid {
+    display: flex;
+    flex-wrap: inherit;
+    align-items: center;
+    justify-content: space-between;
+}
+.navbar-nav {
+    display: flex;
+    flex-direction: column;
+    padding-left: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    list-style: none;
+}
+.navbar-nav .nav-link { padding-right: 0; padding-left: 0; }
+.navbar-collapse { flex-basis: 100%; flex-grow: 1; align-items: center; }
+.collapse:not(.show) { display: none; }
+.navbar-toggler {
+    padding: .25rem .75rem;
+    font-size: 1.25rem;
+    line-height: 1;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+}
+.navbar-toggler-icon {
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    vertical-align: middle;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+}
+.dropdown { position: relative; }
+.dropdown-toggle { white-space: nowrap; }
+.dropdown-toggle::after {
+    display: inline-block;
+    margin-left: .255em;
+    vertical-align: .255em;
+    content: "";
+    border-top: .3em solid;
+    border-right: .3em solid transparent;
+    border-bottom: 0;
+    border-left: .3em solid transparent;
+}
+.dropdown-menu {
+    position: absolute;
+    z-index: 1000;
+    display: none;
+    min-width: 10rem;
+    padding: .5rem 0;
+    margin: 0;
+    font-size: 1rem;
+    text-align: left;
+    list-style: none;
+    background-clip: padding-box;
+    border-radius: .25rem;
+}
+.dropdown-menu.show,
+.nav-item.dropdown:hover > .dropdown-menu { display: block; }
+.dropdown-menu-end { right: 0; left: auto; }
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: .25rem 1rem;
+    clear: both;
+    text-align: inherit;
+    white-space: nowrap;
+    border: 0;
+}
+.dropdown-divider {
+    height: 0;
+    margin: .5rem 0;
+    overflow: hidden;
+    border: 0;
+    border-top: 1px solid rgba(255,255,255,.15);
+}
+
+@media (min-width: 576px) {
+    .navbar-expand-sm { flex-wrap: nowrap; justify-content: flex-start; }
+    .navbar-expand-sm .navbar-nav { flex-direction: row; }
+    .navbar-expand-sm .navbar-nav .dropdown-menu { position: absolute; }
+    .navbar-expand-sm .navbar-nav .nav-link { padding-right: .5rem; padding-left: .5rem; }
+    .navbar-expand-sm .navbar-collapse { display: flex !important; flex-basis: auto; }
+    .navbar-expand-sm .navbar-toggler { display: none; }
+}
+
+/* The imported V1 CSS deliberately sets the navbar to top:-100px and Razor JS moved it.
+   V2 has no Razor script, so keep the React navbar visible. */
+.ph-v1-navbar.navbar-custom { top: 0; }
+
+/* V1 layout contract on the React shell. */
+.ph-v1-layout {
+    min-height: 100vh;
+    background: #111;
+    color: #fff;
+}
+.ph-v1-layout-content { padding-top: 80px; }
+.ph-v1-main-container { padding-bottom: 3rem !important; }
+
+/* V1 is desktop-first at 1600px, but V2 must not create a broken horizontal canvas. */
+.ph-v1-layout .outer-wrapper { width: 100%; max-width: 100%; }
+.ph-v1-layout .page-container,
+.ph-v1-layout .main-wrapper,
+.ph-v1-layout .image-cover-container,
+.ph-v1-layout .retribution-cover-container,
+.ph-v1-layout .holy-cover-container,
+.ph-v1-layout .protection-cover-container {
+    max-width: 1600px;
+}
+.ph-v1-layout .page-container,
+.ph-v1-layout .main-wrapper,
+.ph-v1-layout .image-cover-container,
+.ph-v1-layout .retribution-cover-container,
+.ph-v1-layout .holy-cover-container,
+.ph-v1-layout .protection-cover-container {
+    width: 1600px;
+}
+
+/* Cover/header blocks emitted by V2 page-header equivalents. */
+.image-cover-container {
+    aspect-ratio: 2560 / 820;
+    overflow: hidden;
+}
+.image-cover-container > img,
+.image-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* React migration wrappers must be transparent; page-specific legacy classes own the look. */
+.ph-v1-layout main[data-migrated-page],
+.ph-v1-layout [data-migrated-inner],
+.ph-v1-layout [data-migrated-content] {
+    background: transparent;
+    color: inherit;
+    width: auto;
+    max-width: none;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/* V1 page header/section grid behavior. */
+.section-grid { width: 100%; }
+.section-cell { min-width: 0; }
+.section-cell .icon { flex: 0 0 32px; }
+
+/* Keep V1 1600px geometry on wide screens while preventing breakage below it. */
+@media (max-width: 1639px) {
+    .ph-v1-layout .page-container,
+    .ph-v1-layout .main-wrapper,
+    .ph-v1-layout .image-cover-container,
+    .ph-v1-layout .retribution-cover-container,
+    .ph-v1-layout .holy-cover-container,
+    .ph-v1-layout .protection-cover-container {
+        width: 100%;
+    }
+    .ph-v1-layout .main-wrapper { padding-left: 50px; padding-right: 50px; }
+}
+
+@media (max-width: 768px) {
+    body { padding-left: 0; padding-right: 0; }
+    .ph-v1-layout-content { padding-top: 72px; }
+    .ph-v1-layout .main-wrapper { padding-left: 20px; padding-right: 20px; }
+    .section-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .content-columns { flex-direction: column; align-items: stretch; }
+    .content-columns > div { min-width: 0; width: 100%; }
+    .trees-container, .trees-row { overflow-x: auto; justify-content: flex-start; }
+}
+
+@media (max-width: 480px) {
+    .section-grid { grid-template-columns: 1fr; }
+    .ph-v1-layout .main-wrapper { padding-left: 12px; padding-right: 12px; }
+}
