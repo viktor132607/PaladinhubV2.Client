@@ -5,6 +5,7 @@ import { useLocation } from "@/router/nextCompat";
 
 const STYLE_MARKER = "data-paladinhub-v1-route-style";
 const STYLE_ROOT = "/styles/v1";
+const BOOTSTRAP_STYLE = "https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css";
 const SITE_STYLE = `${STYLE_ROOT}/site.css`;
 
 const normalizePath = (pathname: string) => pathname.toLowerCase().replace(/\/+$/, "") || "/";
@@ -44,19 +45,26 @@ const getRouteStyles = (pathname: string): string[] => {
   const normalized = normalizePath(pathname);
 
   if (normalized === "/" || normalized === "/home/home") {
-    return [SITE_STYLE, `${STYLE_ROOT}/home.css`, `${SITE_STYLE}?home-reload=1`];
+    return [
+      BOOTSTRAP_STYLE,
+      SITE_STYLE,
+      `${STYLE_ROOT}/home.css`,
+      `${BOOTSTRAP_STYLE}?home-reload=1`,
+      `${SITE_STYLE}?home-reload=1`,
+    ];
   }
 
   if (usesAccountLayout(normalized)) {
-    return [`${STYLE_ROOT}/account.css`];
+    return [BOOTSTRAP_STYLE, `${STYLE_ROOT}/account.css`];
   }
 
   if (isMainAccountPath(normalized)) {
-    return [SITE_STYLE];
+    return [BOOTSTRAP_STYLE, SITE_STYLE];
   }
 
   if (isMerchandisePath(normalized)) {
     return [
+      BOOTSTRAP_STYLE,
       SITE_STYLE,
       `${STYLE_ROOT}/merchandise.css`,
       `${STYLE_ROOT}/merchandise-final.css`,
@@ -64,15 +72,11 @@ const getRouteStyles = (pathname: string): string[] => {
     ];
   }
 
-  // V1 source truth: every Holy / Protection / Retribution guide view either has
-  // its page stylesheet commented out or has no page stylesheet link at all.
-  // The live guide pages therefore use the shared _Layout cascade (site.css)
-  // instead of the old holy/*, protection/* and retribution/* files.
   if (isGuidePath(normalized)) {
-    return [SITE_STYLE];
+    return [BOOTSTRAP_STYLE, SITE_STYLE];
   }
 
-  return [SITE_STYLE];
+  return [BOOTSTRAP_STYLE, SITE_STYLE];
 };
 
 export default function V1Stylesheets() {
