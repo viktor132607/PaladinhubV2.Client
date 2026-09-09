@@ -100,7 +100,7 @@ export default function Database() {
   const total = Math.max(0, Number(data.total) || 0);
   const currentPageSize = Math.min(100, positiveInteger(data.pageSize, pageSize));
   const pages = Math.max(1, positiveInteger(data.pages, Math.ceil(total / currentPageSize) || 1));
-  const currentPage = Math.min(pages, positiveInteger(data.page, page));
+  const currentPage = positiveInteger(data.page, page);
 
   const changeQuery = (changes: Record<string, string | number | null>) => {
     const next = new URLSearchParams(searchParams);
@@ -119,7 +119,10 @@ export default function Database() {
 
   const submitSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    changeQuery({ search: searchInput.trim() || null, page: 1 });
+    const next = new URLSearchParams({ entity });
+    const nextSearch = searchInput.trim();
+    if (nextSearch) next.set("search", nextSearch);
+    setSearchParams(next);
   };
 
   return (

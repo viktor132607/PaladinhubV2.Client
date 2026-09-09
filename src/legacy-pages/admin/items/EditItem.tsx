@@ -53,7 +53,7 @@ function nullableInteger(value: string, fieldName: string): number | null {
   const normalized = value.trim();
   if (!normalized) return null;
   const parsed = Number(normalized);
-  if (!Number.isInteger(parsed) || parsed < 0) throw new Error(`${fieldName} must be a non-negative whole number.`);
+  if (!Number.isInteger(parsed)) throw new Error(`${fieldName} must be a whole number.`);
   return parsed;
 }
 
