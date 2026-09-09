@@ -21,8 +21,3 @@
 .fragment {
   color: inherit;
 }
-
-.content :global(img),
-.fragment :global(img) {
-  max-width: 100%;
-}
