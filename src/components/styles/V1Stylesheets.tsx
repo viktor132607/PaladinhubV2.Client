@@ -50,6 +50,11 @@ const isAccountPath = (pathname: string) =>
   pathname === "/recovery-codes" ||
   pathname.startsWith("/account");
 
+const isMerchandisePath = (pathname: string) =>
+  pathname === "/merchandise/merchandise" ||
+  pathname === "/merchandise/list" ||
+  pathname === "/products";
+
 const getRouteStyles = (pathname: string): string[] => {
   const normalized = normalizePath(pathname);
 
@@ -59,6 +64,10 @@ const getRouteStyles = (pathname: string): string[] => {
 
   if (isAccountPath(normalized)) {
     return [`${STYLE_ROOT}/account.css`];
+  }
+
+  if (isMerchandisePath(normalized)) {
+    return [`${STYLE_ROOT}/merchandise.css`];
   }
 
   const [section, page = "overview"] = normalized.split("/").filter(Boolean);
