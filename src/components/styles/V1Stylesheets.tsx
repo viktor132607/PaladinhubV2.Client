@@ -69,7 +69,7 @@ const getRouteStyles = (pathname: string): string[] => {
   if (isMerchandisePath(normalized)) {
     return [
       `${STYLE_ROOT}/merchandise.css`,
-      `${STYLE_ROOT}/merchandise-exact.css`,
+      `${STYLE_ROOT}/merchandise-final.css`,
     ];
   }
 
@@ -88,21 +88,27 @@ export default function V1Stylesheets() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const requiredStyles = new Set(getRouteStyles(pathname));
+    const requiredStyles = getRouteStyles(pathname);
+    const requiredSet = new Set(requiredStyles);
     const activeLinks = Array.from(
       document.head.querySelectorAll<HTMLLinkElement>(`link[${STYLE_MARKER}]`),
     );
 
     for (const link of activeLinks) {
       const href = link.getAttribute("href");
-      if (!href || !requiredStyles.has(href)) {
+      if (!href || !requiredSet.has(href)) {
         link.remove();
-      } else {
-        requiredStyles.delete(href);
       }
     }
 
     for (const href of requiredStyles) {
+      const existing = document.head.querySelector<HTMLLinkElement>(
+        `link[${STYLE_MARKER}][href="${href}"]`,
+      );
+      if (existing) {
+        existing.remove();
+      }
+
       const link = document.createElement("link");
       link.rel = "stylesheet";
       link.href = href;
