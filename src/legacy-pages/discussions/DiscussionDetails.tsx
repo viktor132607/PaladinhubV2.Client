@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
-import { Link, useNavigate, useParams } from "@/router/nextCompat";
+import { Link, useNavigate, useParams, useSearchParams } from "@/router/nextCompat";
 
 type DiscussionComment = {
   id: string;
@@ -40,7 +40,9 @@ function formatDate(value: string): string {
 }
 
 export default function DiscussionDetails() {
-  const { id = "" } = useParams<{ id: string }>();
+  const { id: routeId = "" } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const id = routeId === "view" ? (searchParams.get("id") ?? "") : routeId;
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const [post, setPost] = useState<DiscussionPost | null>(null);

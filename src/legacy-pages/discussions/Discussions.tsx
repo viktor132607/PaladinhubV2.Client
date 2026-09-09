@@ -112,7 +112,10 @@ export default function Discussions() {
             return (
               <div key={post.id} className="discussion-item mb-4 p-3" style={cardStyle}>
                 <h3 className="discussion-title mb-1">
-                  <Link className="item-link" to={`/Discussions/Details/${post.id}`}>
+                  <Link
+                    className="item-link"
+                    to={`/Discussions/Details/view?id=${encodeURIComponent(post.id)}`}
+                  >
                     {post.title}
                   </Link>
                 </h3>

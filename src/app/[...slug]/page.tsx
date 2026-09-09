@@ -23,6 +23,7 @@ export function generateStaticParams() {
   { slug: ["Retribution", "Stats"] },
   { slug: ["Discussions", "Index"] },
   { slug: ["Discussions", "Create"] },
+  { slug: ["Discussions", "Details", "view"] },
   { slug: ["Merchandise", "Merchandise"] },
   { slug: ["Merchandise", "List"] },
   { slug: ["Products"] },
