@@ -4,27 +4,13 @@ import type { FormEvent, HTMLAttributes } from "react";
 import { useLocation } from "@/router/nextCompat";
 import styles from "./MigratedView.module.css";
 
-type HtmlViewProps = {
-  html: string;
-  className?: string;
-};
-
-type PageViewProps = HtmlViewProps & {
-  title?: string;
-};
-
+type HtmlViewProps = { html: string; className?: string };
+type PageViewProps = HtmlViewProps & { title?: string };
 type GuideSection = "holy" | "protection" | "retribution";
 type GuidePage = "overview" | "gear" | "talents" | "consumables" | "rotation" | "stats";
+type GuideButton = { url: string; text: string; icon: string };
 
-type GuideButton = {
-  url: string;
-  text: string;
-  icon: string;
-};
-
-const stopLegacyFormSubmission = (event: FormEvent<HTMLDivElement>) => {
-  event.preventDefault();
-};
+const stopLegacyFormSubmission = (event: FormEvent<HTMLDivElement>) => event.preventDefault();
 
 const guideMeta: Record<GuideSection, { cover: string; titles: Record<GuidePage, string>; texts: Record<GuidePage, string> }> = {
   holy: {
@@ -163,7 +149,7 @@ function SectionGrid({ title, buttons }: { title: string; buttons: GuideButton[]
   );
 }
 
-function GuideHeader({ page, cover, titles, texts }: ReturnType<typeof resolveGuide> extends infer T ? Exclude<T, null> : never) {
+function GuideHeader({ section, page, cover, titles, texts }: ReturnType<typeof resolveGuide> extends infer T ? Exclude<T, null> : never) {
   return (
     <div className="outer-wrapper ph-guide-page-header">
       <div className="page-container">
@@ -175,7 +161,7 @@ function GuideHeader({ page, cover, titles, texts }: ReturnType<typeof resolveGu
           <h1 className="page-title">{titles[page]}</h1>
           {texts[page] ? <p className="page-text">{texts[page]}</p> : null}
           <SectionGrid title="Current Sections" buttons={currentButtons[page]} />
-          <SectionGrid title="Other Sections" buttons={otherButtons(resolveGuideSectionFromTitle(titles))} />
+          <SectionGrid title="Other Sections" buttons={otherButtons(section)} />
           <div className="separator-container">
             <img src="/images/Separators/D4.png" alt="Separator 4" className="separator" />
           </div>
@@ -186,12 +172,6 @@ function GuideHeader({ page, cover, titles, texts }: ReturnType<typeof resolveGu
   );
 }
 
-function resolveGuideSectionFromTitle(titles: Record<GuidePage, string>): GuideSection {
-  if (titles === guideMeta.protection.titles) return "protection";
-  if (titles === guideMeta.retribution.titles) return "retribution";
-  return "holy";
-}
-
 export function GuidePageHeader() {
   const { pathname } = useLocation();
   const guide = resolveGuide(pathname);
@@ -200,15 +180,7 @@ export function GuidePageHeader() {
 
 export function HtmlContent({ html, className }: HtmlViewProps) {
   const classes = [styles.fragment, className].filter(Boolean).join(" ");
-
-  return (
-    <div
-      className={classes}
-      data-migrated-content
-      onSubmit={stopLegacyFormSubmission}
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
-  );
+  return <div className={classes} data-migrated-content onSubmit={stopLegacyFormSubmission} dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 export function MigratedPageView({ title, html, className }: PageViewProps) {
@@ -218,15 +190,9 @@ export function MigratedPageView({ title, html, className }: PageViewProps) {
 
   return (
     <main className={styles.page} data-migrated-page data-guide-page={guide ? `${guide.section}-${guide.page}` : undefined}>
-      {guide ? <GuideHeader {...guide} /> : null}
       <div className={styles.pageInner} data-migrated-inner>
         {!guide && title ? <h1 className={styles.pageTitle}>{title}</h1> : undefined}
-        <div
-          className={classes}
-          data-migrated-content
-          onSubmit={stopLegacyFormSubmission}
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
+        <div className={classes} data-migrated-content onSubmit={stopLegacyFormSubmission} dangerouslySetInnerHTML={{ __html: html }} />
       </div>
     </main>
   );
