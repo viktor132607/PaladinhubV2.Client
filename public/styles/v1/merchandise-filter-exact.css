@@ -1,0 +1,270 @@
+/* V1 Merchandise filter: final effective cascade from Bootstrap 5.1.0 + Merchandise.cshtml. */
+
+.ph-v1-main-container > div:first-child > div:first-child > aside > div {
+  box-sizing: border-box !important;
+  min-width: 270px !important;
+  padding: 1rem !important;
+  background: #171a21 !important;
+  border: 1px solid #272b35 !important;
+  border-radius: 12px !important;
+  color: #e6e6e6 !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside h2 {
+  margin: 0 0 1rem !important;
+  padding: 0 !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 1.25rem !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  text-align: left !important;
+  color: #fff !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside > div > label:first-of-type {
+  display: block !important;
+  margin: 0 0 1rem !important;
+  padding: 0 !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  color: #d7dde7 !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside > div > label:first-of-type input {
+  display: block !important;
+  width: 100% !important;
+  margin: .5rem 0 0 !important;
+  padding: .25rem .5rem !important;
+  font-family: Arial, sans-serif !important;
+  font-size: .875rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #e6e6e6 !important;
+  background-color: #0f1115 !important;
+  background-image: none !important;
+  border: 1px solid #2a2f3a !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside input::placeholder {
+  color: #6b7280 !important;
+  opacity: 1 !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset {
+  min-width: 0 !important;
+  margin: 0 0 1rem !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside legend {
+  float: none !important;
+  width: auto !important;
+  margin: 0 0 .5rem !important;
+  padding: 0 !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  color: #d7dde7 !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside label:has(input[type="checkbox"]) {
+  display: block !important;
+  min-height: 1.5rem !important;
+  margin: 0 !important;
+  padding-left: 1.5em !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #e6e6e6 !important;
+  cursor: pointer !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside input[type="checkbox"] {
+  float: left !important;
+  width: 1em !important;
+  height: 1em !important;
+  margin-top: .25em !important;
+  margin-right: 0 !important;
+  margin-left: -1.5em !important;
+  padding: 0 !important;
+  vertical-align: top !important;
+  appearance: none !important;
+  background-color: #0f1115 !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+  border: 1px solid #2a2f3a !important;
+  border-radius: .25em !important;
+  box-shadow: none !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside input[type="checkbox"]:checked {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e") !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:nth-of-type(3) > div {
+  display: flex !important;
+  gap: .5rem !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside input[type="number"] {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: .25rem .5rem !important;
+  font-family: Arial, sans-serif !important;
+  font-size: .875rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #e6e6e6 !important;
+  background-color: #0f1115 !important;
+  background-image: none !important;
+  border: 1px solid #2a2f3a !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type > div {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: .4rem !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: .5rem !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: .45rem .6rem !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  text-align: left !important;
+  color: #e6e6e6 !important;
+  background: #111419 !important;
+  border: 1px solid #2a2f3a !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  transition: border-color .12s ease, background-color .12s ease, box-shadow .12s ease !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button:hover {
+  border-color: #3a4150 !important;
+  background: #161a21 !important;
+  box-shadow: 0 0 0 2px rgba(58,123,213,.12) !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button > span:first-child {
+  display: inline-flex !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+  font-size: 0 !important;
+  line-height: 1 !important;
+  color: #f6c441 !important;
+  white-space: nowrap !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button > span:first-child > span {
+  display: none !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button > span:first-child::before,
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button > span:first-child::after {
+  font-family: "Font Awesome 6 Free" !important;
+  font-size: 1rem !important;
+  line-height: 1 !important;
+  letter-spacing: 2px !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button > span:first-child::before {
+  font-weight: 900 !important;
+  color: #f6c441 !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button > span:first-child::after {
+  font-weight: 400 !important;
+  color: #6b7280 !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button:nth-child(1) > span:first-child::before { content: "\f005\f005\f005\f005\f005"; }
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button:nth-child(1) > span:first-child::after { content: ""; }
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button:nth-child(2) > span:first-child::before { content: "\f005\f005\f005\f005"; }
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button:nth-child(2) > span:first-child::after { content: "\f005"; }
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button:nth-child(3) > span:first-child::before { content: "\f005\f005\f005"; }
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button:nth-child(3) > span:first-child::after { content: "\f005\f005"; }
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button:nth-child(4) > span:first-child::before { content: "\f005\f005"; }
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button:nth-child(4) > span:first-child::after { content: "\f005\f005\f005"; }
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button:nth-child(5) > span:first-child::before { content: "\f005"; }
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button:nth-child(5) > span:first-child::after { content: "\f005\f005\f005\f005"; }
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button > span:last-child {
+  font-family: Arial, sans-serif !important;
+  font-size: .875em !important;
+  line-height: 1 !important;
+  color: #6c757d !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside > div > button:last-child {
+  display: inline-block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: .25rem .5rem !important;
+  font-size: 0 !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  color: #cfd3da !important;
+  background: #0f1115 !important;
+  border: 1px solid #2a2f3a !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside > div > button:last-child::before {
+  content: "\f51a" !important;
+  display: inline-block !important;
+  margin-right: .5rem !important;
+  font-family: "Font Awesome 6 Free" !important;
+  font-size: .875rem !important;
+  font-weight: 900 !important;
+  line-height: 1.5 !important;
+  color: #cfd3da !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside > div > button:last-child::after {
+  content: "Clear all filters" !important;
+  font-family: Arial, sans-serif !important;
+  font-size: .875rem !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  color: #cfd3da !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside > div > button:last-child:hover {
+  color: #fff !important;
+  background: #171a21 !important;
+  border-color: #3a4150 !important;
+  box-shadow: 0 0 0 2px rgba(66,153,225,.15) !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside > div > button:last-child:hover::before,
+.ph-v1-main-container > div:first-child > div:first-child > aside > div > button:last-child:hover::after {
+  color: #fff !important;
+}
