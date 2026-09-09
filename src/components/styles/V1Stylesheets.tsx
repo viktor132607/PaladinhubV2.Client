@@ -7,33 +7,6 @@ const STYLE_MARKER = "data-paladinhub-v1-route-style";
 const STYLE_ROOT = "/styles/v1";
 const SITE_STYLE = `${STYLE_ROOT}/site.css`;
 
-const guideStyles: Record<string, Record<string, string>> = {
-  holy: {
-    overview: "holy/holyOverview.css",
-    talents: "holy/holyTalents.css",
-    rotation: "holy/holyRotation.css",
-    gear: "holy/holyGear.css",
-    stats: "holy/holyStats.css",
-    consumables: "holy/holyConsumables.css",
-  },
-  protection: {
-    overview: "protection/protectionOverview.css",
-    talents: "protection/protectionTalents.css",
-    rotation: "protection/protectionRotation.css",
-    gear: "protection/protectionGear.css",
-    stats: "protection/protectionStats.css",
-    consumables: "protection/protectionConsumables.css",
-  },
-  retribution: {
-    overview: "retribution/retributionOverview.css",
-    talents: "retribution/retributionTalents.css",
-    rotation: "retribution/retributionRotation.css",
-    gear: "retribution/retributionGear.css",
-    stats: "retribution/retributionStats.css",
-    consumables: "retribution/retributionConsumables.css",
-  },
-};
-
 const normalizePath = (pathname: string) => pathname.toLowerCase().replace(/\/+$/, "") || "/";
 
 const usesAccountLayout = (pathname: string) =>
@@ -53,6 +26,19 @@ const isMerchandisePath = (pathname: string) =>
   pathname === "/merchandise/merchandise" ||
   pathname === "/merchandise/list" ||
   pathname === "/products";
+
+const isGuidePath = (pathname: string) => {
+  const [section, page] = pathname.split("/").filter(Boolean);
+  return (
+    (section === "holy" || section === "protection" || section === "retribution") &&
+    (page === "overview" ||
+      page === "gear" ||
+      page === "talents" ||
+      page === "consumables" ||
+      page === "rotation" ||
+      page === "stats")
+  );
+};
 
 const getRouteStyles = (pathname: string): string[] => {
   const normalized = normalizePath(pathname);
@@ -78,12 +64,15 @@ const getRouteStyles = (pathname: string): string[] => {
     ];
   }
 
-  const [section, page = "overview"] = normalized.split("/").filter(Boolean);
-  const sectionStyles = guideStyles[section];
-  if (!sectionStyles) return [SITE_STYLE];
+  // V1 source truth: every Holy / Protection / Retribution guide view either has
+  // its page stylesheet commented out or has no page stylesheet link at all.
+  // The live guide pages therefore use the shared _Layout cascade (site.css)
+  // instead of the old holy/*, protection/* and retribution/* files.
+  if (isGuidePath(normalized)) {
+    return [SITE_STYLE];
+  }
 
-  const stylesheet = sectionStyles[page] ?? sectionStyles.overview;
-  return [SITE_STYLE, `${STYLE_ROOT}/${stylesheet}`];
+  return [SITE_STYLE];
 };
 
 export default function V1Stylesheets() {
