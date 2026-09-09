@@ -4,6 +4,7 @@ import Providers from "./providers";
 
 import "../index.css";
 import "../App.css";
+import "../styles/v1-site.css";
 
 export const metadata: Metadata = {
   title: "PaladinHub",
