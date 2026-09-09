@@ -1,0 +1,36 @@
+/* Final V1 navbar compatibility overrides. Loaded after the generic adapter. */
+.ph-v1-navbar.navbar {
+    font-family: Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.ph-v1-navbar .navbar-nav .nav-link {
+    font-size: 1.1rem !important;
+    line-height: 1.5 !important;
+    padding-top: .5rem !important;
+    padding-bottom: .5rem !important;
+}
+
+.ph-v1-navbar .nav-link.dropdown-toggle::after {
+    display: inline-block !important;
+    margin-left: .255em !important;
+    vertical-align: .255em !important;
+    content: "" !important;
+    border-top: .3em solid !important;
+    border-right: .3em solid transparent !important;
+    border-bottom: 0 !important;
+    border-left: .3em solid transparent !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: none !important;
+    transform: none !important;
+}
+
+.ph-v1-navbar .dropdown-toggle {
+    white-space: nowrap !important;
+}
+
+.ph-v1-navbar .dropdown-menu {
+    margin-top: 0 !important;
+}
