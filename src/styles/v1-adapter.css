@@ -1,4 +1,5 @@
-/* React/Next compatibility only. Visual values come from V1 site.css. */
+/* V2 compatibility layer for the exact V1 site.css import.
+   Keep src/styles/v1-site.css untouched; adapt React/Next structure here. */
 
 /* Bootstrap 5.1 structural primitives used by the V1 Razor layout. */
 .container,
@@ -9,6 +10,7 @@
     margin-right: auto;
     margin-left: auto;
 }
+
 @media (min-width: 576px) { .container { max-width: 540px; } }
 @media (min-width: 768px) { .container { max-width: 720px; } }
 @media (min-width: 992px) { .container { max-width: 960px; } }
@@ -34,7 +36,6 @@
 }
 @media (min-width: 768px) { .col-md-4 { flex: 0 0 auto; width: 33.33333333%; } }
 
-.d-none { display: none !important; }
 .d-flex { display: flex !important; }
 .d-inline { display: inline !important; }
 .flex-column { flex-direction: column !important; }
@@ -55,34 +56,17 @@
 .mb-3 { margin-bottom: 1rem !important; }
 .mb-4 { margin-bottom: 1.5rem !important; }
 .mb-5 { margin-bottom: 3rem !important; }
-.mt-5 { margin-top: 3rem !important; }
 .pb-5 { padding-bottom: 3rem !important; }
-.py-3 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
 .px-0 { padding-right: 0 !important; padding-left: 0 !important; }
 .px-3 { padding-right: 1rem !important; padding-left: 1rem !important; }
 .gap-2 { gap: .5rem !important; }
 .text-center { text-align: center !important; }
 .text-warning { color: #ffc107 !important; }
-.text-muted { color: #6c757d !important; }
 .w-100 { width: 100% !important; }
 .h-100 { height: 100% !important; }
 
-/* Exact V1 page/theme background. */
-html,
-body,
-.ph-v1-layout,
-.ph-v1-layout-content {
-    background-color: #111 !important;
-}
-.ph-v1-layout {
-    min-height: 100vh;
-    color: #fff;
-}
-.ph-v1-layout-content { padding-top: 80px; }
-.ph-v1-main-container { padding-bottom: 3rem !important; }
-
-/* Navbar: V1 site.css + Bootstrap structure, adapted to React. */
-.ph-v1-navbar.navbar-custom {
+/* Navbar: map the V2 React markup back to the Bootstrap/V1 layout contract. */
+.ph-v1-navbar.navbar {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -92,9 +76,8 @@ body,
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    background-color: #1e1e1e !important;
-    padding: .5rem 1rem !important;
-    transition: top .3s ease;
+    padding: .5rem 1rem;
+    background-color: #1e1e1e;
 }
 .ph-v1-navbar > .container-fluid {
     display: flex !important;
@@ -114,6 +97,8 @@ body,
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
+    padding-right: 0;
+    padding-left: 0;
 }
 .ph-v1-navbar .navbar-collapse {
     flex-basis: 100%;
@@ -121,6 +106,28 @@ body,
     align-items: center;
 }
 .ph-v1-navbar .collapse:not(.show) { display: none; }
+.ph-v1-navbar .navbar-toggler {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .25rem .75rem;
+    font-size: 1.25rem;
+    line-height: 1;
+    background-color: transparent;
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: .25rem;
+    color: #FFD700;
+}
+.ph-v1-navbar .navbar-toggler-icon {
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    vertical-align: middle;
+    background:
+        linear-gradient(#FFD700 0 0) center 25% / 100% 2px no-repeat,
+        linear-gradient(#FFD700 0 0) center 50% / 100% 2px no-repeat,
+        linear-gradient(#FFD700 0 0) center 75% / 100% 2px no-repeat;
+}
 .ph-v1-navbar .dropdown { position: relative; }
 .ph-v1-navbar .dropdown-toggle { white-space: nowrap; }
 .ph-v1-navbar .dropdown-toggle::after {
@@ -133,8 +140,6 @@ body,
     border-bottom: 0;
     border-left: .3em solid transparent;
 }
-
-/* Final V1 dropdown cascade from site.css. */
 .ph-v1-navbar .dropdown-menu {
     position: absolute;
     z-index: 1000;
@@ -145,16 +150,12 @@ body,
     font-size: 1rem;
     text-align: left;
     list-style: none;
-    background: #171a21 !important;
     background-clip: padding-box;
-    border: 1px solid #2a2f3a !important;
     border-radius: .25rem;
 }
 .ph-v1-navbar .dropdown-menu.show,
-.ph-v1-navbar .nav-item.dropdown:hover > .dropdown-menu {
-    display: block;
-    margin-top: 0;
-}
+.ph-v1-navbar .nav-item.dropdown:hover > .dropdown-menu { display: block; }
+.ph-v1-navbar .dropdown-menu-end { right: 0; left: auto; }
 .ph-v1-navbar .dropdown-item {
     display: block;
     width: 100%;
@@ -164,48 +165,12 @@ body,
     white-space: nowrap;
     border: 0;
 }
-.ph-v1-navbar .dropdown-menu .dropdown-item {
-    color: #FFD700 !important;
-    background-color: transparent !important;
-    font-weight: bold;
-    text-decoration: none !important;
-}
-.ph-v1-navbar .dropdown-menu .dropdown-item:hover,
-.ph-v1-navbar .dropdown-menu .dropdown-item:focus {
-    background: #f59f00 !important;
-    color: #000 !important;
-}
-.ph-v1-navbar .dropdown-menu-end { right: 0; left: auto; }
 .ph-v1-navbar .dropdown-divider {
     height: 0;
     margin: .5rem 0;
     overflow: hidden;
     border: 0;
     border-top: 1px solid rgba(255,255,255,.15);
-}
-.ph-v1-navbar .navbar-toggler {
-    padding: .25rem .75rem;
-    font-size: 1.25rem;
-    line-height: 1;
-    background-color: transparent;
-    border: 1px solid rgba(255,255,255,.1);
-    border-radius: .25rem;
-}
-.ph-v1-navbar .navbar-toggler-icon {
-    display: inline-block;
-    width: 1.5em;
-    height: 1.5em;
-    vertical-align: middle;
-    background:
-        linear-gradient(#aaa 0 0) center 25% / 100% 2px no-repeat,
-        linear-gradient(#aaa 0 0) center 50% / 100% 2px no-repeat,
-        linear-gradient(#aaa 0 0) center 75% / 100% 2px no-repeat;
-}
-.ph-v1-navbar .ph-v1-nav-icon {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    vertical-align: -.125em;
 }
 
 @media (min-width: 576px) {
@@ -223,7 +188,15 @@ body,
     .ph-v1-navbar.navbar-expand-sm .navbar-toggler { display: none !important; }
 }
 
-/* Shared V1 1600px guide geometry. */
+/* V1 layout contract on the React shell. */
+.ph-v1-layout {
+    min-height: 100vh;
+    background: #111;
+    color: #fff;
+}
+.ph-v1-layout-content { padding-top: 80px; }
+.ph-v1-main-container { padding-bottom: 3rem !important; }
+
 .ph-v1-layout .outer-wrapper { width: 100%; max-width: 100%; }
 .ph-v1-layout .page-container,
 .ph-v1-layout .main-wrapper,
@@ -235,6 +208,7 @@ body,
     width: 1600px;
 }
 
+/* Shared V1 page header used by Holy, Protection and Retribution. */
 .ph-guide-page-header {
     width: 100%;
     max-width: none;
@@ -260,11 +234,11 @@ body,
     display: block;
 }
 
-/* Migration wrappers must not introduce a second V2 theme. */
+/* React migration wrappers must be transparent; page-specific legacy classes own the look. */
 .ph-v1-layout main[data-migrated-page],
 .ph-v1-layout [data-migrated-inner],
 .ph-v1-layout [data-migrated-content] {
-    background: transparent !important;
+    background: transparent;
     color: inherit;
     width: auto;
     max-width: none;
@@ -273,7 +247,8 @@ body,
     padding: 0;
 }
 
-/* Tailwind preflight makes images block-level; V1 section icons are inline. */
+/* Tailwind preflight makes every img display:block. V1 relies on inline images in headings.
+   Restore the original V1 behavior for section titles across all class guide pages. */
 .ph-v1-layout [data-guide-page] h2.section-header > img.section-icon,
 .ph-v1-layout [data-guide-page] h2 > img.section-icon,
 .ph-v1-layout [data-guide-page] h3.section-title > img.section-icon,
@@ -304,6 +279,7 @@ body,
     padding-bottom: 30px !important;
 }
 
+/* V1 page header/section grid behavior. */
 .section-grid { width: 100%; }
 .section-cell { min-width: 0; }
 .section-cell .icon { flex: 0 0 32px; }
@@ -322,6 +298,7 @@ body,
 }
 
 @media (max-width: 768px) {
+    body { padding-left: 0; padding-right: 0; }
     .ph-v1-layout-content { padding-top: 72px; }
     .ph-v1-layout .main-wrapper,
     .ph-guide-page-header-body { padding-left: 20px; padding-right: 20px; }
