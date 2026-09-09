@@ -1,0 +1,6 @@
+/* Restores browser/default behavior where the V1 source has no overriding rule. */
+
+/* _PageHeader.cshtml renders PageText as a normal <p>; V1 does not use pre-line. */
+.ph-guide-page-header .page-text {
+    white-space: normal !important;
+}
