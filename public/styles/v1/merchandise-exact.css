@@ -1,0 +1,105 @@
+/* Final V1 Merchandise compatibility overrides. Loaded after merchandise.css. */
+.ph-v1-main-container > div:first-child > div:first-child > aside input[type="checkbox"] {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    width: 1em !important;
+    height: 1em !important;
+    background-color: #0f1115 !important;
+    border: 1px solid #2a2f3a !important;
+    border-radius: .25em !important;
+    display: inline-grid !important;
+    place-content: center !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside input[type="checkbox"]:checked {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside input[type="checkbox"]:checked::after {
+    content: "";
+    width: .42em;
+    height: .22em;
+    border-left: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: rotate(-45deg) translateY(-1px);
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > section article > div:nth-child(2) > div:nth-of-type(2) > span:first-child,
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button > span:first-child {
+    color: #f6c441 !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > section article > div:nth-child(2) > div:nth-of-type(2) > span:first-child > span,
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button > span:first-child > span {
+    color: #6b7280 !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside > div > button:last-child {
+    font-size: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: .5rem !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside > div > button:last-child::before {
+    content: "\f51a";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: .875rem;
+    line-height: 1;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside > div > button:last-child::after {
+    content: "Clear all filters";
+    font-family: Arial, sans-serif;
+    font-weight: 600;
+    font-size: .875rem;
+    line-height: 1.5;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > section > div:first-child a[href*="/Cart/MyCart"] {
+    font-size: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: .5rem !important;
+    padding: .25rem 1rem !important;
+    border-radius: 50rem !important;
+    background: #ffc107 !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    line-height: 1.5 !important;
+    text-decoration: none !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > section > div:first-child a[href*="/Cart/MyCart"]::before {
+    content: "\f07a";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: .875rem;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > section > div:first-child a[href*="/Cart/MyCart"]::after {
+    content: "My Cart";
+    font-family: Arial, sans-serif;
+    font-size: .875rem;
+    font-weight: 700;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > section > div:nth-child(2) button {
+    min-height: calc(1.5em + .5rem + 2px) !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > section > div:nth-last-of-type(2) {
+    column-gap: 1rem !important;
+    row-gap: 1rem !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > section article > div:nth-child(2) {
+    padding: 1rem !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > section article > div:last-child {
+    padding: 0 1rem 1rem !important;
+}
