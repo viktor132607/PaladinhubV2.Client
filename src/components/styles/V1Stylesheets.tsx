@@ -70,6 +70,7 @@ const getRouteStyles = (pathname: string): string[] => {
     return [
       `${STYLE_ROOT}/merchandise.css`,
       `${STYLE_ROOT}/merchandise-final.css`,
+      `${STYLE_ROOT}/merchandise-filter-exact.css`,
     ];
   }
 
