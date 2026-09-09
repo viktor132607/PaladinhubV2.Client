@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { FormEvent, HTMLAttributes } from "react";
@@ -23,6 +22,7 @@ export function HtmlContent({ html, className }: HtmlViewProps) {
   return (
     <div
       className={classes}
+      data-migrated-content
       onSubmit={stopLegacyFormSubmission}
       dangerouslySetInnerHTML={{ __html: html }}
     />
@@ -33,11 +33,12 @@ export function MigratedPageView({ title, html, className }: PageViewProps) {
   const classes = [styles.content, className].filter(Boolean).join(" ");
 
   return (
-    <main className={styles.page}>
-      <div className={styles.pageInner}>
+    <main className={styles.page} data-migrated-page>
+      <div className={styles.pageInner} data-migrated-inner>
         {title ? <h1 className={styles.pageTitle}>{title}</h1> : undefined}
         <div
           className={classes}
+          data-migrated-content
           onSubmit={stopLegacyFormSubmission}
           dangerouslySetInnerHTML={{ __html: html }}
         />
