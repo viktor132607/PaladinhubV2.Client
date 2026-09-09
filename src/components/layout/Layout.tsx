@@ -4,25 +4,16 @@ import Footer from "./Footer";
 
 export default function Layout() {
   return (
-    <div className="min-h-screen bg-[#1e1e1e] text-white">
+    <div className="ph-v1-layout">
       <Navbar />
 
-      <div className="pt-[80px]">
-        <main
-          className="
-            mx-auto w-full px-3 pb-12
-
-            min-[576px]:max-w-[540px]
-            min-[768px]:max-w-[720px]
-            min-[992px]:max-w-[960px]
-            min-[1200px]:max-w-[1140px]
-            min-[1400px]:max-w-[1320px]
-          "
-        >
+      <div className="ph-v1-layout-content">
+        <main role="main" className="pb-5 container ph-v1-main-container">
           <Outlet />
         </main>
       </div>
 
+      <br />
       <Footer />
     </div>
   );
