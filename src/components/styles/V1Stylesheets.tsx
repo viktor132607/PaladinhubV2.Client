@@ -5,6 +5,7 @@ import { useLocation } from "@/router/nextCompat";
 
 const STYLE_MARKER = "data-paladinhub-v1-route-style";
 const STYLE_ROOT = "/styles/v1";
+const SITE_STYLE = `${STYLE_ROOT}/site.css`;
 
 const guideStyles: Record<string, Record<string, string>> = {
   holy: {
@@ -59,15 +60,16 @@ const getRouteStyles = (pathname: string): string[] => {
   const normalized = normalizePath(pathname);
 
   if (normalized === "/" || normalized === "/home/home") {
-    return [`${STYLE_ROOT}/home.css`];
+    return [SITE_STYLE, `${STYLE_ROOT}/home.css`];
   }
 
   if (isAccountPath(normalized)) {
-    return [`${STYLE_ROOT}/account.css`];
+    return [SITE_STYLE, `${STYLE_ROOT}/account.css`];
   }
 
   if (isMerchandisePath(normalized)) {
     return [
+      SITE_STYLE,
       `${STYLE_ROOT}/merchandise.css`,
       `${STYLE_ROOT}/merchandise-final.css`,
       `${STYLE_ROOT}/merchandise-filter-exact.css`,
@@ -78,11 +80,11 @@ const getRouteStyles = (pathname: string): string[] => {
   const sectionStyles = guideStyles[section];
 
   if (!sectionStyles) {
-    return [];
+    return [SITE_STYLE];
   }
 
   const stylesheet = sectionStyles[page] ?? sectionStyles.overview;
-  return [`${STYLE_ROOT}/${stylesheet}`];
+  return [SITE_STYLE, `${STYLE_ROOT}/${stylesheet}`];
 };
 
 export default function V1Stylesheets() {
