@@ -217,9 +217,16 @@
 .ph-guide-page-header .page-container { padding: 0; }
 .ph-guide-page-header-body { padding: 0 50px; }
 .ph-guide-page-header .page-title {
+    margin-top: 0;
+    margin-bottom: .5rem;
+    padding-bottom: 0;
     text-align: center;
-    padding-bottom: 30px;
     color: #fff;
+}
+.ph-guide-page-header .page-text {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    line-height: 1.5;
 }
 .image-cover-container {
     aspect-ratio: 2560 / 820;
