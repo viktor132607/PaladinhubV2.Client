@@ -32,7 +32,7 @@ h2 { color: hotpink; }
 .ph-v1-navbar .dropdown-toggle { white-space: nowrap; }
 .ph-v1-navbar .dropdown-toggle::after { display: inline-block; margin-left: .255em; vertical-align: .255em; content: ""; border-top: .3em solid; border-right: .3em solid transparent; border-bottom: 0; border-left: .3em solid transparent; }
 .ph-v1-navbar .dropdown-menu { position: absolute; z-index: 1000; display: none; min-width: 10rem; padding: .5rem 0; margin: 0; font-size: 1rem; text-align: left; list-style: none; background-color: #2c2c2c; background-clip: padding-box; border: 1px solid #FFD700; border-radius: .25rem; }
-.ph-v1-navbar .nav-item.dropdown:hover .dropdown-menu { display: block; margin-top: 0; }
+.ph-v1-navbar .nav-item.dropdown:hover .dropdown-menu, .ph-v1-navbar .dropdown-menu.show { display: block; margin-top: 0; }
 .ph-v1-navbar .dropdown-menu .dropdown-item { display: block; width: 100%; padding: .25rem 1rem; clear: both; color: #FFD700 !important; background-color: transparent; border: 0; font-weight: bold; text-align: inherit; text-decoration: none !important; white-space: nowrap; transition: background-color .3s, color .3s; }
 .ph-v1-navbar .dropdown-menu .dropdown-item:hover { color: black !important; background-color: #FFD700 !important; text-decoration: none !important; }
 .ph-v1-navbar .ms-auto { margin-left: auto !important; }
@@ -40,6 +40,18 @@ h2 { color: hotpink; }
 .ph-v1-navbar .ph-v1-nav-icon { display: inline-block; width: 1em; height: 1em; vertical-align: -.125em; }
 .ph-v1-navbar .navbar-toggler { padding: .25rem .75rem; font-size: 1.25rem; line-height: 1; background-color: transparent; border: 1px solid rgba(255,255,255,.1); border-radius: .25rem; }
 .ph-v1-navbar .navbar-toggler-icon { display: inline-block; width: 1.5em; height: 1.5em; vertical-align: middle; background: linear-gradient(#aaa 0 0) center 25%/100% 2px no-repeat, linear-gradient(#aaa 0 0) center 50%/100% 2px no-repeat, linear-gradient(#aaa 0 0) center 75%/100% 2px no-repeat; }
+.ph-v1-navbar .d-flex { display: flex !important; }
+.ph-v1-navbar .align-items-center { align-items: center !important; }
+.ph-v1-navbar .gap-2 { gap: .5rem !important; }
+.ph-v1-navbar .rounded-circle { border-radius: 50% !important; }
+.ph-v1-navbar .border { border: 1px solid #dee2e6 !important; }
+.ph-v1-navbar .ph-auth-avatar { width: 28px; height: 28px; object-fit: cover; }
+.ph-v1-navbar .ph-auth-toggle { border: 0; background: transparent; cursor: pointer; }
+.ph-v1-navbar .dropdown-menu-end { right: 0; left: auto; }
+.ph-v1-navbar .dropdown-divider { height: 0; margin: .5rem 0; overflow: hidden; border: 0; border-top: 1px solid rgba(255,255,255,.15); }
+.ph-v1-navbar .px-3 { padding-right: 1rem !important; padding-left: 1rem !important; }
+.ph-v1-navbar .px-0 { padding-right: 0 !important; padding-left: 0 !important; }
+.ph-v1-navbar .text-warning { color: #ffc107 !important; }
 
 @media (min-width: 576px) {
   .ph-v1-navbar.navbar-expand-sm { flex-wrap: nowrap; justify-content: flex-start; }
@@ -50,6 +62,17 @@ h2 { color: hotpink; }
   .ph-v1-navbar.navbar-expand-sm .navbar-collapse { display: flex !important; flex-basis: auto; }
   .ph-v1-navbar .justify-content-between { justify-content: space-between !important; }
 }
+
+.ph-v1-layout { min-height: 100vh; background-color: #1e1e1e; color: #fff; }
+.ph-v1-layout-content { padding-top: 80px; }
+.ph-v1-main-container { width: 100%; margin-right: auto; margin-left: auto; padding-right: .75rem; padding-left: .75rem; padding-bottom: 3rem !important; }
+.ph-v1-footer { width: 100%; border-top: 1px solid #dee2e6; color: #6c757d; text-align: center; margin-top: 3rem; padding-top: 1rem; padding-bottom: 1rem; }
+.ph-v1-footer .container { width: 100%; margin-right: auto; margin-left: auto; padding-right: .75rem; padding-left: .75rem; }
+@media (min-width: 576px) { .ph-v1-main-container, .ph-v1-footer .container { max-width: 540px; } }
+@media (min-width: 768px) { .ph-v1-main-container, .ph-v1-footer .container { max-width: 720px; } }
+@media (min-width: 992px) { .ph-v1-main-container, .ph-v1-footer .container { max-width: 960px; } }
+@media (min-width: 1200px) { .ph-v1-main-container, .ph-v1-footer .container { max-width: 1140px; } }
+@media (min-width: 1400px) { .ph-v1-main-container, .ph-v1-footer .container { max-width: 1320px; } }
 
 /* Home: direct port of V1 home.css. */
 .home-v1 { color: #FFD700; }
