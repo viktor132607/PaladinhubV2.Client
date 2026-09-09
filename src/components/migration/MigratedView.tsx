@@ -26,7 +26,7 @@ const stopLegacyFormSubmission = (event: FormEvent<HTMLDivElement>) => {
   event.preventDefault();
 };
 
-const guideMeta: Record<GuideSection, { cover: string; titles: Record<GuidePage, string>; texts: Partial<Record<GuidePage, string>> }> = {
+const guideMeta: Record<GuideSection, { cover: string; titles: Record<GuidePage, string>; texts: Record<GuidePage, string> }> = {
   holy: {
     cover: "/images/TheHolyCover2.jpg",
     titles: {
@@ -38,11 +38,11 @@ const guideMeta: Record<GuideSection, { cover: string; titles: Record<GuidePage,
       stats: "Holy Paladin Stat Priority - The War Within",
     },
     texts: {
-      overview: "Holy Paladin is a plate-wearing Healer specialization with a wide range of damage reduction and defensive abilities. We specialize in healing specific targets with large single-target heals, commonly referred to as “spot healing”. Holy Paladin gets access to the iconic Beacon of Light ability at level 16, which allows us to keep a consistent stream of healing on a specific target while healing other allies who might need it!\n\nBesides the classic Healer resource, Mana, Holy Paladins also utilize a secondary resource known as Holy Power, which functions similarly to Combo Points. Most of our spells generate this resource, which we can then use to cast our most powerful heals, Word of Glory and Light of Dawn.",
-      talents: "Here are all the best Holy Paladin Talent Tree builds in the Patch 11.1.7 & Season 2 for raids and Mythic+, including export links to import these builds directly into the game.\n\nFor recommended talent builds for each raid boss and Mythic+ dungeon, check out our Liberation of Undermine Raid Page and Mythic+ page.",
-      gear: "Gear is one of the most important elements in WoW to strengthen your Holy Paladin, providing massive amounts of stats as well as armor, procs, and set bonuses.\n\nThis guide will explain how to obtain the best gear for your Holy Paladin in Patch 11.1.5 & Season 2 and how to check if a piece is Best in Slot (BiS), an upgrade, or just bad.\nThis guide will help you select the best pieces of gear from Dungeons and Raids in The War Within, whether they be weapons, trinkets, or armor.",
-      consumables: "Consumables are a vital part of high-level content in WoW, like Mythic+ Dungeons and Raids, providing additional ways for players to improve and customize their stats outside of gear.\n\nIn this guide, we will explain the best Holy Paladin gems, Holy Paladin flasks, Holy Paladin potions, and Holy Paladin enchants in Patch 11.1.7 & Season 2, as well as cheaper alternatives.\nBelow you will find the best Holy Paladin enchants and consumables. Make sure to also check our The War Within Profession Guide for all profession details, updated for Patch 11.1.7 & Season 2.",
-      stats: "Stats are a key component when customizing your Holy Paladin in World of Warcraft The War Within--having the right combination of them can be crucial to your performance.\n\nIn this guide, we will detail the best stat priority for your Holy Paladin, as well as provide explanations covering how to determine Holy Paladin stat priorities personalized for your character in Patch 11.1.7 & Season 2, as well as how to check if a piece of gear is BiS, upgrade or just bad for you.\n\nBesides talking about your Holy Paladin stat priority, we will also cover your stats in-depth, explaining nuances and synergies for niche situations that go beyond a generic Holy Paladin priority.",
+      overview: "\t\t\t\t\tHoly Paladin is a plate-wearing Healer specialization with a wide range of damage reduction and defensive abilities. We specialize in healing specific targets with large single-target heals, commonly referred to as “spot healing”. Holy Paladin gets access to the iconic Beacon of Light ability at level 16, which allows us to keep a consistent stream of healing on a specific target while healing other allies who might need it!\r\n\r\n\t\t\t\t\tBesides the classic Healer resource, Mana, Holy Paladins also utilize a secondary resource known as Holy Power, which functions similarly to Combo Points. Most of our spells generate this resource, which we can then use to cast our most powerful heals, Word of Glory and Light of Dawn.\r\n",
+      talents: "Here are all the best Holy Paladin Talent Tree builds in the Patch 11.1.7 & Season 2 for raids and Mythic+, including export links to import these builds directly into the game.\r\n\r\nFor recommended talent builds for each raid boss and Mythic+ dungeon, check out our Liberation of Undermine Raid Page and Mythic+ page.",
+      gear: "\t\t\t\t\tGear is one of the most important elements in WoW to strengthen your Holy Paladin, providing massive amounts of stats as well as armor, procs, and set bonuses.\r\n\r\n\t\t\t\t\tThis guide will explain how to obtain the best gear for your Holy Paladin in Patch 11.1.5 & Season 2 and how to check if a piece is Best in Slot (BiS), an upgrade, or just bad.\r\n\t\t\t\t\tThis guide will help you select the best pieces of gear from Dungeons and Raids in The War Within, whether they be weapons, trinkets, or armor.\r\n",
+      consumables: "Consumables are a vital part of high-level content in WoW, like Mythic+ Dungeons and Raids, providing additional ways for players to improve and customize their stats outside of gear.\r\n\r\nIn this guide, we will explain the best Holy Paladin gems, Holy Paladin flasks, Holy Paladin potions, and Holy Paladin enchants in Patch 11.1.7 & Season 2, as well as cheaper alternatives.\r\nBelow you will find the best Holy Paladin enchants and consumables. Make sure to also check our The War Within Profession Guide for all profession details, updated for Patch 11.1.7 & Season 2.",
+      stats: "Stats are a key component when customizing your Holy Paladin in World of Warcraft The War Within--having the right combination of them can be crucial to your performance.\r\n\r\nIn this guide, we will detail the best stat priority for your Holy Paladin, as well as provide explanations covering how to determine Holy Paladin stat priorities personalized for your character in Patch 11.1.7 & Season 2, as well as how to check if a piece of gear is BiS, upgrade or just bad for you.\r\n\r\nBesides talking about your Holy Paladin stat priority, we will also cover your stats in-depth, explaining nuances and synergies for niche situations that go beyond a generic Holy Paladin priority.",
       rotation: "Learn the best Holy Paladin rotation for The War Within Season 2. Details about how to excel at your Holy Paladin and the optimal rotation for all talent builds in dungeons and raids for Patch 11.1.7 & Season 2.",
     },
   },
@@ -56,7 +56,14 @@ const guideMeta: Record<GuideSection, { cover: string; titles: Record<GuidePage,
       rotation: "Protection Paladin Rotation Guide – The War Within",
       stats: "Protection Paladin Stat Priority – The War Within",
     },
-    texts: {},
+    texts: {
+      overview: "Welcome to the 11.1.7 Season 2 Protection Paladin guide. This guide will help you master your Protection Paladin in all aspects of the game including raids and dungeons.",
+      talents: "This page covers the best Protection Paladin talent tree builds for Season 2 in raids and Mythic+, including exports to import these builds directly into the game.",
+      gear: "Gear is one of the most important elements in WoW to strengthen your Protection Paladin, providing massive amounts of stats as well as armor, procs, and set bonuses.",
+      consumables: "Consumables can add a vital amount of high-value secondary stats and buffs, providing another way for players to improve and customize their stats outside of gear.",
+      stats: "Stats are a key component when customizing your Protection Paladin for raiding and Mythic+.",
+      rotation: "Learn the best Protection Paladin rotation for The War Within Season 2. Details about how to excel at your Protection Paladin and the optimal rotation for all talent builds in dungeons and raids.",
+    },
   },
   retribution: {
     cover: "/images/RetributionCoverOrig.jpg",
@@ -68,7 +75,14 @@ const guideMeta: Record<GuideSection, { cover: string; titles: Record<GuidePage,
       rotation: "Retribution Paladin Rotation Guide - The War Within",
       stats: "Retribution Paladin Stat Priority - The War Within",
     },
-    texts: {},
+    texts: {
+      overview: "Welcome to Patch 11.1.7 & Season 2 Retribution Paladin guide. This guide will help you master your Retribution Paladin in all aspects of the game including raids and dungeons.",
+      talents: "Here are all the best Retribution Paladin Talent Tree builds in the Patch 11.1.7 & Season 2 for raids and Mythic+, including export links to import these builds directly into the game.\r\n\r\nFor recommended talent builds for each raid boss and Mythic+ dungeon, check out our Liberation of Undermine Raid Page and Mythic+ page.",
+      gear: "Gear is one of the most important elements in WoW to strengthen your Retribution Paladin, providing massive amounts of stats as well as armor, procs, and set bonuses.\r\n\r\nWe will explain how to obtain the best gear for your Retribution Paladin in Patch 11.1.7 & Season 2 and how to check if a piece is BiS, an upgrade, or just bad. This guide will help you select the best pieces of gear from Dungeons and Raids in The War Within, whether they be weapons, trinkets, or armor.\r\n",
+      consumables: "Consumables are a vital part of high-level content in WoW, like Mythic+ Dungeons and Raids, providing additional ways for players to improve and customize their stats outside of gear.\r\n\r\nIn this guide, we will explain the best Retribution Paladin gems, Retribution Paladin flasks, Retribution Paladin potions, and Retribution Paladin enchants in Patch 11.1.7 & Season 2, as well as cheaper alternatives.\r\nBelow you will find the best Retribution Paladin enchants and consumables. Make sure to also check our The War Within Profession Guide for all profession details, updated for Patch 11.1.7 & Season 2.\r\n",
+      stats: "Stats are a key component when customizing your Retribution Paladin in World of Warcraft The War Within--having the right combination of them can be crucial to your performance.\r\n\r\nIn this guide, we will detail the best stat priority for your Retribution Paladin, as well as provide explanations covering how to determine Retribution Paladin stat priorities personalized for your character in Patch 11.1.7 & Season 2, as well as how to check if a piece of gear is BiS, upgrade or just bad for you.\r\n\r\nBesides talking about your Retribution Paladin stat priority, we will also cover your stats in-depth, explaining nuances and synergies for niche situations that go beyond a generic Retribution Paladin priority.\r\n",
+      rotation: "Learn the best Retribution Paladin rotation for The War Within Season 2. Details about how to excel at your Retribution Paladin and the optimal rotation for all talent builds in dungeons and raids for Patch 11.1.7 & Season 2.",
+    },
   },
 };
 
@@ -149,19 +163,19 @@ function SectionGrid({ title, buttons }: { title: string; buttons: GuideButton[]
   );
 }
 
-function GuideHeader({ section, page, cover, titles, texts }: ReturnType<typeof resolveGuide> extends infer T ? Exclude<T, null> : never) {
+function GuideHeader({ page, cover, titles, texts }: ReturnType<typeof resolveGuide> extends infer T ? Exclude<T, null> : never) {
   return (
     <div className="outer-wrapper ph-guide-page-header">
       <div className="page-container">
         <div className="image-cover-container">
-          <img src={cover} alt={`${section} Paladin`} className="image-cover" />
+          <img src={cover} alt="Cover" className="image-cover" />
         </div>
         <div className="main-wrapper ph-guide-page-header-body">
           <br />
           <h1 className="page-title">{titles[page]}</h1>
-          {texts[page] ? <p className="page-text" style={{ whiteSpace: "pre-line" }}>{texts[page]}</p> : null}
+          {texts[page] ? <p className="page-text">{texts[page]}</p> : null}
           <SectionGrid title="Current Sections" buttons={currentButtons[page]} />
-          <SectionGrid title="Other Sections" buttons={otherButtons(section)} />
+          <SectionGrid title="Other Sections" buttons={otherButtons(resolveGuideSectionFromTitle(titles))} />
           <div className="separator-container">
             <img src="/images/Separators/D4.png" alt="Separator 4" className="separator" />
           </div>
@@ -170,6 +184,18 @@ function GuideHeader({ section, page, cover, titles, texts }: ReturnType<typeof 
       </div>
     </div>
   );
+}
+
+function resolveGuideSectionFromTitle(titles: Record<GuidePage, string>): GuideSection {
+  if (titles === guideMeta.protection.titles) return "protection";
+  if (titles === guideMeta.retribution.titles) return "retribution";
+  return "holy";
+}
+
+export function GuidePageHeader() {
+  const { pathname } = useLocation();
+  const guide = resolveGuide(pathname);
+  return guide ? <GuideHeader {...guide} /> : null;
 }
 
 export function HtmlContent({ html, className }: HtmlViewProps) {
