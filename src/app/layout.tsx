@@ -4,7 +4,6 @@ import Providers from "./providers";
 
 import "../index.css";
 import "../App.css";
-import "../styles/v1-site.css";
 import "../styles/v1-adapter.css";
 import "../styles/v1-navbar-exact.css";
 
@@ -22,11 +21,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
