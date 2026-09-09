@@ -21,3 +21,9 @@
 .fragment {
   color: inherit;
 }
+
+.page[data-guide-page],
+.page[data-guide-page] > .pageInner,
+.page[data-guide-page] > .pageInner > .content {
+  display: contents;
+}
