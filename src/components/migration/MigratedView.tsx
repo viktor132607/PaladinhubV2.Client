@@ -16,11 +16,17 @@ type PageViewProps = HtmlViewProps & {
 type GuideSection = "holy" | "protection" | "retribution";
 type GuidePage = "overview" | "gear" | "talents" | "consumables" | "rotation" | "stats";
 
+type GuideButton = {
+  url: string;
+  text: string;
+  icon: string;
+};
+
 const stopLegacyFormSubmission = (event: FormEvent<HTMLDivElement>) => {
   event.preventDefault();
 };
 
-const guideMeta: Record<GuideSection, { cover: string; titles: Record<GuidePage, string> }> = {
+const guideMeta: Record<GuideSection, { cover: string; titles: Record<GuidePage, string>; texts: Partial<Record<GuidePage, string>> }> = {
   holy: {
     cover: "/images/TheHolyCover2.jpg",
     titles: {
@@ -30,6 +36,14 @@ const guideMeta: Record<GuideSection, { cover: string; titles: Record<GuidePage,
       consumables: "Holy Paladin Enchants & Consumables - The War Within",
       rotation: "Holy Paladin Rotation Guide - The War Within",
       stats: "Holy Paladin Stat Priority - The War Within",
+    },
+    texts: {
+      overview: "Holy Paladin is a plate-wearing Healer specialization with a wide range of damage reduction and defensive abilities. We specialize in healing specific targets with large single-target heals, commonly referred to as “spot healing”. Holy Paladin gets access to the iconic Beacon of Light ability at level 16, which allows us to keep a consistent stream of healing on a specific target while healing other allies who might need it!\n\nBesides the classic Healer resource, Mana, Holy Paladins also utilize a secondary resource known as Holy Power, which functions similarly to Combo Points. Most of our spells generate this resource, which we can then use to cast our most powerful heals, Word of Glory and Light of Dawn.",
+      talents: "Here are all the best Holy Paladin Talent Tree builds in the Patch 11.1.7 & Season 2 for raids and Mythic+, including export links to import these builds directly into the game.\n\nFor recommended talent builds for each raid boss and Mythic+ dungeon, check out our Liberation of Undermine Raid Page and Mythic+ page.",
+      gear: "Gear is one of the most important elements in WoW to strengthen your Holy Paladin, providing massive amounts of stats as well as armor, procs, and set bonuses.\n\nThis guide will explain how to obtain the best gear for your Holy Paladin in Patch 11.1.5 & Season 2 and how to check if a piece is Best in Slot (BiS), an upgrade, or just bad.\nThis guide will help you select the best pieces of gear from Dungeons and Raids in The War Within, whether they be weapons, trinkets, or armor.",
+      consumables: "Consumables are a vital part of high-level content in WoW, like Mythic+ Dungeons and Raids, providing additional ways for players to improve and customize their stats outside of gear.\n\nIn this guide, we will explain the best Holy Paladin gems, Holy Paladin flasks, Holy Paladin potions, and Holy Paladin enchants in Patch 11.1.7 & Season 2, as well as cheaper alternatives.\nBelow you will find the best Holy Paladin enchants and consumables. Make sure to also check our The War Within Profession Guide for all profession details, updated for Patch 11.1.7 & Season 2.",
+      stats: "Stats are a key component when customizing your Holy Paladin in World of Warcraft The War Within--having the right combination of them can be crucial to your performance.\n\nIn this guide, we will detail the best stat priority for your Holy Paladin, as well as provide explanations covering how to determine Holy Paladin stat priorities personalized for your character in Patch 11.1.7 & Season 2, as well as how to check if a piece of gear is BiS, upgrade or just bad for you.\n\nBesides talking about your Holy Paladin stat priority, we will also cover your stats in-depth, explaining nuances and synergies for niche situations that go beyond a generic Holy Paladin priority.",
+      rotation: "Learn the best Holy Paladin rotation for The War Within Season 2. Details about how to excel at your Holy Paladin and the optimal rotation for all talent builds in dungeons and raids for Patch 11.1.7 & Season 2.",
     },
   },
   protection: {
@@ -42,6 +56,7 @@ const guideMeta: Record<GuideSection, { cover: string; titles: Record<GuidePage,
       rotation: "Protection Paladin Rotation Guide – The War Within",
       stats: "Protection Paladin Stat Priority – The War Within",
     },
+    texts: {},
   },
   retribution: {
     cover: "/images/RetributionCoverOrig.jpg",
@@ -53,11 +68,64 @@ const guideMeta: Record<GuideSection, { cover: string; titles: Record<GuidePage,
       rotation: "Retribution Paladin Rotation Guide - The War Within",
       stats: "Retribution Paladin Stat Priority - The War Within",
     },
+    texts: {},
   },
+};
+
+const currentButtons: Record<GuidePage, GuideButton[]> = {
+  overview: [
+    { url: "#rotation", text: "Scroll to Rotation", icon: "/images/icons/ui_spellbook_onebutton.jpg" },
+    { url: "#talents", text: "Scroll to Talents", icon: "/images/itemIcons/talents.jpg" },
+  ],
+  gear: [
+    { url: "#overall-bis", text: "Overall BiS", icon: "/images/SpellIcons/Divine Hammer.jpg" },
+    { url: "#raid-mythic-bis", text: "Raid / Mythic+ BiS", icon: "/images/icons/inv_plate_raidpaladingoblin_d_01_helm.jpg" },
+    { url: "#best-trinkets", text: "Best Trinkets", icon: "/images/icons/EyeOfKezan.jpg" },
+    { url: "#upgrade-priorities", text: "Upgrade Priorities", icon: "/images/icons/inv_crestupgrade_undermine_gilded.jpg" },
+    { url: "#cyrces-circlet", text: "Cyrce's Circlet", icon: "/images/icons/Cyrces Circlet.jpg" },
+    { url: "#corruptions", text: "Corruptions", icon: "/images/icons/inv_eyeofnzothpet.jpg" },
+    { url: "#cartel-chip-usage", text: "Cartel Chip Usage", icon: "/images/icons/inv_misc_curiouscoin.jpg" },
+    { url: "#crafted-gear", text: "Crafted Gear", icon: "/images/icons/inv_spark_whole_orange (1).jpg" },
+  ],
+  consumables: [
+    { url: "#enchants", text: "Enchants", icon: "/images/itemIcons/inv_misc_enchantedscroll.jpg" },
+    { url: "#consumables", text: "Consumables", icon: "/images/itemIcons/inv_potion_green.jpg" },
+    { url: "#food", text: "Food", icon: "/images/itemIcons/inv_misc_food_meat_cooked_02_color02.jpg" },
+    { url: "#gems", text: "Gems", icon: "/images/itemIcons/inv_10_jewelcrafting_gem3primal_cut_red.jpg" },
+  ],
+  rotation: [
+    { url: "#how-to-play", text: "How to Play", icon: "/images/SpellIcons/Unending Light.jpg" },
+    { url: "#rotation-and-spell-priority", text: "Rotation and Spell Priority", icon: "/images/SpellIcons/Aura Mastery.jpg" },
+    { url: "#single-button-rotation", text: "Single Button Rotation Assistant", icon: "/images/icons/ui_spellbook_onebutton.jpg" },
+    { url: "#major-cooldown-usage", text: "Major Cooldown Usage", icon: "/images/SpellIcons/Divine Toll.jpg" },
+    { url: "#advanced-insights", text: "Advanced Insights", icon: "/images/SpellIcons/Beacon of Virtue.jpg" },
+  ],
+  stats: [
+    { url: "#stats-overview-section", text: "Stats Overview", icon: "/images/SpellIcons/Divine Hammer.jpg" },
+    { url: "#best-stats-section", text: "Best Stats", icon: "/images/icons/inv_10_inscription2_repcontracts_scroll_02_uprez_color2.jpg" },
+  ],
+  talents: [
+    { url: "#talents-tree-1", text: "Scroll to Talents", icon: "/images/itemIcons/talents.jpg" },
+    { url: "#talents-tree-2", text: "Scroll to Talents", icon: "/images/itemIcons/talents.jpg" },
+  ],
 };
 
 const guidePages = new Set<GuidePage>(["overview", "gear", "talents", "consumables", "rotation", "stats"]);
 const guideSections = new Set<GuideSection>(["holy", "protection", "retribution"]);
+
+function otherButtons(section: GuideSection): GuideButton[] {
+  const base = `/${section[0].toUpperCase()}${section.slice(1)}`;
+  return [
+    { url: `${base}/Overview`, text: "Overview", icon: "/images/SpellIcons/Divine Hammer.jpg" },
+    { url: `${base}/Gear`, text: "BiS Gear", icon: "/images/itemIcons/inv_chest_plate_earthendungeon_c_01.jpg" },
+    { url: `${base}/Talents`, text: "Talent Builds", icon: "/images/itemIcons/talents.jpg" },
+    { url: `${base}/Consumables`, text: "Consumables", icon: "/images/itemIcons/inv_potion_green.jpg" },
+    { url: `${base}/Rotation`, text: "Rotation", icon: "/images/icons/ui_spellbook_onebutton.jpg" },
+    { url: `${base}/Stats`, text: "Stats", icon: "/images/icons/inv_10_inscription2_repcontracts_scroll_02_uprez_color2.jpg" },
+    { url: `${base}/Overview`, text: "CheatSheet", icon: "/images/itemIcons/inv_misc_note_03.jpg" },
+    { url: `${base}/WA-Addons`, text: "WA & Addons", icon: "/images/icons/WA.png" },
+  ];
+}
 
 function resolveGuide(pathname: string) {
   const [section, page] = pathname.toLowerCase().split("/").filter(Boolean) as [GuideSection?, GuidePage?];
@@ -65,7 +133,23 @@ function resolveGuide(pathname: string) {
   return { section, page, ...guideMeta[section] };
 }
 
-function GuideHeader({ section, page, cover, titles }: ReturnType<typeof resolveGuide> extends infer T ? Exclude<T, null> : never) {
+function SectionGrid({ title, buttons }: { title: string; buttons: GuideButton[] }) {
+  return (
+    <>
+      <div className="section-title" style={{ fontSize: "1.8em", textAlign: "center", color: "white" }}>{title} :</div>
+      <div className="section-grid">
+        {buttons.map((button) => (
+          <a href={button.url} className="section-cell" key={`${button.url}-${button.text}`}>
+            <span className="icon" style={{ backgroundImage: `url('${button.icon}')` }} />
+            <span>{button.text}</span>
+          </a>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function GuideHeader({ section, page, cover, titles, texts }: ReturnType<typeof resolveGuide> extends infer T ? Exclude<T, null> : never) {
   return (
     <div className="outer-wrapper ph-guide-page-header">
       <div className="page-container">
@@ -75,6 +159,13 @@ function GuideHeader({ section, page, cover, titles }: ReturnType<typeof resolve
         <div className="main-wrapper ph-guide-page-header-body">
           <br />
           <h1 className="page-title">{titles[page]}</h1>
+          {texts[page] ? <p className="page-text" style={{ whiteSpace: "pre-line" }}>{texts[page]}</p> : null}
+          <SectionGrid title="Current Sections" buttons={currentButtons[page]} />
+          <SectionGrid title="Other Sections" buttons={otherButtons(section)} />
+          <div className="separator-container">
+            <img src="/images/Separators/D4.png" alt="Separator 4" className="separator" />
+          </div>
+          <br />
         </div>
       </div>
     </div>
