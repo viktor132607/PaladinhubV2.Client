@@ -34,3 +34,21 @@
 .ph-v1-navbar .dropdown-menu {
     margin-top: 0 !important;
 }
+
+/* V1 uses Font Awesome <i> icons, which inherit the nav-link font size.
+   Heroicons in V2 must be forced to the same inline 1em footprint. */
+.ph-v1-navbar .ph-v1-nav-icon {
+    display: inline-block !important;
+    width: 1em !important;
+    height: 1em !important;
+    min-width: 1em !important;
+    max-width: 1em !important;
+    min-height: 1em !important;
+    max-height: 1em !important;
+    vertical-align: -.125em !important;
+    flex: 0 0 1em !important;
+}
+
+.ph-v1-navbar .nav-link:has(.ph-v1-nav-icon) {
+    white-space: nowrap !important;
+}
