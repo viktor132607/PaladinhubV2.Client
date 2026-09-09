@@ -44,6 +44,10 @@ const isGuidePath = (pathname: string) => {
 const getRouteStyles = (pathname: string): string[] => {
   const normalized = normalizePath(pathname);
 
+  if (normalized === "/admin" || normalized.startsWith("/admin/")) {
+    return [BOOTSTRAP_STYLE, SITE_STYLE, `${STYLE_ROOT}/admin/admin.css`];
+  }
+
   if (normalized === "/" || normalized === "/home/home") {
     return [
       BOOTSTRAP_STYLE,

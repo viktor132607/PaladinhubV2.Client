@@ -1,0 +1,66 @@
+/* Exact V1 Admin/Database inline CSS ported from PaladinHub v1. */
+#admin-db-bleed {
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  width: 100vw;
+}
+
+#admin-db-inner {
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.table-wide {
+  min-width: 1920px;
+}
+
+.icon-cell img {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+.icon-name {
+  font-size: .75rem;
+  opacity: .8;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.w-id {
+  width: 72px;
+}
+
+.w-actions {
+  width: 260px;
+}
+
+.w-icon {
+  width: 140px;
+}
+
+.text-trim {
+  max-width: 520px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.url-cell a {
+  word-break: break-all;
+}
+
+/* Keep Bootstrap collapse usable under the app's global CSS reset. */
+.ph-admin .collapse {
+  visibility: visible;
+}
