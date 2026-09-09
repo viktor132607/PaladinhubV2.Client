@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Outlet, useLocation } from "@/router/nextCompat";
 import { GuidePageHeader } from "@/components/migration/MigratedView";
 import Navbar from "./Navbar";
@@ -12,8 +13,33 @@ function usesAccountLayout(pathname: string) {
 
 export default function Layout() {
   const { pathname } = useLocation();
+  const accountLayout = usesAccountLayout(pathname);
 
-  if (usesAccountLayout(pathname)) {
+  useEffect(() => {
+    if (accountLayout) return;
+
+    const applyCurrentSection = () => {
+      const currentHash = window.location.hash;
+
+      document.querySelectorAll<HTMLElement>(".section-cell.active").forEach((el) => {
+        el.classList.remove("active");
+      });
+
+      if (!currentHash) return;
+
+      document.querySelectorAll<HTMLAnchorElement>(".section-cell").forEach((el) => {
+        if (el.getAttribute("href") === currentHash) {
+          el.classList.add("active");
+        }
+      });
+    };
+
+    applyCurrentSection();
+    window.addEventListener("hashchange", applyCurrentSection);
+    return () => window.removeEventListener("hashchange", applyCurrentSection);
+  }, [pathname, accountLayout]);
+
+  if (accountLayout) {
     return <Outlet />;
   }
 
