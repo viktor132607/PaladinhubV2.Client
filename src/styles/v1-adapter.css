@@ -199,7 +199,6 @@
 .ph-v1-layout-content { padding-top: 80px; }
 .ph-v1-main-container { padding-bottom: 3rem !important; }
 
-/* V1 is desktop-first at 1600px, but V2 must not create a broken horizontal canvas. */
 .ph-v1-layout .outer-wrapper { width: 100%; max-width: 100%; }
 .ph-v1-layout .page-container,
 .ph-v1-layout .main-wrapper,
@@ -208,20 +207,26 @@
 .ph-v1-layout .holy-cover-container,
 .ph-v1-layout .protection-cover-container {
     max-width: 1600px;
-}
-.ph-v1-layout .page-container,
-.ph-v1-layout .main-wrapper,
-.ph-v1-layout .image-cover-container,
-.ph-v1-layout .retribution-cover-container,
-.ph-v1-layout .holy-cover-container,
-.ph-v1-layout .protection-cover-container {
     width: 1600px;
 }
 
-/* Cover/header blocks emitted by V2 page-header equivalents. */
+/* Shared V1 page header used by Holy, Protection and Retribution. */
+.ph-guide-page-header {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+.ph-guide-page-header .page-container { padding: 0; }
+.ph-guide-page-header-body { padding: 0 50px; }
+.ph-guide-page-header .page-title {
+    text-align: center;
+    padding-bottom: 30px;
+    color: #fff;
+}
 .image-cover-container {
     aspect-ratio: 2560 / 820;
     overflow: hidden;
+    margin: 0 auto;
 }
 .image-cover-container > img,
 .image-cover {
@@ -244,12 +249,43 @@
     padding: 0;
 }
 
+/* Tailwind preflight makes every img display:block. V1 relies on inline images in headings.
+   Restore the original V1 behavior for section titles across all class guide pages. */
+.ph-v1-layout [data-guide-page] h2.section-header > img.section-icon,
+.ph-v1-layout [data-guide-page] h2 > img.section-icon,
+.ph-v1-layout [data-guide-page] h3.section-title > img.section-icon,
+.ph-v1-layout [data-guide-page] .section-title > img.section-icon,
+.ph-v1-layout [data-guide-page] h2 > img.item-icon,
+.ph-v1-layout [data-guide-page] h3 > img.item-icon {
+    display: inline-block !important;
+    vertical-align: middle !important;
+    flex: none !important;
+}
+.ph-v1-layout [data-guide-page] h2.section-header > img.section-icon,
+.ph-v1-layout [data-guide-page] h2 > img.section-icon {
+    width: 48px !important;
+    height: 48px !important;
+    max-width: 48px !important;
+    margin-right: 0 !important;
+}
+.ph-v1-layout [data-guide-page] .section-title > img.section-icon.small-icon,
+.ph-v1-layout [data-guide-page] h3.section-title > img.section-icon.small-icon {
+    width: 32px !important;
+    height: 32px !important;
+    max-width: 32px !important;
+    margin-right: 10px !important;
+}
+.ph-v1-layout [data-guide-page] h2.section-header {
+    display: block !important;
+    text-align: center !important;
+    padding-bottom: 30px !important;
+}
+
 /* V1 page header/section grid behavior. */
 .section-grid { width: 100%; }
 .section-cell { min-width: 0; }
 .section-cell .icon { flex: 0 0 32px; }
 
-/* Keep V1 1600px geometry on wide screens while preventing breakage below it. */
 @media (max-width: 1639px) {
     .ph-v1-layout .page-container,
     .ph-v1-layout .main-wrapper,
@@ -259,13 +295,15 @@
     .ph-v1-layout .protection-cover-container {
         width: 100%;
     }
-    .ph-v1-layout .main-wrapper { padding-left: 50px; padding-right: 50px; }
+    .ph-v1-layout .main-wrapper,
+    .ph-guide-page-header-body { padding-left: 50px; padding-right: 50px; }
 }
 
 @media (max-width: 768px) {
     body { padding-left: 0; padding-right: 0; }
     .ph-v1-layout-content { padding-top: 72px; }
-    .ph-v1-layout .main-wrapper { padding-left: 20px; padding-right: 20px; }
+    .ph-v1-layout .main-wrapper,
+    .ph-guide-page-header-body { padding-left: 20px; padding-right: 20px; }
     .section-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .content-columns { flex-direction: column; align-items: stretch; }
     .content-columns > div { min-width: 0; width: 100%; }
@@ -274,5 +312,6 @@
 
 @media (max-width: 480px) {
     .section-grid { grid-template-columns: 1fr; }
-    .ph-v1-layout .main-wrapper { padding-left: 12px; padding-right: 12px; }
+    .ph-v1-layout .main-wrapper,
+    .ph-guide-page-header-body { padding-left: 12px; padding-right: 12px; }
 }
