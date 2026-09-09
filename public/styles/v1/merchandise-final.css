@@ -1,0 +1,341 @@
+/* Final V1 Merchandise cascade: Bootstrap 5.1.0 + V1 inline page CSS, mapped to V2 DOM. */
+
+/* page layout */
+.ph-v1-main-container > div:first-child {
+  background: #0f1115 !important;
+  color: #e6e6e6 !important;
+  min-height: 100vh !important;
+  width: 100% !important;
+  padding-top: 1.5rem !important;
+  padding-bottom: 1.5rem !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child {
+  display: grid !important;
+  grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+  column-gap: 1.5rem !important;
+  row-gap: 0 !important;
+  width: 100% !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside {
+  grid-column: span 3 / span 3 !important;
+  min-width: 0 !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > section {
+  grid-column: span 9 / span 9 !important;
+  min-width: 0 !important;
+}
+
+/* Filters card: exact V1 effective values */
+.ph-v1-main-container > div:first-child > div:first-child > aside > div {
+  background: #171a21 !important;
+  border: 1px solid #272b35 !important;
+  border-radius: 12px !important;
+  min-width: 270px !important;
+  padding: 1rem !important;
+  color: #e6e6e6 !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside h2 {
+  margin: 0 0 1rem !important;
+  padding: 0 !important;
+  font-size: 1.25rem !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  text-align: left !important;
+  color: #fff !important;
+}
+
+/* Search block mirrors .mb-3 + .form-label */
+.ph-v1-main-container > div:first-child > div:first-child > aside > div > label:first-of-type {
+  display: block !important;
+  margin: 0 0 1rem !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  color: #d7dde7 !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside > div > label:first-of-type input {
+  display: block !important;
+  width: 100% !important;
+  min-height: calc(1.5em + .5rem + 2px) !important;
+  margin-top: .5rem !important;
+  padding: .25rem .5rem !important;
+  font-size: .875rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #e6e6e6 !important;
+  background: #0f1115 !important;
+  border: 1px solid #2a2f3a !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside input::placeholder {
+  color: #6b7280 !important;
+  opacity: 1 !important;
+}
+
+/* fieldsets mirror V1 .mb-3 */
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset {
+  min-width: 0 !important;
+  margin: 0 0 1rem !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside legend {
+  float: none !important;
+  width: auto !important;
+  margin: 0 0 .5rem !important;
+  padding: 0 !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  color: #d7dde7 !important;
+}
+
+/* Bootstrap 5.1 form-check geometry */
+.ph-v1-main-container > div:first-child > div:first-child > aside label:has(input[type="checkbox"]) {
+  display: block !important;
+  min-height: 1.5rem !important;
+  margin: 0 0 .125rem !important;
+  padding-left: 1.5em !important;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #e6e6e6 !important;
+  cursor: pointer !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside input[type="checkbox"] {
+  float: left !important;
+  width: 1em !important;
+  height: 1em !important;
+  margin-top: .25em !important;
+  margin-right: 0 !important;
+  margin-left: -1.5em !important;
+  padding: 0 !important;
+  vertical-align: top !important;
+  appearance: none !important;
+  background-color: #0f1115 !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+  border: 1px solid #2a2f3a !important;
+  border-radius: .25em !important;
+  box-shadow: none !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside input[type="checkbox"]:checked {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e") !important;
+}
+
+/* custom price inputs: .d-flex.gap-2 + .form-control.form-control-sm */
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:nth-of-type(3) > div {
+  display: flex !important;
+  gap: .5rem !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside input[type="number"] {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: calc(1.5em + .5rem + 2px) !important;
+  padding: .25rem .5rem !important;
+  font-size: .875rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #e6e6e6 !important;
+  background: #0f1115 !important;
+  border: 1px solid #2a2f3a !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+/* Rating pills: exact V1 page CSS */
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type > div {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: .4rem !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: .5rem !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: .45rem .6rem !important;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  text-align: left !important;
+  color: #e6e6e6 !important;
+  background: #111419 !important;
+  border: 1px solid #2a2f3a !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button:hover {
+  border-color: #3a4150 !important;
+  background: #161a21 !important;
+  box-shadow: 0 0 0 2px rgba(58,123,213,.12) !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button > span:first-child {
+  display: inline-flex !important;
+  gap: 2px !important;
+  color: #f6c441 !important;
+  font-size: 1rem !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button > span:first-child > span {
+  color: #6b7280 !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside fieldset:last-of-type button > span:last-child {
+  font-size: .875em !important;
+  line-height: 1 !important;
+  color: #6c757d !important;
+}
+
+/* Clear button: .btn .btn-clear .w-100 .btn-sm; remove V2 mt-5 */
+.ph-v1-main-container > div:first-child > div:first-child > aside > div > button:last-child {
+  display: inline-block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: .25rem .5rem !important;
+  font-size: .875rem !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  color: #cfd3da !important;
+  background: #0f1115 !important;
+  border: 1px solid #2a2f3a !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > aside > div > button:last-child:hover {
+  color: #fff !important;
+  background: #171a21 !important;
+  border-color: #3a4150 !important;
+  box-shadow: 0 0 0 2px rgba(66,153,225,.15) !important;
+}
+
+/* top row */
+.ph-v1-main-container > div:first-child > div:first-child > section > div:first-child {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: .5rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > section > div:first-child h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 1.75rem !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  text-align: left !important;
+  color: #fff !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > section > div:first-child a {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: .5rem !important;
+  padding: .25rem 1rem !important;
+  font-size: .875rem !important;
+  font-weight: 700 !important;
+  line-height: 1.5 !important;
+  color: #000 !important;
+  text-decoration: none !important;
+  background-color: #ffc107 !important;
+  border: 1px solid #ffc107 !important;
+  border-radius: 50rem !important;
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+}
+
+/* summary / sort controls */
+.ph-v1-main-container > div:first-child > div:first-child > section > div:nth-child(2) {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 1rem !important;
+  margin-bottom: 1rem !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > section > div:nth-child(2) > div:last-child {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 1rem !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > section > div:nth-child(2) label,
+.ph-v1-main-container > div:first-child > div:first-child > section > div:nth-child(2) span {
+  font-size: .875em !important;
+  color: #6c757d !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > section select {
+  display: block !important;
+  width: auto !important;
+  min-width: 0 !important;
+  padding: .25rem 2rem .25rem .5rem !important;
+  font-size: .875rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #212529 !important;
+  background-color: #fff !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right .5rem center !important;
+  background-size: 16px 12px !important;
+  border: 1px solid #ced4da !important;
+  border-radius: .2rem !important;
+  appearance: none !important;
+}
+
+.ph-v1-main-container > div:first-child > div:first-child > section > div:nth-child(2) button {
+  display: inline-block !important;
+  padding: .25rem .5rem !important;
+  font-size: .875rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #f8f9fa !important;
+  text-align: center !important;
+  background: transparent !important;
+  border: 1px solid #f8f9fa !important;
+  border-radius: .2rem !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 991.98px) {
+  .ph-v1-main-container > div:first-child > div:first-child {
+    grid-template-columns: 1fr !important;
+    row-gap: 1.5rem !important;
+  }
+  .ph-v1-main-container > div:first-child > div:first-child > aside,
+  .ph-v1-main-container > div:first-child > div:first-child > section {
+    grid-column: 1 !important;
+  }
+}
