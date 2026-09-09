@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -18,44 +17,116 @@ export type PageHeaderProps = {
   canEdit?: boolean;
 };
 
-function SectionButtons({ title, buttons }: { title: string; buttons?: PageHeaderButton[] }) {
-  if (!buttons?.length) return undefined;
+function SectionButtons({
+  title,
+  buttons,
+}: {
+  title: string;
+  buttons?: PageHeaderButton[];
+}) {
+  if (!buttons?.length) return null;
+
   return (
-    <section className="mt-8">
-      <h2 className="mb-4 text-center text-2xl font-semibold text-white">{title}</h2>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <>
+      <div
+        className="section-title"
+        style={{ fontSize: "1.8em", textAlign: "center", color: "white" }}
+      >
+        {title} :
+      </div>
+      <div className="section-grid">
         {buttons.map((button) => (
-          <a key={`${button.url}-${button.text}`} href={button.url} className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-900/80 p-4 text-white hover:bg-slate-800">
-            {button.icon ? <span className="h-10 w-10 rounded bg-cover bg-center" style={{ backgroundImage: `url(${button.icon})` }} /> : undefined}
+          <a
+            key={`${button.url}-${button.text}`}
+            href={button.url}
+            className="section-cell"
+          >
+            {button.icon ? (
+              <span
+                className="icon"
+                style={{ backgroundImage: `url('${button.icon}')` }}
+              />
+            ) : null}
             <span>{button.text}</span>
           </a>
         ))}
       </div>
-    </section>
+    </>
   );
 }
 
-export default function PageHeader({ coverImage, title, text, currentSections, otherSections, canEdit = false }: PageHeaderProps) {
+export default function PageHeader({
+  coverImage,
+  title,
+  text,
+  currentSections,
+  otherSections,
+  canEdit = false,
+}: PageHeaderProps) {
   const [editOpen, setEditOpen] = useState(false);
+
   return (
-    <header className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 text-white">
-      {coverImage ? <img src={coverImage} alt="Cover" className="h-64 w-full object-cover" /> : undefined}
-      <div className="p-6 sm:p-8">
-        {title ? <h1 className="text-3xl font-bold sm:text-5xl">{title}</h1> : undefined}
-        {text ? <p className="mt-4 max-w-4xl text-slate-300">{text}</p> : undefined}
-        <SectionButtons title="Current Sections" buttons={currentSections} />
-        <SectionButtons title="Other Sections" buttons={otherSections} />
+    <div className="outer-wrapper ph-guide-page-header">
+      <div className="page-container">
+        {coverImage ? (
+          <div className="image-cover-container">
+            <img src={coverImage} alt="Cover" className="image-cover" />
+          </div>
+        ) : null}
+
+        <div className="main-wrapper ph-guide-page-header-body">
+          {canEdit ? (
+            <>
+              <div
+                className="position-fixed"
+                style={{ left: 80, bottom: 80, zIndex: 1050 }}
+              >
+                <button
+                  id="btnEditPopup"
+                  type="button"
+                  className="btn btn-warning btn-todo-hover"
+                  onClick={() => setEditOpen(true)}
+                >
+                  <i className="fa fa-pen me-1" />Edit Page
+                </button>
+              </div>
+
+              {editOpen ? (
+                <div
+                  className="edit-overlay"
+                  style={{ display: "flex" }}
+                  aria-hidden="false"
+                  onClick={() => setEditOpen(false)}
+                >
+                  <span className="edit-close">×</span>
+                  <img
+                    src="/images/WorkInProgress.jpg"
+                    alt="Work in progress"
+                    onClick={(event) => event.stopPropagation()}
+                  />
+                </div>
+              ) : null}
+            </>
+          ) : null}
+
+          <br />
+
+          {title ? <h1 className="page-title">{title}</h1> : null}
+          {text ? <p className="page-text">{text}</p> : null}
+
+          <SectionButtons title="Current Sections" buttons={currentSections} />
+          <SectionButtons title="Other Sections" buttons={otherSections} />
+
+          <div className="separator-container">
+            <img
+              src="/images/Separators/D4.png"
+              alt="Separator 4"
+              className="separator"
+            />
+          </div>
+          <br />
+        </div>
       </div>
-      {canEdit ? (
-        <>
-          <button type="button" onClick={() => setEditOpen(true)} className="fixed bottom-20 left-20 z-40 rounded-lg bg-amber-400 px-4 py-2 font-semibold text-slate-950">Edit Page</button>
-          {editOpen ? (
-            <button type="button" onClick={() => setEditOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-8" aria-label="Close edit preview">
-              <img src="/images/WorkInProgress.jpg" alt="Work in progress" className="max-h-[80vh] max-w-[80vw] rounded-lg" />
-            </button>
-          ) : undefined}
-        </>
-      ) : undefined}
-    </header>
+    </div>
   );
 }
