@@ -5,13 +5,14 @@ import { Link, Outlet, useLocation } from "@/router/nextCompat";
 
 const sectionPages = ["Overview", "Gear", "Talents", "Consumables", "Rotation", "Stats"] as const;
 
-function normalizePath(pathname: string) {
-  return pathname.toLowerCase().replace(/\/+$/, "") || "/";
-}
-
-function usesPublicLayoutInsideAdmin(pathname: string) {
-  const path = normalizePath(pathname);
-  return path === "/admin/pagebuilder" || path.startsWith("/admin/pagebuilder/") || path === "/admin/products" || path.startsWith("/admin/products/");
+function usesPublicLayout(pathname: string) {
+  const path = pathname.toLowerCase().replace(/\/+$/, "") || "/";
+  return (
+    path === "/admin/pagebuilder" ||
+    path.startsWith("/admin/pagebuilder/") ||
+    path === "/admin/products" ||
+    path.startsWith("/admin/products/")
+  );
 }
 
 export default function AdminLayout({ children }: { children?: ReactNode }) {
@@ -19,7 +20,6 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
   const [dropdown, setDropdown] = useState("");
   const { pathname } = useLocation();
   const header = useRef<HTMLElement>(null);
-  const publicLayoutPage = usesPublicLayoutInsideAdmin(pathname);
 
   useEffect(() => {
     setExpanded(false);
@@ -34,7 +34,7 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
     return () => document.removeEventListener("click", close);
   }, []);
 
-  if (publicLayoutPage) {
+  if (usesPublicLayout(pathname)) {
     return <>{children ?? <Outlet />}</>;
   }
 
@@ -93,7 +93,7 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
               </ul>
               <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
                 {navLink("Merchandise", "/Merchandise/Merchandise")}
-                {navLink("Pages", "/Admin/PageBuilder/Index")}
+                {navLink("Pages", "/Admin/PageBuilder/Create")}
                 {navLink("Database", "/Admin/Database")}
                 {navLink("Products", "/Merchandise/Merchandise")}
                 {menu("Promo Codes", [["All", "/Admin/PromoCodes"], ["Create", "/Admin/PromoCodes/Create"]])}

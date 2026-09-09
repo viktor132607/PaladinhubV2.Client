@@ -40,27 +40,42 @@ export default function AuthMenu() {
   };
 
   return (
-    <li className={`nav-item dropdown ph-auth-menu${open ? " show" : ""}`}>
-      <button
-        type="button"
-        className="nav-link dropdown-toggle d-flex align-items-center gap-2 ph-auth-toggle"
+    <li className="nav-item dropdown">
+      <a
+        className="nav-link dropdown-toggle d-flex align-items-center gap-2"
+        href="#"
+        id="userMenu"
+        role="button"
         aria-expanded={open}
-        onClick={() => setOpen((value) => !value)}
+        onClick={(event) => {
+          event.preventDefault();
+          setOpen((value) => !value);
+        }}
       >
         <img
           src={avatarSrc}
           alt="Avatar"
-          className="rounded-circle border ph-auth-avatar"
+          className="rounded-circle border"
+          style={{ width: 28, height: 28, objectFit: "cover" }}
         />
         <span>{displayName}</span>
-      </button>
+      </a>
 
-      <ul className={`dropdown-menu dropdown-menu-end${open ? " show" : ""}`}>
-        <li><Link className="dropdown-item" to="/Account/MyAccount">My Account</Link></li>
+      <ul
+        className={`dropdown-menu dropdown-menu-end${open ? " show" : ""}`}
+        aria-labelledby="userMenu"
+      >
+        <li>
+          <Link className="dropdown-item" to="/Account/MyAccount">My Account</Link>
+        </li>
         <li><hr className="dropdown-divider" /></li>
-        <li><Link className="dropdown-item" to="/Account/Settings">Settings</Link></li>
+        <li>
+          <Link className="dropdown-item" to="/Account/Settings">Settings</Link>
+        </li>
         <li><hr className="dropdown-divider" /></li>
-        <li><Link className="dropdown-item" to="/Account/ChangePassword">Change Password</Link></li>
+        <li>
+          <Link className="dropdown-item" to="/Account/ChangePassword">Change Password</Link>
+        </li>
         <li><hr className="dropdown-divider" /></li>
         <li className="px-3">
           <button
