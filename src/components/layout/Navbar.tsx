@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { BuildingStorefrontIcon, ShoppingCartIcon } from "@heroicons/react/24/solid";
 import { useAuth } from "@/auth/AuthContext";
 import { Link } from "@/router/nextCompat";
 import AuthMenu from "./AuthMenu";
@@ -41,8 +40,8 @@ export default function Navbar() {
               <li className="nav-item"><Link to="/Home/Privacy" className="nav-link">Privacy</Link></li>
             </ul>
             <ul className="navbar-nav ms-auto">
-              <li className="nav-item"><Link to="/Merchandise/Merchandise" className="nav-link"><BuildingStorefrontIcon aria-hidden="true" className="ph-v1-nav-icon" /> Merchandise</Link></li>
-              <li className="nav-item position-relative"><Link to="/Cart/MyCart" title="My Cart" aria-label="My Cart" className="nav-link position-relative"><ShoppingCartIcon aria-hidden="true" className="ph-v1-nav-icon" /></Link></li>
+              <li className="nav-item"><Link to="/Merchandise/Merchandise" className="nav-link"><i className="fa-solid fa-store" aria-hidden="true" /> Merchandise</Link></li>
+              <li className="nav-item position-relative"><Link to="/Cart/MyCart" title="My Cart" aria-label="My Cart" className="nav-link position-relative"><i className="fa-solid fa-cart-shopping" aria-hidden="true" /></Link></li>
               <AuthMenu />
             </ul>
           </div>
