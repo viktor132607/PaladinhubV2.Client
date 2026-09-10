@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import DynamicPageContent, {hasDynamicTrees} from "@/components/dynamic-talents/DynamicPageContent";
 import { HtmlContent } from "@/components/migration/MigratedView";
 import {
   backendEndpoints,
@@ -388,7 +389,7 @@ export default function ContentPage() {
           </h1>
         </header>
 
-        {content.renderError ? (
+        {!hasDynamicTrees(content.page.jsonLayout || "[]") && content.renderError ? (
           <div
             className="mt-5 rounded border border-amber-500/40 bg-amber-950/30 px-4 py-3 text-amber-200"
             role="alert"
@@ -399,7 +400,7 @@ export default function ContentPage() {
           </div>
         ) : null}
 
-        {content.html.trim() ? (
+        {hasDynamicTrees(content.page.jsonLayout || "[]") ? (<DynamicPageContent json={content.page.jsonLayout || "[]"}/>) : content.html.trim() ? (
           <HtmlContent
             html={content.html}
             className="mt-6"

@@ -1,5 +1,6 @@
 "use client";
 
+import BuilderNavigation from "@/components/admin/page-builder/BuilderNavigation";
 import {
   useMemo,
   useState,
@@ -529,6 +530,7 @@ export default function CreatePage() {
   return (
     <main className="px-4 py-8 text-slate-100">
       <section className="mx-auto max-w-7xl">
+        <BuilderNavigation/>
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-3xl font-semibold">Create Page</h1>
