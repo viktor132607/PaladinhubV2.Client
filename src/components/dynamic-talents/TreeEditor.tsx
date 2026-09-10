@@ -33,6 +33,14 @@ type SpellDatabasePage = {
 
 type CsrfResponse = { token?: string };
 
+type PieceDraft = {
+  name: string;
+  icon: string;
+  description: string;
+  url: string;
+  quality: PieceKind;
+};
+
 function normalizeLibraryKind(item: SpellLibraryItem): PieceKind {
   const value = item.quality?.trim().toLowerCase() ?? "";
   return value.includes("talent") ? "talent" : "spell";
@@ -53,6 +61,16 @@ function spellIconPath(icon?: string | null): string {
   return `/images/SpellIcons/${encodeURIComponent(decoded)}`;
 }
 
+function toPieceDraft(item: SpellLibraryItem): PieceDraft {
+  return {
+    name: item.name ?? "",
+    icon: item.icon ?? "",
+    description: item.description ?? "",
+    url: item.url ?? "",
+    quality: normalizeLibraryKind(item),
+  };
+}
+
 export default function TreeEditor({
   tree,
   onChange,
@@ -68,7 +86,11 @@ export default function TreeEditor({
   const [librarySearch, setLibrarySearch] = useState("");
   const [libraryKind, setLibraryKind] = useState<LibraryKind>("all");
   const [armedSourceId, setArmedSourceId] = useState<number | null>(null);
-  const [typeSavingId, setTypeSavingId] = useState<number | null>(null);
+  const [pieceDraft, setPieceDraft] = useState<PieceDraft | null>(null);
+  const [pieceSaving, setPieceSaving] = useState(false);
+  const [pieceSaved, setPieceSaved] = useState(false);
+  const [iconBrowserOpen, setIconBrowserOpen] = useState(false);
+  const [iconSearch, setIconSearch] = useState("");
 
   const errors = validateTree(tree);
   const node = tree.nodes.find((n) => n.id === selected);
@@ -144,6 +166,20 @@ export default function TreeEditor({
     [library],
   );
 
+  const databaseIcons = useMemo(() => {
+    const unique = new Map<string, string>();
+    for (const item of library) {
+      const icon = item.icon?.trim();
+      if (!icon || unique.has(icon)) continue;
+      unique.set(icon, spellIconPath(icon));
+    }
+
+    const search = iconSearch.trim().toLowerCase();
+    return [...unique.entries()]
+      .filter(([name]) => !search || name.toLowerCase().includes(search))
+      .sort(([a], [b]) => a.localeCompare(b));
+  }, [library, iconSearch]);
+
   const updateNode = (patch: Partial<Tree["nodes"][number]>) =>
     onChange({
       ...tree,
@@ -152,10 +188,33 @@ export default function TreeEditor({
       ),
     });
 
-  const updateLibraryType = async (item: SpellLibraryItem, quality: PieceKind) => {
-    if (typeSavingId !== null || normalizeLibraryKind(item) === quality) return;
+  const selectLibraryItem = (item: SpellLibraryItem) => {
+    setArmedSourceId(item.id);
+    setPieceDraft(toPieceDraft(item));
+    setPieceSaved(false);
+    setIconBrowserOpen(false);
+    setIconSearch("");
+  };
 
-    setTypeSavingId(item.id);
+  const clearLibraryItem = () => {
+    setArmedSourceId(null);
+    setPieceDraft(null);
+    setPieceSaved(false);
+    setIconBrowserOpen(false);
+    setIconSearch("");
+  };
+
+  const savePieceChanges = async () => {
+    if (!armedSource || !pieceDraft || pieceSaving) return;
+
+    const name = pieceDraft.name.trim();
+    if (!name) {
+      setLibraryError("Name is required.");
+      return;
+    }
+
+    setPieceSaving(true);
+    setPieceSaved(false);
     setLibraryError("");
 
     try {
@@ -165,7 +224,7 @@ export default function TreeEditor({
       const csrf = await readApiJson<CsrfResponse>(csrfResponse);
       if (!csrf?.token) throw new Error("The server did not return a CSRF token.");
 
-      const response = await fetchBackend(`/Admin/api/spells/${item.id}`, {
+      const response = await fetchBackend(`/Admin/api/spells/${armedSource.id}`, {
         method: "PUT",
         cache: "no-store",
         headers: {
@@ -174,33 +233,44 @@ export default function TreeEditor({
           "X-CSRF-TOKEN": csrf.token,
         },
         body: JSON.stringify({
-          id: item.id,
-          name: item.name,
-          icon: item.icon?.trim() || null,
-          description: item.description?.trim() || null,
-          url: item.url?.trim() || null,
-          quality,
+          id: armedSource.id,
+          name,
+          icon: pieceDraft.icon.trim() || null,
+          description: pieceDraft.description.trim() || null,
+          url: pieceDraft.url.trim() || null,
+          quality: pieceDraft.quality,
         }),
       });
 
       const updated = await readApiJson<SpellLibraryItem>(response);
+      const merged: SpellLibraryItem = {
+        ...armedSource,
+        ...updated,
+        name: updated.name ?? name,
+        icon: updated.icon ?? (pieceDraft.icon.trim() || null),
+        description: updated.description ?? (pieceDraft.description.trim() || null),
+        url: updated.url ?? (pieceDraft.url.trim() || null),
+        quality: updated.quality ?? pieceDraft.quality,
+      };
+
       setLibrary((current) =>
-        current.map((record) =>
-          record.id === item.id
-            ? { ...record, ...updated, quality: updated.quality ?? quality }
-            : record,
-        ),
+        current.map((record) => (record.id === armedSource.id ? merged : record)),
       );
+      setPieceDraft(toPieceDraft(merged));
+      setPieceSaved(true);
     } catch (cause) {
       setLibraryError(
-        cause instanceof Error ? cause.message : "Could not update the piece type.",
+        cause instanceof Error ? cause.message : "Could not save the database piece.",
       );
     } finally {
-      setTypeSavingId(null);
+      setPieceSaving(false);
     }
   };
 
   const addNodeAt = (row: number, column: number) => {
+    const sourceName = pieceDraft?.name.trim() || armedSource?.name;
+    const sourceDescription = pieceDraft?.description ?? armedSource?.description ?? "";
+    const sourceIcon = pieceDraft?.icon ?? armedSource?.icon ?? "";
     const id = armedSource
       ? `db-spell-${armedSource.id}-${crypto.randomUUID()}`
       : crypto.randomUUID();
@@ -211,9 +281,9 @@ export default function TreeEditor({
         ...tree.nodes,
         {
           id,
-          name: armedSource?.name ?? "New talent",
-          description: armedSource?.description ?? "",
-          icon: spellIconPath(armedSource?.icon),
+          name: sourceName || "New talent",
+          description: sourceDescription,
+          icon: spellIconPath(sourceIcon),
           row,
           column,
           maxRank: 1,
@@ -224,7 +294,7 @@ export default function TreeEditor({
     });
 
     setSelected(id);
-    setArmedSourceId(null);
+    clearLibraryItem();
   };
 
   const libraryPanel = (
@@ -233,26 +303,26 @@ export default function TreeEditor({
         <div>
           <h3 className="text-xl">Spell / Talent pieces</h3>
           <p className="mt-1 text-sm text-slate-400">
-            Select a database piece, then click an empty + slot in the tree.
+            Select a database piece, edit it here if needed, then click an empty + slot in the tree.
           </p>
         </div>
 
         {armedSource ? (
           <div className="flex items-center gap-2 rounded border border-amber-400 bg-amber-400/10 px-3 py-2">
-            {spellIconPath(armedSource.icon) ? (
+            {spellIconPath(pieceDraft?.icon ?? armedSource.icon) ? (
               <img
-                src={spellIconPath(armedSource.icon)}
+                src={spellIconPath(pieceDraft?.icon ?? armedSource.icon)}
                 alt=""
                 className="h-8 w-8 object-cover"
               />
             ) : null}
             <span className="text-sm">
-              Ready: <strong>{armedSource.name}</strong>
+              Ready: <strong>{pieceDraft?.name || armedSource.name}</strong>
             </span>
             <button
               type="button"
               className="rounded bg-slate-700 px-2 py-1 text-xs"
-              onClick={() => setArmedSourceId(null)}
+              onClick={clearLibraryItem}
             >
               Clear
             </button>
@@ -296,7 +366,7 @@ export default function TreeEditor({
         <p className="text-slate-400">Loading database pieces...</p>
       ) : (
         <div className="grid min-w-0 gap-4 lg:grid-cols-[320px_minmax(0,1fr)] lg:items-start">
-          <div className="max-h-[460px] overflow-auto pr-1">
+          <div className="max-h-[560px] overflow-auto pr-1">
             <div className="space-y-2">
               {filteredLibrary.map((item) => {
                 const icon = spellIconPath(item.icon);
@@ -314,7 +384,7 @@ export default function TreeEditor({
                         ? "border-amber-400 bg-amber-400/10 ring-1 ring-amber-400"
                         : "border-slate-700 bg-[#151a20] hover:border-slate-500 hover:bg-slate-800"
                     }`}
-                    onClick={() => setArmedSourceId(active ? null : item.id)}
+                    onClick={() => selectLibraryItem(item)}
                   >
                     {icon ? (
                       <img
@@ -350,12 +420,12 @@ export default function TreeEditor({
           </div>
 
           <div className="min-w-0 rounded border border-slate-700 bg-[#151a20] p-4">
-            {armedSource ? (
+            {armedSource && pieceDraft ? (
               <div className="space-y-3">
                 <div className="flex items-start gap-4">
-                  {spellIconPath(armedSource.icon) ? (
+                  {spellIconPath(pieceDraft.icon) ? (
                     <img
-                      src={spellIconPath(armedSource.icon)}
+                      src={spellIconPath(pieceDraft.icon)}
                       alt=""
                       className="h-20 w-20 shrink-0 object-cover"
                     />
@@ -365,9 +435,9 @@ export default function TreeEditor({
                     </span>
                   )}
                   <div className="min-w-0">
-                    <h4 className="text-xl font-semibold">{armedSource.name}</h4>
+                    <h4 className="text-xl font-semibold">{pieceDraft.name || "Untitled"}</h4>
                     <span className="mt-1 inline-block rounded bg-slate-700 px-2 py-1 text-xs uppercase">
-                      {normalizeLibraryKind(armedSource)}
+                      {pieceDraft.quality}
                     </span>
                   </div>
                 </div>
@@ -381,52 +451,157 @@ export default function TreeEditor({
                     Type
                     <select
                       className={field}
-                      value={normalizeLibraryKind(armedSource)}
-                      disabled={typeSavingId === armedSource.id}
-                      onChange={(event) =>
-                        void updateLibraryType(
-                          armedSource,
-                          event.target.value as PieceKind,
-                        )
-                      }
+                      value={pieceDraft.quality}
+                      disabled={pieceSaving}
+                      onChange={(event) => {
+                        setPieceDraft({
+                          ...pieceDraft,
+                          quality: event.target.value as PieceKind,
+                        });
+                        setPieceSaved(false);
+                      }}
                     >
                       <option value="spell">spell</option>
                       <option value="talent">talent</option>
                     </select>
-                    {typeSavingId === armedSource.id ? (
-                      <span className="mt-1 block text-xs text-slate-400">Saving...</span>
-                    ) : null}
                   </label>
                 </div>
 
                 <label className="block">
                   Name
-                  <input className={field} readOnly value={armedSource.name} />
+                  <input
+                    className={field}
+                    value={pieceDraft.name}
+                    disabled={pieceSaving}
+                    onChange={(event) => {
+                      setPieceDraft({ ...pieceDraft, name: event.target.value });
+                      setPieceSaved(false);
+                    }}
+                  />
                 </label>
 
-                <label className="block">
-                  Icon
-                  <input className={field} readOnly value={armedSource.icon ?? ""} />
-                </label>
+                <div className="space-y-2">
+                  <label className="block">
+                    Icon
+                    <div className="flex gap-2">
+                      <input
+                        className={field}
+                        value={pieceDraft.icon}
+                        disabled={pieceSaving}
+                        onChange={(event) => {
+                          setPieceDraft({ ...pieceDraft, icon: event.target.value });
+                          setPieceSaved(false);
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="shrink-0 rounded bg-slate-700 px-3 py-2 hover:bg-slate-600"
+                        onClick={() => setIconBrowserOpen((open) => !open)}
+                      >
+                        {iconBrowserOpen ? "Close icons" : "Browse DB icons"}
+                      </button>
+                    </div>
+                  </label>
+
+                  {iconBrowserOpen ? (
+                    <div className="space-y-2 rounded border border-slate-700 bg-slate-950/70 p-3">
+                      <input
+                        className={field}
+                        type="search"
+                        value={iconSearch}
+                        placeholder="Search icon filenames..."
+                        onChange={(event) => setIconSearch(event.target.value)}
+                      />
+                      <div className="max-h-[300px] overflow-auto pr-1">
+                        <div className="grid grid-cols-[repeat(auto-fill,minmax(70px,1fr))] gap-2">
+                          {databaseIcons.map(([iconName, iconSrc]) => (
+                            <button
+                              type="button"
+                              key={iconName}
+                              title={iconName}
+                              className={`flex min-h-[78px] flex-col items-center justify-center gap-1 rounded border p-1 ${
+                                pieceDraft.icon === iconName
+                                  ? "border-amber-400 bg-amber-400/10"
+                                  : "border-slate-700 bg-[#151a20] hover:border-slate-500"
+                              }`}
+                              onClick={() => {
+                                setPieceDraft({ ...pieceDraft, icon: iconName });
+                                setPieceSaved(false);
+                                setIconBrowserOpen(false);
+                              }}
+                            >
+                              <img
+                                src={iconSrc}
+                                alt=""
+                                className="h-12 w-12 object-cover"
+                              />
+                              <span className="w-full truncate text-center text-[10px] text-slate-400">
+                                {iconName}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
 
                 <label className="block">
                   Description
                   <textarea
                     className={field}
-                    readOnly
                     rows={6}
-                    value={armedSource.description ?? ""}
+                    value={pieceDraft.description}
+                    disabled={pieceSaving}
+                    onChange={(event) => {
+                      setPieceDraft({ ...pieceDraft, description: event.target.value });
+                      setPieceSaved(false);
+                    }}
                   />
                 </label>
 
                 <label className="block">
                   URL
-                  <input className={field} readOnly value={armedSource.url ?? ""} />
+                  <input
+                    className={field}
+                    value={pieceDraft.url}
+                    disabled={pieceSaving}
+                    onChange={(event) => {
+                      setPieceDraft({ ...pieceDraft, url: event.target.value });
+                      setPieceSaved(false);
+                    }}
+                  />
                 </label>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    className="rounded bg-amber-500 px-4 py-2 font-medium text-slate-950 disabled:opacity-50"
+                    disabled={pieceSaving}
+                    onClick={() => void savePieceChanges()}
+                  >
+                    {pieceSaving ? "Saving..." : "Save changes"}
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded bg-slate-700 px-4 py-2 disabled:opacity-50"
+                    disabled={pieceSaving}
+                    onClick={() => {
+                      setPieceDraft(toPieceDraft(armedSource));
+                      setPieceSaved(false);
+                      setIconBrowserOpen(false);
+                    }}
+                  >
+                    Reset
+                  </button>
+                  {pieceSaved ? (
+                    <span className="text-sm text-green-300">Saved to database.</span>
+                  ) : null}
+                </div>
               </div>
             ) : (
               <div className="grid min-h-[260px] place-items-center text-center text-slate-500">
-                Select a spell or talent from the first column to see its fields here.
+                Select a spell or talent from the first column to edit its fields here.
               </div>
             )}
           </div>
@@ -490,7 +665,7 @@ export default function TreeEditor({
         <>
           <p>
             {armedSource
-              ? `Click + to place ${armedSource.name}.`
+              ? `Click + to place ${pieceDraft?.name || armedSource.name}.`
               : "Click + to add a blank talent, or select a database piece on the right first."}{" "}
             Select a talent to edit or move it. Connections require all parents at maximum rank.
           </p>
