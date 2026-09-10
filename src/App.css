@@ -97,3 +97,52 @@ section[data-build] {
 section[data-build] section[class~="border-white/20"] {
   border-color: transparent !important;
 }
+
+/* V1 talent-tree geometry. Bootstrap's .gap-5 is 3rem !important and was overriding
+   the React tree's intended 20px grid gap while its edge math still used 20px. */
+section[data-tree-key][data-build] > div[data-tree-key][data-edit-mode] {
+  gap: 20px !important;
+}
+
+/* TalentTree.tsx currently starts connector lines at -8/-8; V1 LineStyle uses
+   +7.5/+7.5. The 15.5px delta restores the original V1 connector origin. */
+div[data-tree-key][data-edit-mode] > span[aria-hidden="true"] {
+  margin-left: 15.5px !important;
+  margin-top: 15.5px !important;
+}
+
+/* Match the original V1 three-column build widths: 650 / 250 / 650 with 15px gaps. */
+section[data-build="holy-herald"] > div > div,
+section[data-build="holy-lightsmith"] > div > div,
+section[data-build="protection-lightsmith"] > div > div,
+section[data-build="protection-templar"] > div > div,
+section[data-build="retribution-herald"] > div > div,
+section[data-build="retribution-templar"] > div > div {
+  width: 1580px !important;
+  min-width: 1580px !important;
+  gap: 15px !important;
+}
+
+section[data-build="holy-herald"] > div > div > section:nth-child(1),
+section[data-build="holy-lightsmith"] > div > div > section:nth-child(1),
+section[data-build="protection-lightsmith"] > div > div > section:nth-child(1),
+section[data-build="protection-templar"] > div > div > section:nth-child(1),
+section[data-build="retribution-herald"] > div > div > section:nth-child(1),
+section[data-build="retribution-templar"] > div > div > section:nth-child(1),
+section[data-build="holy-herald"] > div > div > section:nth-child(3),
+section[data-build="holy-lightsmith"] > div > div > section:nth-child(3),
+section[data-build="protection-lightsmith"] > div > div > section:nth-child(3),
+section[data-build="protection-templar"] > div > div > section:nth-child(3),
+section[data-build="retribution-herald"] > div > div > section:nth-child(3),
+section[data-build="retribution-templar"] > div > div > section:nth-child(3) {
+  width: 650px !important;
+}
+
+section[data-build="holy-herald"] > div > div > section:nth-child(2),
+section[data-build="holy-lightsmith"] > div > div > section:nth-child(2),
+section[data-build="protection-lightsmith"] > div > div > section:nth-child(2),
+section[data-build="protection-templar"] > div > div > section:nth-child(2),
+section[data-build="retribution-herald"] > div > div > section:nth-child(2),
+section[data-build="retribution-templar"] > div > div > section:nth-child(2) {
+  width: 250px !important;
+}
