@@ -243,57 +243,125 @@ export default function TreeEditor({
       {libraryLoading ? (
         <p className="text-slate-400">Loading database pieces...</p>
       ) : (
-        <div className="max-h-[300px] overflow-auto pr-1">
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(185px,1fr))] gap-2">
-            {filteredLibrary.map((item) => {
-              const icon = spellIconPath(item.icon);
-              const kind = normalizeLibraryKind(item);
-              const active = armedSourceId === item.id;
+        <div className="grid min-w-0 gap-4 lg:grid-cols-[320px_minmax(0,1fr)] lg:items-start">
+          <div className="max-h-[460px] overflow-auto pr-1">
+            <div className="space-y-2">
+              {filteredLibrary.map((item) => {
+                const icon = spellIconPath(item.icon);
+                const kind = normalizeLibraryKind(item);
+                const active = armedSourceId === item.id;
 
-              return (
-                <button
-                  type="button"
-                  key={item.id}
-                  aria-pressed={active}
-                  title={item.description || item.name}
-                  className={`flex min-h-[68px] items-center gap-3 rounded border p-2 text-left transition ${
-                    active
-                      ? "border-amber-400 bg-amber-400/10 ring-1 ring-amber-400"
-                      : "border-slate-700 bg-[#151a20] hover:border-slate-500 hover:bg-slate-800"
-                  }`}
-                  onClick={() => setArmedSourceId(active ? null : item.id)}
-                >
-                  {icon ? (
+                return (
+                  <button
+                    type="button"
+                    key={item.id}
+                    aria-pressed={active}
+                    title={item.description || item.name}
+                    className={`flex w-full min-h-[64px] items-center gap-3 rounded border p-2 text-left transition ${
+                      active
+                        ? "border-amber-400 bg-amber-400/10 ring-1 ring-amber-400"
+                        : "border-slate-700 bg-[#151a20] hover:border-slate-500 hover:bg-slate-800"
+                    }`}
+                    onClick={() => setArmedSourceId(active ? null : item.id)}
+                  >
+                    {icon ? (
+                      <img
+                        src={icon}
+                        alt=""
+                        className="h-11 w-11 shrink-0 object-cover"
+                      />
+                    ) : (
+                      <span className="grid h-11 w-11 shrink-0 place-items-center bg-slate-800 text-xs text-slate-500">
+                        no icon
+                      </span>
+                    )}
+                    <span className="min-w-0">
+                      <span className="block truncate font-medium">{item.name}</span>
+                      <span className={`mt-1 inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${
+                        kind === "talent"
+                          ? "bg-violet-900/70 text-violet-200"
+                          : "bg-blue-900/70 text-blue-200"
+                      }`}>
+                        {kind}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+
+              {!filteredLibrary.length ? (
+                <p className="py-4 text-center text-sm text-slate-500">
+                  No database pieces match this filter.
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="min-w-0 rounded border border-slate-700 bg-[#151a20] p-4">
+            {armedSource ? (
+              <div className="space-y-3">
+                <div className="flex items-start gap-4">
+                  {spellIconPath(armedSource.icon) ? (
                     <img
-                      src={icon}
+                      src={spellIconPath(armedSource.icon)}
                       alt=""
-                      className="h-11 w-11 shrink-0 object-cover"
+                      className="h-20 w-20 shrink-0 object-cover"
                     />
                   ) : (
-                    <span className="grid h-11 w-11 shrink-0 place-items-center bg-slate-800 text-xs text-slate-500">
+                    <span className="grid h-20 w-20 shrink-0 place-items-center bg-slate-800 text-xs text-slate-500">
                       no icon
                     </span>
                   )}
-                  <span className="min-w-0">
-                    <span className="block truncate font-medium">{item.name}</span>
-                    <span className={`mt-1 inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${
-                      kind === "talent"
-                        ? "bg-violet-900/70 text-violet-200"
-                        : "bg-blue-900/70 text-blue-200"
-                    }`}>
-                      {kind}
+                  <div className="min-w-0">
+                    <h4 className="text-xl font-semibold">{armedSource.name}</h4>
+                    <span className="mt-1 inline-block rounded bg-slate-700 px-2 py-1 text-xs uppercase">
+                      {normalizeLibraryKind(armedSource)}
                     </span>
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                  </div>
+                </div>
 
-          {!filteredLibrary.length && !libraryLoading ? (
-            <p className="py-4 text-center text-sm text-slate-500">
-              No database pieces match this filter.
-            </p>
-          ) : null}
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  <label className="block">
+                    ID
+                    <input className={field} readOnly value={armedSource.id} />
+                  </label>
+                  <label className="block">
+                    Type
+                    <input className={field} readOnly value={armedSource.quality ?? ""} />
+                  </label>
+                </div>
+
+                <label className="block">
+                  Name
+                  <input className={field} readOnly value={armedSource.name} />
+                </label>
+
+                <label className="block">
+                  Icon
+                  <input className={field} readOnly value={armedSource.icon ?? ""} />
+                </label>
+
+                <label className="block">
+                  Description
+                  <textarea
+                    className={field}
+                    readOnly
+                    rows={6}
+                    value={armedSource.description ?? ""}
+                  />
+                </label>
+
+                <label className="block">
+                  URL
+                  <input className={field} readOnly value={armedSource.url ?? ""} />
+                </label>
+              </div>
+            ) : (
+              <div className="grid min-h-[260px] place-items-center text-center text-slate-500">
+                Select a spell or talent from the first column to see its fields here.
+              </div>
+            )}
+          </div>
         </div>
       )}
     </section>
