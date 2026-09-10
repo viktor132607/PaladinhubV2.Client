@@ -136,15 +136,15 @@ export default function Navbar() {
                 <Link to="/Discussions/Index" className="nav-link">Discussion</Link>
               </li>
 
-              {isAdmin ? (
-                <li className="nav-item">
-                  <Link to="/Admin/Database" className="nav-link">Database</Link>
-                </li>
-              ) : null}
-
               <li className="nav-item">
                 <Link to="/Home/Privacy" className="nav-link">Privacy</Link>
               </li>
+
+              {isAdmin ? (
+                <li className="nav-item">
+                  <Link to="/Admin/Database" className="nav-link">Admin</Link>
+                </li>
+              ) : null}
             </ul>
 
             <ul className="navbar-nav ms-auto">
