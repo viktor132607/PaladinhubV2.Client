@@ -60,6 +60,7 @@ function normalizeSection(value: string): SectionName {
 export default function PageBuilderIndex() {
   const [dynamicPages, setDynamicPages] = useState<DynamicPage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statusChangingId, setStatusChangingId] = useState<number | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -95,6 +96,54 @@ export default function PageBuilderIndex() {
 
     return () => controller.abort();
   }, []);
+
+  const setPublished = async (page: DynamicPage, isPublished: boolean) => {
+    if (statusChangingId !== null || page.isPublished === isPublished) return;
+
+    setStatusChangingId(page.id);
+    setError("");
+
+    try {
+      const response = await fetchBackend(
+        `/Admin/api/page-builder/pages/${page.id}`,
+        {
+          method: "PUT",
+          cache: "no-store",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            section: page.section,
+            title: page.title,
+            slug: page.slug,
+            isPublished,
+          }),
+        },
+      );
+
+      const updated = await readApiJson<DynamicPage>(response);
+
+      setDynamicPages((current) =>
+        current.map((candidate) =>
+          candidate.id === page.id
+            ? {
+                ...candidate,
+                ...updated,
+                section: normalizeSection(updated.section),
+              }
+            : candidate,
+        ),
+      );
+    } catch (caught) {
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "Could not change page status.",
+      );
+    } finally {
+      setStatusChangingId(null);
+    }
+  };
 
   const grouped = useMemo(
     () =>
@@ -160,13 +209,13 @@ export default function PageBuilderIndex() {
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-[760px] text-left text-sm">
+                  <table className="w-full min-w-[940px] text-left text-sm">
                     <thead className="bg-slate-950/70 text-slate-400">
                       <tr>
                         <th className="px-5 py-3 font-medium">Page</th>
                         <th className="px-5 py-3 font-medium">Slug</th>
                         <th className="px-5 py-3 font-medium">Source</th>
-                        <th className="px-5 py-3 font-medium">Status</th>
+                        <th className="px-5 py-3 font-medium">Site status</th>
                         <th className="px-5 py-3 text-right font-medium">Actions</th>
                       </tr>
                     </thead>
@@ -182,7 +231,16 @@ export default function PageBuilderIndex() {
                               Hardcoded constant
                             </span>
                           </td>
-                          <td className="px-5 py-4 text-emerald-300">Protected</td>
+                          <td className="px-5 py-4">
+                            <div className="flex items-center gap-2 whitespace-nowrap">
+                              <span className="rounded-md bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white">
+                                Active on site
+                              </span>
+                              <span className="rounded-md bg-slate-800 px-3 py-1.5 text-xs text-slate-400">
+                                Locked
+                              </span>
+                            </div>
+                          </td>
                           <td className="px-5 py-4 text-right">
                             <Link
                               to={page.path}
@@ -194,48 +252,73 @@ export default function PageBuilderIndex() {
                         </tr>
                       ))}
 
-                      {dynamic.map((page) => (
-                        <tr key={`dynamic:${page.id}`}>
-                          <td className="px-5 py-4 font-medium">{page.title}</td>
-                          <td className="px-5 py-4 font-mono text-slate-300">
-                            {page.slug}
-                          </td>
-                          <td className="px-5 py-4">
-                            <span className="rounded-full bg-amber-500/15 px-2.5 py-1 text-xs text-amber-300">
-                              Page Builder
-                            </span>
-                          </td>
-                          <td className="px-5 py-4">
-                            {page.isPublished ? (
-                              <span className="text-emerald-300">Published</span>
-                            ) : (
-                              <span className="text-slate-400">Draft</span>
-                            )}
-                          </td>
-                          <td className="px-5 py-4">
-                            <div className="flex justify-end gap-2">
-                              <Link
-                                to={`/${page.section}/${page.slug}`}
-                                className="rounded bg-slate-700 px-3 py-1.5 hover:bg-slate-600"
-                              >
-                                View
-                              </Link>
-                              <Link
-                                to={`/Admin/PageBuilder/Edit?id=${page.id}`}
-                                className="rounded bg-blue-700 px-3 py-1.5 hover:bg-blue-600"
-                              >
-                                Edit
-                              </Link>
-                              <Link
-                                to={`/Admin/PageBuilder/Delete?id=${page.id}`}
-                                className="rounded bg-red-800 px-3 py-1.5 hover:bg-red-700"
-                              >
-                                Delete
-                              </Link>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                      {dynamic.map((page) => {
+                        const changing = statusChangingId === page.id;
+
+                        return (
+                          <tr key={`dynamic:${page.id}`}>
+                            <td className="px-5 py-4 font-medium">{page.title}</td>
+                            <td className="px-5 py-4 font-mono text-slate-300">
+                              {page.slug}
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className="rounded-full bg-amber-500/15 px-2.5 py-1 text-xs text-amber-300">
+                                Page Builder
+                              </span>
+                            </td>
+                            <td className="px-5 py-4">
+                              <div className="flex items-center gap-2 whitespace-nowrap">
+                                <button
+                                  type="button"
+                                  disabled={changing || page.isPublished}
+                                  onClick={() => void setPublished(page, true)}
+                                  className={`rounded-md px-3 py-1.5 text-xs font-semibold transition disabled:cursor-default ${
+                                    page.isPublished
+                                      ? "bg-emerald-700 text-white"
+                                      : "bg-slate-800 text-slate-400 hover:bg-emerald-800 hover:text-white"
+                                  }`}
+                                >
+                                  Active on site
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={changing || !page.isPublished}
+                                  onClick={() => void setPublished(page, false)}
+                                  className={`rounded-md px-3 py-1.5 text-xs font-semibold transition disabled:cursor-default ${
+                                    !page.isPublished
+                                      ? "bg-red-800 text-white"
+                                      : "bg-slate-800 text-slate-400 hover:bg-red-900 hover:text-white"
+                                  }`}
+                                >
+                                  {changing ? "Saving..." : "Inactive"}
+                                </button>
+                              </div>
+                            </td>
+                            <td className="px-5 py-4">
+                              <div className="flex justify-end gap-2">
+                                <Link
+                                  to={`/${page.section}/${page.slug}`}
+                                  className="rounded bg-slate-700 px-3 py-1.5 hover:bg-slate-600"
+                                >
+                                  View
+                                </Link>
+                                <Link
+                                  to={`/Admin/PageBuilder/Edit?id=${page.id}`}
+                                  className="rounded bg-blue-700 px-3 py-1.5 hover:bg-blue-600"
+                                >
+                                  Edit
+                                </Link>
+                                <Link
+                                  to={`/Admin/PageBuilder/Delete?id=${page.id}`}
+                                  className="rounded bg-red-800 px-3 py-1.5 hover:bg-red-700"
+                                >
+                                  Delete
+                                </Link>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
