@@ -89,3 +89,11 @@
 }
 .ph-auth-logout:hover { background: #ffd700; color: #111; }
 .ph-auth-logout:disabled { opacity: .6; cursor: wait; }
+
+/* Keep talent-tree panel dimensions while making their structural borders invisible. */
+section[data-build] {
+  box-shadow: none !important;
+}
+section[data-build] section[class~="border-white/20"] {
+  border-color: transparent !important;
+}
