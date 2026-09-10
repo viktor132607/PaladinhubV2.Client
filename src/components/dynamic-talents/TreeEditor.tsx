@@ -175,6 +175,130 @@ export default function TreeEditor({
     setArmedSourceId(null);
   };
 
+  const libraryPanel = (
+    <section className="space-y-3 rounded border border-slate-700 bg-slate-950/50 p-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h3 className="text-xl">Spell / Talent pieces</h3>
+          <p className="mt-1 text-sm text-slate-400">
+            Select a database piece, then click an empty + slot in the tree.
+          </p>
+        </div>
+
+        {armedSource ? (
+          <div className="flex items-center gap-2 rounded border border-amber-400 bg-amber-400/10 px-3 py-2">
+            {spellIconPath(armedSource.icon) ? (
+              <img
+                src={spellIconPath(armedSource.icon)}
+                alt=""
+                className="h-8 w-8 object-cover"
+              />
+            ) : null}
+            <span className="text-sm">
+              Ready: <strong>{armedSource.name}</strong>
+            </span>
+            <button
+              type="button"
+              className="rounded bg-slate-700 px-2 py-1 text-xs"
+              onClick={() => setArmedSourceId(null)}
+            >
+              Clear
+            </button>
+          </div>
+        ) : (
+          <span className="text-sm text-slate-500">Manual + mode</span>
+        )}
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <input
+          className={`${field} min-w-[220px] flex-1`}
+          type="search"
+          value={librarySearch}
+          placeholder="Search spells or talents..."
+          onChange={(event) => setLibrarySearch(event.target.value)}
+        />
+
+        {(["all", "spell", "talent"] as const).map((kind) => (
+          <button
+            type="button"
+            key={kind}
+            aria-pressed={libraryKind === kind}
+            className={`rounded px-3 py-2 text-sm ${
+              libraryKind === kind
+                ? "bg-amber-500 text-slate-950"
+                : "bg-slate-700 text-slate-100"
+            }`}
+            onClick={() => setLibraryKind(kind)}
+          >
+            {kind === "all" ? "All" : kind === "spell" ? "Spells" : "Talents"} ({libraryCounts[kind]})
+          </button>
+        ))}
+      </div>
+
+      {libraryError ? (
+        <p role="alert" className="text-red-300">{libraryError}</p>
+      ) : null}
+
+      {libraryLoading ? (
+        <p className="text-slate-400">Loading database pieces...</p>
+      ) : (
+        <div className="max-h-[300px] overflow-auto pr-1">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(185px,1fr))] gap-2">
+            {filteredLibrary.map((item) => {
+              const icon = spellIconPath(item.icon);
+              const kind = normalizeLibraryKind(item);
+              const active = armedSourceId === item.id;
+
+              return (
+                <button
+                  type="button"
+                  key={item.id}
+                  aria-pressed={active}
+                  title={item.description || item.name}
+                  className={`flex min-h-[68px] items-center gap-3 rounded border p-2 text-left transition ${
+                    active
+                      ? "border-amber-400 bg-amber-400/10 ring-1 ring-amber-400"
+                      : "border-slate-700 bg-[#151a20] hover:border-slate-500 hover:bg-slate-800"
+                  }`}
+                  onClick={() => setArmedSourceId(active ? null : item.id)}
+                >
+                  {icon ? (
+                    <img
+                      src={icon}
+                      alt=""
+                      className="h-11 w-11 shrink-0 object-cover"
+                    />
+                  ) : (
+                    <span className="grid h-11 w-11 shrink-0 place-items-center bg-slate-800 text-xs text-slate-500">
+                      no icon
+                    </span>
+                  )}
+                  <span className="min-w-0">
+                    <span className="block truncate font-medium">{item.name}</span>
+                    <span className={`mt-1 inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${
+                      kind === "talent"
+                        ? "bg-violet-900/70 text-violet-200"
+                        : "bg-blue-900/70 text-blue-200"
+                    }`}>
+                      {kind}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {!filteredLibrary.length && !libraryLoading ? (
+            <p className="py-4 text-center text-sm text-slate-500">
+              No database pieces match this filter.
+            </p>
+          ) : null}
+        </div>
+      )}
+    </section>
+  );
+
   return (
     <div className="min-w-0 space-y-4">
       <label className="block">
@@ -228,132 +352,10 @@ export default function TreeEditor({
         <TreeView key={JSON.stringify(tree)} tree={tree} />
       ) : (
         <>
-          <section className="space-y-3 rounded border border-slate-700 bg-slate-950/50 p-4">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <h3 className="text-xl">Spell / Talent pieces</h3>
-                <p className="mt-1 text-sm text-slate-400">
-                  Select a database piece, then click an empty + slot in the tree.
-                </p>
-              </div>
-
-              {armedSource ? (
-                <div className="flex items-center gap-2 rounded border border-amber-400 bg-amber-400/10 px-3 py-2">
-                  {spellIconPath(armedSource.icon) ? (
-                    <img
-                      src={spellIconPath(armedSource.icon)}
-                      alt=""
-                      className="h-8 w-8 object-cover"
-                    />
-                  ) : null}
-                  <span className="text-sm">
-                    Ready: <strong>{armedSource.name}</strong>
-                  </span>
-                  <button
-                    type="button"
-                    className="rounded bg-slate-700 px-2 py-1 text-xs"
-                    onClick={() => setArmedSourceId(null)}
-                  >
-                    Clear
-                  </button>
-                </div>
-              ) : (
-                <span className="text-sm text-slate-500">Manual + mode</span>
-              )}
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              <input
-                className={`${field} min-w-[220px] flex-1`}
-                type="search"
-                value={librarySearch}
-                placeholder="Search spells or talents..."
-                onChange={(event) => setLibrarySearch(event.target.value)}
-              />
-
-              {(["all", "spell", "talent"] as const).map((kind) => (
-                <button
-                  type="button"
-                  key={kind}
-                  aria-pressed={libraryKind === kind}
-                  className={`rounded px-3 py-2 text-sm ${
-                    libraryKind === kind
-                      ? "bg-amber-500 text-slate-950"
-                      : "bg-slate-700 text-slate-100"
-                  }`}
-                  onClick={() => setLibraryKind(kind)}
-                >
-                  {kind === "all" ? "All" : kind === "spell" ? "Spells" : "Talents"} ({libraryCounts[kind]})
-                </button>
-              ))}
-            </div>
-
-            {libraryError ? (
-              <p role="alert" className="text-red-300">{libraryError}</p>
-            ) : null}
-
-            {libraryLoading ? (
-              <p className="text-slate-400">Loading database pieces...</p>
-            ) : (
-              <div className="max-h-[300px] overflow-auto pr-1">
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(185px,1fr))] gap-2">
-                  {filteredLibrary.map((item) => {
-                    const icon = spellIconPath(item.icon);
-                    const kind = normalizeLibraryKind(item);
-                    const active = armedSourceId === item.id;
-
-                    return (
-                      <button
-                        type="button"
-                        key={item.id}
-                        aria-pressed={active}
-                        title={item.description || item.name}
-                        className={`flex min-h-[68px] items-center gap-3 rounded border p-2 text-left transition ${
-                          active
-                            ? "border-amber-400 bg-amber-400/10 ring-1 ring-amber-400"
-                            : "border-slate-700 bg-[#151a20] hover:border-slate-500 hover:bg-slate-800"
-                        }`}
-                        onClick={() => setArmedSourceId(active ? null : item.id)}
-                      >
-                        {icon ? (
-                          <img
-                            src={icon}
-                            alt=""
-                            className="h-11 w-11 shrink-0 object-cover"
-                          />
-                        ) : (
-                          <span className="grid h-11 w-11 shrink-0 place-items-center bg-slate-800 text-xs text-slate-500">
-                            no icon
-                          </span>
-                        )}
-                        <span className="min-w-0">
-                          <span className="block truncate font-medium">{item.name}</span>
-                          <span className={`mt-1 inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${
-                            kind === "talent"
-                              ? "bg-violet-900/70 text-violet-200"
-                              : "bg-blue-900/70 text-blue-200"
-                          }`}>
-                            {kind}
-                          </span>
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {!filteredLibrary.length && !libraryLoading ? (
-                  <p className="py-4 text-center text-sm text-slate-500">
-                    No database pieces match this filter.
-                  </p>
-                ) : null}
-              </div>
-            )}
-          </section>
-
           <p>
             {armedSource
               ? `Click + to place ${armedSource.name}.`
-              : "Click + to add a blank talent, or select a database piece above first."}{" "}
+              : "Click + to add a blank talent, or select a database piece on the right first."}{" "}
             Select a talent to edit or move it. Connections require all parents at maximum rank.
           </p>
 
@@ -369,7 +371,7 @@ export default function TreeEditor({
               )}
             </div>
 
-            <div className="min-w-0 xl:sticky xl:top-4">
+            <div className="min-w-0 space-y-4 xl:sticky xl:top-4">
               {node ? (
                 <div className="space-y-3 rounded border border-slate-600 p-4">
                   <h3 className="text-xl">Edit talent</h3>
@@ -476,6 +478,8 @@ export default function TreeEditor({
                   Select a talent in the tree to edit it here.
                 </div>
               )}
+
+              {libraryPanel}
             </div>
           </div>
         </>
