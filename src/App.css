@@ -104,11 +104,14 @@ section[data-tree-key][data-build] > div[data-tree-key][data-edit-mode] {
   gap: 20px !important;
 }
 
-/* TalentTree.tsx currently starts connector lines at -8/-8; V1 LineStyle uses
-   +7.5/+7.5. The 15.5px delta restores the original V1 connector origin. */
+/* Center every connector on the actual 50x50 talent icon. TalentTree.tsx currently
+   calculates the connector origin at x=27/y=32 inside each 50x60 grid track, while
+   the self-centered node center is x=25/y=30. The 1px line rotates around left-center,
+   so the vertical half-pixel is included as well. */
 div[data-tree-key][data-edit-mode] > span[aria-hidden="true"] {
-  margin-left: 15.5px !important;
-  margin-top: 15.5px !important;
+  margin-left: -2px !important;
+  margin-top: -2.5px !important;
+  transform-origin: left center !important;
 }
 
 /* Keep the V1 650/250/650 proportions, but fit the three panels exactly between
