@@ -7,6 +7,8 @@ import {
 } from "@/features/dynamic-talents/model";
 import TreeView from "./TreeView";
 import Heading from "@/components/page-builder/blocks/HeadingBlock";
+import Paragraph from "@/components/page-builder/blocks/ParagraphBlock";
+import ImageBlock from "@/components/page-builder/blocks/ImageBlock";
 import Callout from "@/components/page-builder/blocks/CalloutBlock";
 import Divider from "@/components/page-builder/blocks/DividerBlock";
 import PageHeader from "@/components/page-builder/blocks/PageHeaderBlock";
@@ -23,16 +25,17 @@ import Switcher from "@/components/page-builder/blocks/SwitcherBlock";
 import ColumnsText from "@/components/page-builder/blocks/ColumnsTextBlock";
 import TierList from "@/components/page-builder/blocks/TierListBlock";
 import Section from "@/components/page-builder/blocks/SectionBlock";
+
 const views: Record<string, ComponentType<Record<string, unknown>>> = {
   heading: Heading as ComponentType<Record<string, unknown>>,
+  paragraph: Paragraph as ComponentType<Record<string, unknown>>,
+  image: ImageBlock as ComponentType<Record<string, unknown>>,
   callout: Callout as ComponentType<Record<string, unknown>>,
   divider: Divider as ComponentType<Record<string, unknown>>,
   pageheader: PageHeader as ComponentType<Record<string, unknown>>,
   "table.generic": GenericTable as ComponentType<Record<string, unknown>>,
   "table.gear": GearTable as ComponentType<Record<string, unknown>>,
-  "table.consumables": ConsumablesTable as ComponentType<
-    Record<string, unknown>
-  >,
+  "table.consumables": ConsumablesTable as ComponentType<Record<string, unknown>>,
   talenttree: TalentTree as ComponentType<Record<string, unknown>>,
   talentbuildmenu: TalentBuildMenu as ComponentType<Record<string, unknown>>,
   itemgrid: ItemGrid as ComponentType<Record<string, unknown>>,
@@ -44,6 +47,7 @@ const views: Record<string, ComponentType<Record<string, unknown>>> = {
   tierlist: TierList as ComponentType<Record<string, unknown>>,
   section: Section as ComponentType<Record<string, unknown>>,
 };
+
 function normalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(normalize);
   if (!value || typeof value !== "object") return value;
@@ -63,6 +67,7 @@ function normalize(value: unknown): unknown {
     }),
   );
 }
+
 class Boundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() {
@@ -76,20 +81,26 @@ class Boundary extends Component<{ children: ReactNode }, { failed: boolean }> {
     );
   }
 }
+
 function RenderBlock({ block }: { block: Block }) {
   if (block.type === "talenttree.dynamic")
     return <TreeView tree={block as Tree} />;
+
   const View = views[block.type.toLowerCase()];
   if (!View) return <p role="alert">Unsupported block: {block.type}</p>;
+
   const props = normalize({
     ...block,
     ...(typeof block.props === "object" ? block.props : {}),
   }) as Record<string, unknown>;
+
   props.adminMode = false;
   if (block.type.toLowerCase() === "table.generic")
     props.rows = block.Rows ?? block.rows ?? [];
+
   return <View {...props} />;
 }
+
 export function hasDynamicTrees(json: string) {
   try {
     return parseLayout(json).some((b) => b.type === "talenttree.dynamic");
@@ -97,6 +108,23 @@ export function hasDynamicTrees(json: string) {
     return false;
   }
 }
+
+export function canRenderLayout(json: string) {
+  try {
+    const blocks = parseLayout(json);
+    return (
+      blocks.length > 0 &&
+      blocks.every(
+        (block) =>
+          block.type === "talenttree.dynamic" ||
+          Boolean(views[block.type.toLowerCase()]),
+      )
+    );
+  } catch {
+    return false;
+  }
+}
+
 export default function DynamicPageContent({ json }: { json: string }) {
   return (
     <div className="min-w-0 space-y-6">
