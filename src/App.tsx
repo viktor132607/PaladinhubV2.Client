@@ -34,6 +34,7 @@ import CreateItem from "@/pages/admin/items/CreateItem";
 import DeleteItem from "@/pages/admin/items/DeleteItem";
 import EditItem from "@/pages/admin/items/EditItem";
 import ItemDetails from "@/pages/admin/items/ItemDetails";
+import PageBuilderIndex from "@/pages/admin/page-builder/PageBuilderIndex";
 import TalentTreesBuilder from "@/pages/admin/page-builder/TalentTrees";
 import CreatePage from "@/pages/admin/page-builder/CreatePage";
 import DeletePage from "@/pages/admin/page-builder/DeletePage";
@@ -205,6 +206,8 @@ export default function App() {
             <Route path="Spells/Details/:id" element={<SpellDetails />} />
             <Route path="Spells/Delete/:id" element={<DeleteSpell />} />
 
+            <Route path="PageBuilder" element={<PageBuilderIndex />} />
+            <Route path="PageBuilder/Index" element={<PageBuilderIndex />} />
             <Route path="PageBuilder/TalentTrees" element={<TalentTreesBuilder />} />
             <Route path="PageBuilder/Create" element={<CreatePage />} />
             <Route path="PageBuilder/Edit" element={<CreatePage />} />
