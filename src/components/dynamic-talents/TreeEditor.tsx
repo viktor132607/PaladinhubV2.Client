@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { fetchBackend, readApiJson } from "@/config/api";
+import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import TreeView, { TreeGrid } from "./TreeView";
 import {
   removeTalent,
@@ -13,6 +13,7 @@ import {
 const field = "w-full rounded border border-slate-600 bg-[#1f2327] px-3 py-2";
 
 type LibraryKind = "all" | "spell" | "talent";
+type PieceKind = Exclude<LibraryKind, "all">;
 
 type SpellLibraryItem = {
   id: number;
@@ -30,7 +31,9 @@ type SpellDatabasePage = {
   spells?: SpellLibraryItem[] | null;
 };
 
-function normalizeLibraryKind(item: SpellLibraryItem): "spell" | "talent" {
+type CsrfResponse = { token?: string };
+
+function normalizeLibraryKind(item: SpellLibraryItem): PieceKind {
   const value = item.quality?.trim().toLowerCase() ?? "";
   return value.includes("talent") ? "talent" : "spell";
 }
@@ -65,6 +68,7 @@ export default function TreeEditor({
   const [librarySearch, setLibrarySearch] = useState("");
   const [libraryKind, setLibraryKind] = useState<LibraryKind>("all");
   const [armedSourceId, setArmedSourceId] = useState<number | null>(null);
+  const [typeSavingId, setTypeSavingId] = useState<number | null>(null);
 
   const errors = validateTree(tree);
   const node = tree.nodes.find((n) => n.id === selected);
@@ -147,6 +151,54 @@ export default function TreeEditor({
         n.id === selected ? { ...n, ...patch } : n,
       ),
     });
+
+  const updateLibraryType = async (item: SpellLibraryItem, quality: PieceKind) => {
+    if (typeSavingId !== null || normalizeLibraryKind(item) === quality) return;
+
+    setTypeSavingId(item.id);
+    setLibraryError("");
+
+    try {
+      const csrfResponse = await fetchBackend(backendEndpoints.auth.csrf, {
+        cache: "no-store",
+      });
+      const csrf = await readApiJson<CsrfResponse>(csrfResponse);
+      if (!csrf?.token) throw new Error("The server did not return a CSRF token.");
+
+      const response = await fetchBackend(`/Admin/api/spells/${item.id}`, {
+        method: "PUT",
+        cache: "no-store",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": csrf.token,
+        },
+        body: JSON.stringify({
+          id: item.id,
+          name: item.name,
+          icon: item.icon?.trim() || null,
+          description: item.description?.trim() || null,
+          url: item.url?.trim() || null,
+          quality,
+        }),
+      });
+
+      const updated = await readApiJson<SpellLibraryItem>(response);
+      setLibrary((current) =>
+        current.map((record) =>
+          record.id === item.id
+            ? { ...record, ...updated, quality: updated.quality ?? quality }
+            : record,
+        ),
+      );
+    } catch (cause) {
+      setLibraryError(
+        cause instanceof Error ? cause.message : "Could not update the piece type.",
+      );
+    } finally {
+      setTypeSavingId(null);
+    }
+  };
 
   const addNodeAt = (row: number, column: number) => {
     const id = armedSource
@@ -327,7 +379,23 @@ export default function TreeEditor({
                   </label>
                   <label className="block">
                     Type
-                    <input className={field} readOnly value={armedSource.quality ?? ""} />
+                    <select
+                      className={field}
+                      value={normalizeLibraryKind(armedSource)}
+                      disabled={typeSavingId === armedSource.id}
+                      onChange={(event) =>
+                        void updateLibraryType(
+                          armedSource,
+                          event.target.value as PieceKind,
+                        )
+                      }
+                    >
+                      <option value="spell">spell</option>
+                      <option value="talent">talent</option>
+                    </select>
+                    {typeSavingId === armedSource.id ? (
+                      <span className="mt-1 block text-xs text-slate-400">Saving...</span>
+                    ) : null}
                   </label>
                 </div>
 
