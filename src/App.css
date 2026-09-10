@@ -153,3 +153,21 @@ section[data-build="retribution-templar"] > div > div > section:nth-child(2) {
   width: auto !important;
   flex: 250 1 0 !important;
 }
+
+/* Match the in-game talent state: inactive nodes are subdued and desaturated,
+   while selected talents immediately return to their full-color artwork. */
+div[data-tree-key][data-edit-mode] button[data-id][aria-pressed="false"] img {
+  filter: grayscale(88%) saturate(25%) brightness(58%) contrast(90%);
+  opacity: .78;
+  transition: filter .18s ease, opacity .18s ease;
+}
+
+div[data-tree-key][data-edit-mode] button[data-id][aria-pressed="true"] img {
+  filter: none;
+  opacity: 1;
+}
+
+div[data-tree-key][data-edit-mode] button[data-id][aria-pressed="false"]:hover img {
+  filter: grayscale(62%) saturate(45%) brightness(72%) contrast(95%);
+  opacity: .92;
+}
