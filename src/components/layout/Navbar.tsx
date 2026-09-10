@@ -30,7 +30,7 @@ function GuideMenu({
         id={`${section.toLowerCase()}Dropdown`}
         role="button"
       >
-        {label}
+        {label}{" "}
       </Link>
 
       <ul

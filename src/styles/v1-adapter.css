@@ -93,8 +93,9 @@
     margin-bottom: 0;
     list-style: none;
 }
+/* Match Bootstrap/V1: .d-flex on the account toggle must override display:block. */
 .ph-v1-navbar .navbar-nav .nav-link {
-    display: block !important;
+    display: block;
     visibility: visible !important;
     opacity: 1 !important;
     padding-right: 0;
