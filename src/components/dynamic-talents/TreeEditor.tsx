@@ -89,124 +89,134 @@ export default function TreeEditor({
             Connections require all parents at maximum rank.
           </p>
 
-          {!errors.length && (
-            <TreeGrid
-              tree={tree}
-              selected={selected}
-              onNode={setSelected}
-              onCell={(row, column) => {
-                const id = crypto.randomUUID();
-                onChange({
-                  ...tree,
-                  nodes: [
-                    ...tree.nodes,
-                    {
-                      id,
-                      name: "New talent",
-                      description: "",
-                      icon: "",
-                      row,
-                      column,
-                      maxRank: 1,
-                      requires: [],
-                      shape: "circle",
-                    },
-                  ],
-                });
-                setSelected(id);
-              }}
-            />
-          )}
+          <div className="grid min-w-0 gap-4 xl:grid-cols-[max-content_minmax(420px,1fr)] xl:items-start">
+            <div className="min-w-0">
+              {!errors.length && (
+                <TreeGrid
+                  tree={tree}
+                  selected={selected}
+                  onNode={setSelected}
+                  onCell={(row, column) => {
+                    const id = crypto.randomUUID();
+                    onChange({
+                      ...tree,
+                      nodes: [
+                        ...tree.nodes,
+                        {
+                          id,
+                          name: "New talent",
+                          description: "",
+                          icon: "",
+                          row,
+                          column,
+                          maxRank: 1,
+                          requires: [],
+                          shape: "circle",
+                        },
+                      ],
+                    });
+                    setSelected(id);
+                  }}
+                />
+              )}
+            </div>
 
-          {node && (
-            <div className="space-y-3 rounded border border-slate-600 p-4">
-              <h3 className="text-xl">Edit talent</h3>
+            <div className="min-w-0 xl:sticky xl:top-4">
+              {node ? (
+                <div className="space-y-3 rounded border border-slate-600 p-4">
+                  <h3 className="text-xl">Edit talent</h3>
 
-              {(["name", "description", "icon"] as const).map((name) => (
-                <label className="block" key={name}>
-                  {name}
-                  <textarea
-                    className={field}
-                    rows={name === "description" ? 3 : 1}
-                    value={node[name]}
-                    onChange={(e) => updateNode({ [name]: e.target.value })}
-                  />
-                </label>
-              ))}
-
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-                {(["row", "column", "maxRank"] as const).map((name) => (
-                  <label key={name}>
-                    {name}
-                    <input
-                      className={field}
-                      type="number"
-                      min={1}
-                      max={
-                        name === "row"
-                          ? tree.rows
-                          : name === "column"
-                            ? tree.columns
-                            : 10
-                      }
-                      value={node[name]}
-                      onChange={(e) =>
-                        updateNode({ [name]: Number(e.target.value) })
-                      }
-                    />
-                  </label>
-                ))}
-
-                <label>
-                  shape
-                  <select
-                    className={field}
-                    value={node.shape ?? "circle"}
-                    onChange={(e) =>
-                      updateNode({ shape: e.target.value as TalentShape })
-                    }
-                  >
-                    <option value="circle">Circle</option>
-                    <option value="square">Square</option>
-                    <option value="hexagon">Hexagon</option>
-                  </select>
-                </label>
-              </div>
-
-              <fieldset className="space-y-2">
-                <legend>Prerequisites / connections</legend>
-                {tree.nodes
-                  .filter((n) => n.id !== selected)
-                  .map((n) => (
-                    <label className="flex gap-2" key={n.id}>
-                      <input
-                        type="checkbox"
-                        checked={node.requires.includes(n.id)}
-                        onChange={(e) =>
-                          updateNode({
-                            requires: e.target.checked
-                              ? [...node.requires, n.id]
-                              : node.requires.filter((id) => id !== n.id),
-                          })
-                        }
+                  {(["name", "description", "icon"] as const).map((name) => (
+                    <label className="block" key={name}>
+                      {name}
+                      <textarea
+                        className={field}
+                        rows={name === "description" ? 3 : 1}
+                        value={node[name]}
+                        onChange={(e) => updateNode({ [name]: e.target.value })}
                       />
-                      {n.name}
                     </label>
                   ))}
-              </fieldset>
 
-              <button
-                type="button"
-                className="rounded bg-red-900 px-3 py-2"
-                onClick={() => {
-                  onChange(removeTalent(tree, selected));
-                  setSelected("");
-                }}
-              >
-                Delete talent and connections
-              </button>
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+                    {(["row", "column", "maxRank"] as const).map((name) => (
+                      <label key={name}>
+                        {name}
+                        <input
+                          className={field}
+                          type="number"
+                          min={1}
+                          max={
+                            name === "row"
+                              ? tree.rows
+                              : name === "column"
+                                ? tree.columns
+                                : 10
+                          }
+                          value={node[name]}
+                          onChange={(e) =>
+                            updateNode({ [name]: Number(e.target.value) })
+                          }
+                        />
+                      </label>
+                    ))}
+
+                    <label>
+                      shape
+                      <select
+                        className={field}
+                        value={node.shape ?? "circle"}
+                        onChange={(e) =>
+                          updateNode({ shape: e.target.value as TalentShape })
+                        }
+                      >
+                        <option value="circle">Circle</option>
+                        <option value="square">Square</option>
+                        <option value="hexagon">Hexagon</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <fieldset className="max-h-[48vh] space-y-2 overflow-auto pr-2">
+                    <legend>Prerequisites / connections</legend>
+                    {tree.nodes
+                      .filter((n) => n.id !== selected)
+                      .map((n) => (
+                        <label className="flex gap-2" key={n.id}>
+                          <input
+                            type="checkbox"
+                            checked={node.requires.includes(n.id)}
+                            onChange={(e) =>
+                              updateNode({
+                                requires: e.target.checked
+                                  ? [...node.requires, n.id]
+                                  : node.requires.filter((id) => id !== n.id),
+                              })
+                            }
+                          />
+                          {n.name}
+                        </label>
+                      ))}
+                  </fieldset>
+
+                  <button
+                    type="button"
+                    className="rounded bg-red-900 px-3 py-2"
+                    onClick={() => {
+                      onChange(removeTalent(tree, selected));
+                      setSelected("");
+                    }}
+                  >
+                    Delete talent and connections
+                  </button>
+                </div>
+              ) : (
+                <div className="rounded border border-dashed border-slate-600 p-6 text-slate-400">
+                  Select a talent in the tree to edit it here.
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </>
       )}
     </div>
