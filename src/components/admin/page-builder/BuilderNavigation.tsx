@@ -5,7 +5,7 @@ export default function BuilderNavigation() {
   return (
     <nav aria-label="Page Builder tabs" className="mb-6 flex flex-wrap gap-2">
       {[
-        ["Page Builder", "/Admin/PageBuilder/Create"],
+        ["Page Builder", "/Admin/PageBuilder/Index"],
         ["Talent Tree Builder", "/Admin/PageBuilder/TalentTrees"],
       ].map(([label, path]) => (
         <Link
