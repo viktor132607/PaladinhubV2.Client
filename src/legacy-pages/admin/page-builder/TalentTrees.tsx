@@ -1,8 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import {
+  Children,
+  isValidElement,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import BuilderNavigation from "@/components/admin/page-builder/BuilderNavigation";
 import TreeEditor from "@/components/dynamic-talents/TreeEditor";
+import HolyTalentTreeHerald from "@/components/talent-trees/HolyTalentTreeHerald";
+import HolyTalentTreeLightsmith from "@/components/talent-trees/HolyTalentTreeLightsmith";
+import ProtectionTreeLightsmith from "@/components/talent-trees/ProtectionTreeLightsmith";
+import ProtectionTreeTemplar from "@/components/talent-trees/ProtectionTreeTemplar";
+import RetributionTreeHerald from "@/components/talent-trees/RetributionTreeHerald";
+import RetributionTreeTemplar from "@/components/talent-trees/RetributionTreeTemplar";
 import RuntimeTalentTree, {
   type TalentEdge,
   type TalentNode,
@@ -34,6 +47,26 @@ type StoredTalentLayout = {
   trees: Tree[];
 };
 
+type StaticColumn = {
+  title: string;
+  treeKey: string;
+  nodes: TalentNode[];
+  maxPoints: number;
+  columns: number;
+  edges: TalentEdge[];
+};
+
+type StaticLayoutDefinition = {
+  key: string;
+  name: string;
+  spec: Spec;
+  component: () => ReactNode;
+};
+
+type StaticLayout = StaticLayoutDefinition & {
+  trees: Tree[];
+};
+
 const ENTITY = "talent-layout";
 const SPECS: Spec[] = ["Holy", "Protection", "Retribution"];
 const EMPTY_SELECTION: string[] = [];
@@ -43,6 +76,45 @@ const secondaryButton =
   "rounded bg-slate-700 px-4 py-2 text-slate-100 disabled:cursor-not-allowed disabled:opacity-40";
 const input =
   "w-full rounded border border-slate-600 bg-[#1f2327] px-3 py-2 text-slate-100";
+
+const STATIC_LAYOUT_DEFINITIONS: StaticLayoutDefinition[] = [
+  {
+    key: "holy-herald",
+    name: "Holy + Herald of the Sun",
+    spec: "Holy",
+    component: HolyTalentTreeHerald,
+  },
+  {
+    key: "holy-lightsmith",
+    name: "Holy + Lightsmith",
+    spec: "Holy",
+    component: HolyTalentTreeLightsmith,
+  },
+  {
+    key: "protection-lightsmith",
+    name: "Protection + Lightsmith",
+    spec: "Protection",
+    component: ProtectionTreeLightsmith,
+  },
+  {
+    key: "protection-templar",
+    name: "Protection + Templar",
+    spec: "Protection",
+    component: ProtectionTreeTemplar,
+  },
+  {
+    key: "retribution-herald",
+    name: "Retribution + Herald of the Sun",
+    spec: "Retribution",
+    component: RetributionTreeHerald,
+  },
+  {
+    key: "retribution-templar",
+    name: "Retribution + Templar",
+    spec: "Retribution",
+    component: RetributionTreeTemplar,
+  },
+];
 
 function isSpec(value: unknown): value is Spec {
   return SPECS.includes(value as Spec);
@@ -55,10 +127,106 @@ function makeDefaultTrees(spec: Spec): Tree[] {
     createTree({
       title: spec,
       rows: 10,
-      columns: spec === "Holy" ? 9 : 7,
+      columns: spec === "Holy" || spec === "Retribution" ? 9 : 7,
       points: 31,
     }),
   ];
+}
+
+function defaultIconPath(name: string): string {
+  return `/images/SpellIcons/${encodeURIComponent(`${name.replace(/['’]/g, "")}.jpg`)}`;
+}
+
+function collectStaticColumns(node: ReactNode, output: StaticColumn[] = []): StaticColumn[] {
+  Children.forEach(node, (child) => {
+    if (!isValidElement(child)) return;
+
+    const props = child.props as {
+      title?: unknown;
+      treeKey?: unknown;
+      nodes?: unknown;
+      maxPoints?: unknown;
+      columns?: unknown;
+      edges?: unknown;
+      children?: ReactNode;
+    };
+
+    if (
+      typeof props.title === "string" &&
+      typeof props.treeKey === "string" &&
+      Array.isArray(props.nodes) &&
+      typeof props.maxPoints === "number" &&
+      typeof props.columns === "number" &&
+      Array.isArray(props.edges)
+    ) {
+      output.push({
+        title: props.title,
+        treeKey: props.treeKey,
+        nodes: props.nodes as TalentNode[],
+        maxPoints: props.maxPoints,
+        columns: props.columns,
+        edges: props.edges as TalentEdge[],
+      });
+    }
+
+    if (props.children) collectStaticColumns(props.children, output);
+  });
+
+  return output;
+}
+
+function staticColumnToTree(layoutKey: string, column: StaticColumn, index: number): Tree {
+  const nodeByPosition = new Map<string, TalentNode>();
+  column.nodes.forEach((node) => {
+    if (node.column != null && node.row != null) {
+      nodeByPosition.set(`${node.column}:${node.row}`, node);
+    }
+  });
+
+  const rows = Math.max(1, ...column.nodes.map((node) => node.row ?? 1));
+
+  return {
+    type: "talenttree.dynamic",
+    id: `seed-${layoutKey}-${index + 1}`,
+    title: column.title,
+    rows,
+    columns: column.columns,
+    points: column.maxPoints,
+    nodes: column.nodes.map((node) => {
+      const columnNumber = node.column ?? 1;
+      const rowNumber = node.row ?? 1;
+      const requires = column.edges
+        .filter((edge) => edge[2] === columnNumber && edge[3] === rowNumber)
+        .map((edge) => nodeByPosition.get(`${edge[0]}:${edge[1]}`)?.id)
+        .filter((id): id is string => Boolean(id));
+
+      return {
+        id: node.id,
+        name: node.name,
+        description: node.description ?? "",
+        icon: node.icon ?? defaultIconPath(node.name),
+        row: rowNumber,
+        column: columnNumber,
+        maxRank: node.maxRank ?? 1,
+        requires: [...new Set(requires)],
+        shape: node.shape ?? "circle",
+      };
+    }),
+  };
+}
+
+function createStaticLayout(definition: StaticLayoutDefinition): StaticLayout {
+  const columns = collectStaticColumns(definition.component());
+  return {
+    ...definition,
+    trees: columns.map((column, index) =>
+      staticColumnToTree(definition.key, column, index),
+    ),
+  };
+}
+
+function cloneTrees(trees: Tree[]): Tree[] {
+  return JSON.parse(JSON.stringify(trees)) as Tree[];
 }
 
 function parseStoredLayout(preset: Preset): StoredTalentLayout {
@@ -108,24 +276,22 @@ function runtimeEdges(tree: Tree): TalentEdge[] {
     node.requires.flatMap((parentId) => {
       const parent = byId.get(parentId);
       return parent
-        ? [
-            [
-              parent.column,
-              parent.row,
-              node.column,
-              node.row,
-            ] as const,
-          ]
+        ? [[parent.column, parent.row, node.column, node.row] as const]
         : [];
     }),
   );
 }
 
 function RuntimePreview({ tree }: { tree: Tree }) {
+  const minimumWidth = Math.max(260, tree.columns * 50 + (tree.columns - 1) * 20 + 48);
+
   return (
-    <div className="min-w-0 rounded bg-[#171717] p-4">
+    <div
+      className="min-w-0 flex-1 rounded bg-[#171717] p-4"
+      style={{ minWidth: `${minimumWidth}px` }}
+    >
       <h3 className="mb-4 text-center text-xl font-semibold">{tree.title}</h3>
-      <div className="max-w-full overflow-auto">
+      <div className="w-full overflow-auto">
         <RuntimeTalentTree
           treeKey={`builder-preview-${tree.id}`}
           build={`builder-preview-${tree.id}`}
@@ -142,6 +308,10 @@ function RuntimePreview({ tree }: { tree: Tree }) {
 }
 
 export default function TalentTrees() {
+  const hardcodedLayouts = useMemo(
+    () => STATIC_LAYOUT_DEFINITIONS.map(createStaticLayout),
+    [],
+  );
   const [presets, setPresets] = useState<PresetSummary[]>([]);
   const [presetId, setPresetId] = useState<number | null>(null);
   const [name, setName] = useState("");
@@ -209,19 +379,27 @@ export default function TalentTrees() {
     setMessage("");
   }
 
-  function newLayout() {
-    if (dirty && !window.confirm("Discard unsaved changes?")) return;
-    const initialSpec: Spec = "Holy";
-    const nextTrees = makeDefaultTrees(initialSpec);
+  function resetWorkspace(nextSpec: Spec, nextName: string, nextTrees: Tree[], nextDirty: boolean) {
     setPresetId(null);
-    setName("");
-    setSpec(initialSpec);
+    setName(nextName);
+    setSpec(nextSpec);
     setTrees(nextTrees);
-    setActiveTreeId(nextTrees[0].id);
-    setDirty(true);
-    setShowLayoutPreview(false);
+    setActiveTreeId(nextTrees[0]?.id ?? "");
+    setDirty(nextDirty);
+    setShowLayoutPreview(nextTrees.length > 0);
     setError("");
     setMessage("");
+  }
+
+  function newLayout(initialSpec: Spec = "Holy") {
+    if (dirty && !window.confirm("Discard unsaved changes?")) return;
+    resetWorkspace(initialSpec, "", makeDefaultTrees(initialSpec), true);
+  }
+
+  function loadHardcodedLayout(layout: StaticLayout) {
+    if (dirty && !window.confirm("Discard unsaved changes?")) return;
+    resetWorkspace(layout.spec, layout.name, cloneTrees(layout.trees), true);
+    setMessage("Hardcoded layout loaded as an editable seed. The live page is unchanged.");
   }
 
   function duplicateLayout() {
@@ -240,7 +418,7 @@ export default function TalentTrees() {
           ? {
               ...tree,
               title: nextSpec,
-              columns: nextSpec === "Holy" ? 9 : 7,
+              columns: nextSpec === "Holy" || nextSpec === "Retribution" ? 9 : 7,
             }
           : tree,
       ),
@@ -267,7 +445,7 @@ export default function TalentTrees() {
       setTrees(stored.trees);
       setActiveTreeId(stored.trees[0]?.id ?? "");
       setDirty(false);
-      setShowLayoutPreview(false);
+      setShowLayoutPreview(true);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Could not load layout.");
     } finally {
@@ -371,87 +549,136 @@ export default function TalentTrees() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100">
-      <div className="mx-auto max-w-[1600px]">
-        <BuilderNavigation />
+    <main className="min-h-[calc(100vh-45px)] w-full max-w-none bg-slate-950 text-slate-100">
+      <div className="flex min-h-[calc(100vh-45px)] w-full max-w-none items-stretch">
+        <aside className="sticky top-0 h-screen w-[300px] shrink-0 overflow-y-auto border-r border-slate-700 bg-[#0b1020] p-4">
+          <BuilderNavigation />
 
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="text-3xl">Talent Tree Builder</h1>
-            <p className="mt-2 text-sm text-slate-400">
-              Admin-only draft layouts. Saving here does not change the live hardcoded
-              Holy, Protection or Retribution talent pages.
-            </p>
-          </div>
-          <button type="button" className={button} onClick={newLayout} disabled={busy}>
-            New layout
-          </button>
-        </div>
-
-        <fieldset disabled={busy} className="min-w-0 space-y-5">
-          <div className="grid gap-3 rounded border border-slate-700 bg-slate-900/60 p-4 md:grid-cols-[2fr_1fr_auto]">
-            <label>
-              Saved layouts
-              <select
-                aria-label="Saved talent layout"
-                className={input}
-                value={presetId ?? ""}
-                onChange={(event) => {
-                  if (event.target.value) void loadLayout(Number(event.target.value));
-                }}
-              >
-                <option value="">Select layout</option>
-                {presets.map((preset) => (
-                  <option key={preset.id} value={preset.id}>
-                    {preset.section || "No spec"} / {preset.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <div className="flex items-end gap-2">
-              <button
-                type="button"
-                className={secondaryButton}
-                onClick={() => void refreshList().catch((cause) =>
-                  setError(cause instanceof Error ? cause.message : "Refresh failed."),
-                )}
-              >
-                Refresh
-              </button>
-              {presetId && (
-                <button type="button" className={secondaryButton} onClick={duplicateLayout}>
-                  Duplicate
-                </button>
+          <div className="mb-5 mt-4 flex gap-2">
+            <button type="button" className={`${button} flex-1`} onClick={() => newLayout()} disabled={busy}>
+              New layout
+            </button>
+            <button
+              type="button"
+              className={secondaryButton}
+              onClick={() => void refreshList().catch((cause) =>
+                setError(cause instanceof Error ? cause.message : "Refresh failed."),
               )}
+            >
+              ↻
+            </button>
+          </div>
+
+          <nav aria-label="Talent layout workspace" className="space-y-5">
+            {SPECS.map((section) => {
+              const staticRows = hardcodedLayouts.filter((layout) => layout.spec === section);
+              const savedRows = presets.filter((preset) => preset.section?.toLowerCase() === section.toLowerCase());
+
+              return (
+                <section key={section}>
+                  <h2 className="mb-2 border-b border-slate-700 pb-2 text-sm font-bold uppercase tracking-wide text-amber-400">
+                    {section}
+                  </h2>
+
+                  <p className="mb-1 text-[11px] uppercase tracking-wide text-slate-500">Hardcoded layouts</p>
+                  <div className="space-y-1">
+                    {staticRows.map((layout) => (
+                      <button
+                        key={layout.key}
+                        type="button"
+                        onClick={() => loadHardcodedLayout(layout)}
+                        className="block w-full rounded px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800"
+                      >
+                        <span className="block font-medium">{layout.name}</span>
+                        <span className="text-xs text-slate-500">Hardcoded seed · {layout.trees.length} trees</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <p className="mb-1 mt-3 text-[11px] uppercase tracking-wide text-slate-500">Saved layouts</p>
+                  <div className="space-y-1">
+                    {savedRows.length ? (
+                      savedRows.map((preset) => (
+                        <button
+                          key={preset.id}
+                          type="button"
+                          onClick={() => void loadLayout(preset.id)}
+                          className={`block w-full rounded px-3 py-2 text-left text-sm hover:bg-slate-800 ${
+                            presetId === preset.id ? "bg-slate-800 text-amber-300" : "text-slate-200"
+                          }`}
+                        >
+                          <span className="block font-medium">{preset.name}</span>
+                          <span className="text-xs text-slate-500">Saved layout</span>
+                        </button>
+                      ))
+                    ) : (
+                      <p className="px-3 py-1 text-xs text-slate-600">No saved layouts</p>
+                    )}
+                  </div>
+                </section>
+              );
+            })}
+          </nav>
+        </aside>
+
+        <section className="min-w-0 flex-1 p-5 xl:p-7">
+          <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h1 className="text-3xl">Talent Tree Builder</h1>
+              <p className="mt-2 text-sm text-slate-400">
+                Hardcoded layouts are read-only sources. Loading one creates an editable seed here and does not change the live Holy, Protection or Retribution pages.
+              </p>
             </div>
 
-            {presetId && (
-              <div className="flex items-end">
+            {trees.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
-                  className="rounded bg-red-900 px-4 py-2 text-white"
-                  onClick={() => void deleteLayout()}
+                  className={secondaryButton}
+                  onClick={() => setShowLayoutPreview((value) => !value)}
                 >
-                  Delete layout
+                  {showLayoutPreview ? "Hide full preview" : "Full preview"}
                 </button>
+                {presetId ? (
+                  <button type="button" className={secondaryButton} onClick={duplicateLayout}>
+                    Duplicate
+                  </button>
+                ) : null}
+                {presetId ? (
+                  <button
+                    type="button"
+                    className="rounded bg-red-900 px-4 py-2 text-white"
+                    onClick={() => void deleteLayout()}
+                  >
+                    Delete layout
+                  </button>
+                ) : null}
               </div>
-            )}
+            ) : null}
           </div>
 
-          {error && (
-            <p role="alert" className="rounded border border-red-800 bg-red-950/50 p-3 text-red-200">
+          {error ? (
+            <p role="alert" className="mb-5 rounded border border-red-800 bg-red-950/50 p-3 text-red-200">
               {error}
             </p>
-          )}
-          {message && (
-            <p role="status" className="rounded border border-emerald-800 bg-emerald-950/40 p-3 text-emerald-200">
+          ) : null}
+          {message ? (
+            <p role="status" className="mb-5 rounded border border-emerald-800 bg-emerald-950/40 p-3 text-emerald-200">
               {message}
             </p>
-          )}
+          ) : null}
 
-          {trees.length > 0 && (
-            <>
+          {!trees.length ? (
+            <div className="grid min-h-[60vh] place-items-center rounded border border-dashed border-slate-700 bg-slate-900/30 p-10 text-center">
+              <div>
+                <h2 className="text-2xl font-semibold">Choose a layout from the left</h2>
+                <p className="mt-2 max-w-xl text-slate-400">
+                  Open one of the existing hardcoded layouts as a seed, open a saved layout, or create a blank layout.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <fieldset disabled={busy} className="min-w-0 space-y-5">
               <div className="grid gap-4 rounded border border-slate-700 bg-slate-900/60 p-4 md:grid-cols-2">
                 <label>
                   Layout name
@@ -476,9 +703,7 @@ export default function TalentTrees() {
                     onChange={(event) => changeSpec(event.target.value as Spec)}
                   >
                     {SPECS.map((value) => (
-                      <option key={value} value={value}>
-                        {value}
-                      </option>
+                      <option key={value} value={value}>{value}</option>
                     ))}
                   </select>
                 </label>
@@ -490,9 +715,7 @@ export default function TalentTrees() {
                     type="button"
                     key={tree.id}
                     aria-pressed={activeTree === tree}
-                    className={`${secondaryButton} ${
-                      activeTree === tree ? "ring-2 ring-amber-400" : ""
-                    }`}
+                    className={`${secondaryButton} ${activeTree === tree ? "ring-2 ring-amber-400" : ""}`}
                     onClick={() => setActiveTreeId(tree.id)}
                   >
                     {tree.title || `Tree ${index + 1}`}
@@ -510,42 +733,34 @@ export default function TalentTrees() {
                 >
                   Add tree
                 </button>
-
-                <button
-                  type="button"
-                  className={secondaryButton}
-                  onClick={() => setShowLayoutPreview((value) => !value)}
-                >
-                  {showLayoutPreview ? "Hide layout preview" : "Preview full layout"}
-                </button>
               </div>
 
-              {showLayoutPreview && (
-                <section className="space-y-4 rounded border border-slate-700 bg-[#101010] p-4">
+              {showLayoutPreview ? (
+                <section className="w-full max-w-none space-y-4 rounded border border-slate-700 bg-[#101010] p-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <h2 className="text-2xl">{name.trim() || "Unsaved layout"}</h2>
                       <p className="text-sm text-slate-400">Spec: {spec}</p>
                     </div>
                   </div>
-                  <div className="grid items-start gap-4 xl:grid-cols-3">
-                    {trees.map((tree) => (
-                      <RuntimePreview key={tree.id} tree={tree} />
-                    ))}
+                  <div className="w-full overflow-x-auto pb-2">
+                    <div className="flex min-w-max items-start gap-4">
+                      {trees.map((tree) => (
+                        <RuntimePreview key={tree.id} tree={tree} />
+                      ))}
+                    </div>
                   </div>
                 </section>
-              )}
+              ) : null}
 
-              {activeTree && (
+              {activeTree ? (
                 <section className="space-y-4 rounded border border-slate-700 bg-slate-900/60 p-4">
                   <TreeEditor
                     key={activeTree.id}
                     tree={activeTree}
                     onChange={(next) =>
                       markChanged(
-                        trees.map((tree) =>
-                          tree.id === activeTree.id ? next : tree,
-                        ),
+                        trees.map((tree) => tree.id === activeTree.id ? next : tree),
                       )
                     }
                   />
@@ -563,9 +778,9 @@ export default function TalentTrees() {
                     Delete tree
                   </button>
                 </section>
-              )}
+              ) : null}
 
-              <div className="sticky bottom-3 flex flex-wrap items-center gap-3 rounded border border-slate-700 bg-slate-950/95 p-3 shadow-xl">
+              <div className="sticky bottom-3 z-20 flex flex-wrap items-center gap-3 rounded border border-slate-700 bg-slate-950/95 p-3 shadow-xl">
                 <button
                   type="button"
                   className={button}
@@ -578,9 +793,9 @@ export default function TalentTrees() {
                   {dirty ? "Unsaved changes" : "All changes saved"}
                 </span>
               </div>
-            </>
+            </fieldset>
           )}
-        </fieldset>
+        </section>
       </div>
     </main>
   );
