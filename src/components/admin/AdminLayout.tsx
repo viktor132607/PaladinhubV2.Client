@@ -94,6 +94,7 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
               <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
                 {navLink("Merchandise", "/Merchandise/Merchandise")}
                 {navLink("Pages", "/Admin/PageBuilder/Create")}
+                {navLink("Talent Trees", "/Admin/PageBuilder/TalentTrees")}
                 {navLink("Database", "/Admin/Database")}
                 {navLink("Products", "/Merchandise/Merchandise")}
                 {menu("Promo Codes", [["All", "/Admin/PromoCodes"], ["Create", "/Admin/PromoCodes/Create"]])}
