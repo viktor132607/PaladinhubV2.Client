@@ -1,12 +1,16 @@
 "use client";
+
 import { useState } from "react";
 import TreeView, { TreeGrid } from "./TreeView";
 import {
   removeTalent,
   validateTree,
+  type TalentShape,
   type Tree,
 } from "@/features/dynamic-talents/model";
+
 const field = "w-full rounded border border-slate-600 bg-[#1f2327] px-3 py-2";
+
 export default function TreeEditor({
   tree,
   onChange,
@@ -14,10 +18,11 @@ export default function TreeEditor({
   tree: Tree;
   onChange: (tree: Tree) => void;
 }) {
-  const [selected, setSelected] = useState(""),
-    [preview, setPreview] = useState(false);
+  const [selected, setSelected] = useState("");
+  const [preview, setPreview] = useState(false);
   const errors = validateTree(tree);
   const node = tree.nodes.find((n) => n.id === selected);
+
   const updateNode = (patch: Partial<Tree["nodes"][number]>) =>
     onChange({
       ...tree,
@@ -25,6 +30,7 @@ export default function TreeEditor({
         n.id === selected ? { ...n, ...patch } : n,
       ),
     });
+
   return (
     <div className="min-w-0 space-y-4">
       <label className="block">
@@ -35,7 +41,8 @@ export default function TreeEditor({
           onChange={(e) => onChange({ ...tree, title: e.target.value })}
         />
       </label>
-      <div className="grid grid-cols-3 gap-3">
+
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         {(
           [
             ["rows", 20],
@@ -58,11 +65,13 @@ export default function TreeEditor({
           </label>
         ))}
       </div>
+
       {errors.length > 0 && (
         <p role="alert" className="text-red-300">
           {errors.join(" ")}
         </p>
       )}
+
       <button
         type="button"
         className="rounded bg-amber-500 px-4 py-2 text-slate-950"
@@ -70,6 +79,7 @@ export default function TreeEditor({
       >
         {preview ? "Edit structure" : "Test build"}
       </button>
+
       {preview ? (
         <TreeView key={JSON.stringify(tree)} tree={tree} />
       ) : (
@@ -78,6 +88,7 @@ export default function TreeEditor({
             Click + to add a talent. Select a talent to edit or move it.
             Connections require all parents at maximum rank.
           </p>
+
           {!errors.length && (
             <TreeGrid
               tree={tree}
@@ -98,6 +109,7 @@ export default function TreeEditor({
                       column,
                       maxRank: 1,
                       requires: [],
+                      shape: "circle",
                     },
                   ],
                 });
@@ -105,9 +117,11 @@ export default function TreeEditor({
               }}
             />
           )}
+
           {node && (
             <div className="space-y-3 rounded border border-slate-600 p-4">
               <h3 className="text-xl">Edit talent</h3>
+
               {(["name", "description", "icon"] as const).map((name) => (
                 <label className="block" key={name}>
                   {name}
@@ -119,7 +133,8 @@ export default function TreeEditor({
                   />
                 </label>
               ))}
-              <div className="grid grid-cols-3 gap-3">
+
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
                 {(["row", "column", "maxRank"] as const).map((name) => (
                   <label key={name}>
                     {name}
@@ -141,9 +156,25 @@ export default function TreeEditor({
                     />
                   </label>
                 ))}
+
+                <label>
+                  shape
+                  <select
+                    className={field}
+                    value={node.shape ?? "circle"}
+                    onChange={(e) =>
+                      updateNode({ shape: e.target.value as TalentShape })
+                    }
+                  >
+                    <option value="circle">Circle</option>
+                    <option value="square">Square</option>
+                    <option value="hexagon">Hexagon</option>
+                  </select>
+                </label>
               </div>
+
               <fieldset className="space-y-2">
-                <legend>Prerequisites</legend>
+                <legend>Prerequisites / connections</legend>
                 {tree.nodes
                   .filter((n) => n.id !== selected)
                   .map((n) => (
@@ -163,6 +194,7 @@ export default function TreeEditor({
                     </label>
                   ))}
               </fieldset>
+
               <button
                 type="button"
                 className="rounded bg-red-900 px-3 py-2"
