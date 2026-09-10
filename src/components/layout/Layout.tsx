@@ -25,10 +25,15 @@ function usesStandaloneAdminLayout(pathname: string) {
   return (path === "/admin" || path.startsWith("/admin/")) && !usesPublicLayoutInsideAdmin(path);
 }
 
+function usesFullWidthAdminWorkspace(pathname: string) {
+  return normalizePath(pathname) === "/admin/pagebuilder/talenttrees";
+}
+
 export default function Layout() {
   const { pathname } = useLocation();
   const accountLayout = usesAccountLayout(pathname);
   const standaloneAdminLayout = usesStandaloneAdminLayout(pathname);
+  const fullWidthAdminWorkspace = usesFullWidthAdminWorkspace(pathname);
 
   useEffect(() => {
     if (accountLayout || standaloneAdminLayout) return;
@@ -62,12 +67,19 @@ export default function Layout() {
     <div className="ph-v1-layout">
       <Navbar />
       <div className="ph-v1-layout-content">
-        <GuidePageHeader />
-        <main role="main" className="pb-5 container ph-v1-main-container">
+        {!fullWidthAdminWorkspace ? <GuidePageHeader /> : null}
+        <main
+          role="main"
+          className={
+            fullWidthAdminWorkspace
+              ? "w-full max-w-none p-0"
+              : "pb-5 container ph-v1-main-container"
+          }
+        >
           <Outlet />
         </main>
       </div>
-      <br />
+      {!fullWidthAdminWorkspace ? <br /> : null}
       <Footer />
     </div>
   );
