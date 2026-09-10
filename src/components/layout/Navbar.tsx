@@ -78,12 +78,14 @@ function GuideMenu({
   );
 }
 
-export default function Navbar() {
+export default function Navbar({ forceVisible = false }: { forceVisible?: boolean } = {}) {
   const { hasRole } = useAuth();
   const [open, setOpen] = useState(false);
   const isAdmin = hasRole("Admin");
 
   useEffect(() => {
+    if (forceVisible) return;
+
     const navbar = document.querySelector<HTMLElement>(".navbar-custom");
     if (!navbar) return;
 
@@ -106,11 +108,14 @@ export default function Navbar() {
       document.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("scroll", onScroll);
     };
-  }, []);
+  }, [forceVisible]);
 
   return (
     <header>
-      <nav className="navbar navbar-expand-sm navbar-toggleable-sm navbar-custom border-bottom box-shadow mb-3 ph-v1-navbar">
+      <nav
+        className={`navbar navbar-expand-sm navbar-toggleable-sm navbar-custom border-bottom box-shadow ph-v1-navbar ${forceVisible ? "mb-0" : "mb-3"}`}
+        style={forceVisible ? { position: "relative", top: 0, left: 0, right: 0 } : undefined}
+      >
         <div className="container-fluid">
           <button
             className="navbar-toggler"
