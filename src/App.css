@@ -171,3 +171,9 @@ div[data-tree-key][data-edit-mode] button[data-id][aria-pressed="false"]:hover i
   filter: grayscale(62%) saturate(45%) brightness(72%) contrast(95%);
   opacity: .92;
 }
+
+/* Talent artwork itself should not have a visible ring. Keep the existing border
+   width in the box model so the 50x50 node geometry and connector alignment do not move. */
+div[data-tree-key][data-edit-mode] button[data-id] {
+  border-color: transparent !important;
+}
