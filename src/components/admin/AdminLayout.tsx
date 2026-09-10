@@ -2,24 +2,16 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, Outlet, useLocation } from "@/router/nextCompat";
-
-const sectionPages = ["Overview", "Gear", "Talents", "Consumables", "Rotation", "Stats"] as const;
-
-function usesPublicLayout(pathname: string) {
-  const path = pathname.toLowerCase().replace(/\/+$/, "") || "/";
-  return (
-    path === "/admin/pagebuilder" ||
-    path.startsWith("/admin/pagebuilder/") ||
-    path === "/admin/products" ||
-    path.startsWith("/admin/products/")
-  );
-}
+import Navbar from "@/components/layout/Navbar";
 
 export default function AdminLayout({ children }: { children?: ReactNode }) {
   const [expanded, setExpanded] = useState(false);
   const [dropdown, setDropdown] = useState("");
   const { pathname } = useLocation();
   const header = useRef<HTMLElement>(null);
+
+  const normalizedPath = pathname.toLowerCase().replace(/\/+$/, "") || "/";
+  const fullWidthWorkspace = normalizedPath === "/admin/pagebuilder/talenttrees";
 
   useEffect(() => {
     setExpanded(false);
@@ -34,82 +26,83 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
     return () => document.removeEventListener("click", close);
   }, []);
 
-  if (usesPublicLayout(pathname)) {
-    return <>{children ?? <Outlet />}</>;
-  }
-
   const navLink = (label: string, to: string) => (
     <li className="nav-item" key={label}>
       <Link className="nav-link" to={to}>{label}</Link>
     </li>
   );
 
-  const menu = (label: string, entries: readonly (readonly [string, string])[]) => (
-    <li className="nav-item dropdown" key={label} onKeyDown={(event) => { if (event.key === "Escape") setDropdown(""); }}>
+  const promoMenu = (
+    <li
+      className="nav-item dropdown"
+      onKeyDown={(event) => {
+        if (event.key === "Escape") setDropdown("");
+      }}
+    >
       <a
         href="#"
         role="button"
-        className={`nav-link dropdown-toggle${label === "Promo Codes" && pathname.toLowerCase().includes("promocodes") ? " active" : ""}`}
-        aria-expanded={dropdown === label}
+        className={`nav-link dropdown-toggle${normalizedPath.includes("promocodes") ? " active" : ""}`}
+        aria-expanded={dropdown === "Promo Codes"}
         onClick={(event) => {
           event.preventDefault();
-          setDropdown((current) => current === label ? "" : label);
+          setDropdown((current) => current === "Promo Codes" ? "" : "Promo Codes");
         }}
       >
-        {label}
+        Promo Codes
       </a>
-      <ul className={`dropdown-menu dropdown-menu-dark${dropdown === label ? " show" : ""}`}>
-        {entries.map(([text, to]) => (
-          <li key={text}><Link className="dropdown-item" to={to}>{text}</Link></li>
-        ))}
+      <ul className={`dropdown-menu dropdown-menu-dark${dropdown === "Promo Codes" ? " show" : ""}`}>
+        <li><Link className="dropdown-item" to="/Admin/PromoCodes">All</Link></li>
+        <li><Link className="dropdown-item" to="/Admin/PromoCodes/Create">Create</Link></li>
       </ul>
     </li>
   );
 
   return (
-    <div className="ph-admin">
-      <header ref={header}>
-        <nav className="navbar navbar-expand-sm navbar-dark bg-dark">
-          <div className="container-fluid">
-            <Link className="navbar-brand" to="/Admin/Database">Admin</Link>
+    <div className="ph-admin min-vh-100">
+      <Navbar />
+
+      <header ref={header} className="admin-secondary-nav">
+        <nav className="navbar navbar-expand-sm navbar-dark bg-dark border-top border-secondary">
+          <div className="container-fluid justify-content-center">
             <button
               className="navbar-toggler"
               type="button"
-              aria-controls="adminNavbar"
+              aria-controls="adminSecondaryNavbar"
               aria-expanded={expanded}
-              aria-label="Toggle navigation"
+              aria-label="Toggle admin navigation"
               onClick={() => setExpanded((current) => !current)}
             >
               <span className="navbar-toggler-icon" />
             </button>
-            <div className={`collapse navbar-collapse${expanded ? " show" : ""}`} id="adminNavbar">
-              <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                {navLink("Home", "/Home/Home")}
-                {(["Holy", "Protection", "Retribution"] as const).map((section) =>
-                  menu(`${section} Paladin`, sectionPages.map((page) => [page, `/${section}/${page}`] as const)),
-                )}
-                {navLink("Discussion", "/Discussion/Index")}
-                {navLink("Privacy", "/Account/Privacy")}
-              </ul>
-              <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
-                {navLink("Merchandise", "/Merchandise/Merchandise")}
-                {navLink("Pages", "/Admin/PageBuilder/Create")}
+
+            <div
+              className={`collapse navbar-collapse justify-content-center flex-grow-0${expanded ? " show" : ""}`}
+              id="adminSecondaryNavbar"
+            >
+              <ul className="navbar-nav align-items-sm-center justify-content-center gap-sm-2">
+                {navLink("Pages", "/Admin/PageBuilder")}
                 {navLink("Talent Trees", "/Admin/PageBuilder/TalentTrees")}
                 {navLink("Database", "/Admin/Database")}
                 {navLink("Products", "/Merchandise/Merchandise")}
-                {menu("Promo Codes", [["All", "/Admin/PromoCodes"], ["Create", "/Admin/PromoCodes/Create"]])}
-                {navLink("Back to Site", "/Home/Home")}
+                {promoMenu}
               </ul>
             </div>
           </div>
         </nav>
       </header>
 
-      <div className="container mt-4">{children ?? <Outlet />}</div>
+      {fullWidthWorkspace ? (
+        <div className="w-100">{children ?? <Outlet />}</div>
+      ) : (
+        <div className="container mt-4">{children ?? <Outlet />}</div>
+      )}
 
-      <footer className="footer bg-dark text-light text-center py-2 mt-5">
-        Admin Panel © {new Date().getFullYear()}
-      </footer>
+      {!fullWidthWorkspace ? (
+        <footer className="footer bg-dark text-light text-center py-2 mt-5">
+          Admin Panel © {new Date().getFullYear()}
+        </footer>
+      ) : null}
     </div>
   );
 }
