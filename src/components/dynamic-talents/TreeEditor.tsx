@@ -182,7 +182,7 @@ export default function TreeEditor({
                     {tree.nodes
                       .filter((n) => n.id !== selected)
                       .map((n) => (
-                        <label className="flex gap-2" key={n.id}>
+                        <label className="flex items-center gap-2" key={n.id}>
                           <input
                             type="checkbox"
                             checked={node.requires.includes(n.id)}
@@ -194,7 +194,20 @@ export default function TreeEditor({
                               })
                             }
                           />
-                          {n.name}
+                          {n.icon ? (
+                            <img
+                              src={n.icon}
+                              alt=""
+                              aria-hidden="true"
+                              className="h-7 w-7 shrink-0 object-cover"
+                            />
+                          ) : (
+                            <span
+                              aria-hidden="true"
+                              className="h-7 w-7 shrink-0 bg-slate-800"
+                            />
+                          )}
+                          <span>{n.name}</span>
                         </label>
                       ))}
                   </fieldset>
