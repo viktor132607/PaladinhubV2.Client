@@ -60,13 +60,13 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
 
   return (
     <div className="ph-admin min-vh-100">
-      <Navbar />
+      <Navbar forceVisible />
 
       <header ref={header} className="admin-secondary-nav">
-        <nav className="navbar navbar-expand-sm navbar-dark bg-dark border-top border-secondary">
-          <div className="container-fluid justify-content-center">
+        <nav className="navbar navbar-dark bg-dark border-bottom border-secondary py-1">
+          <div className="container-fluid flex-column align-items-center justify-content-center">
             <button
-              className="navbar-toggler"
+              className="navbar-toggler d-sm-none"
               type="button"
               aria-controls="adminSecondaryNavbar"
               aria-expanded={expanded}
@@ -77,10 +77,10 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
             </button>
 
             <div
-              className={`collapse navbar-collapse justify-content-center flex-grow-0${expanded ? " show" : ""}`}
+              className={`${expanded ? "d-flex" : "d-none"} d-sm-flex w-100 justify-content-center`}
               id="adminSecondaryNavbar"
             >
-              <ul className="navbar-nav align-items-sm-center justify-content-center gap-sm-2">
+              <ul className="navbar-nav flex-row flex-wrap align-items-center justify-content-center gap-2">
                 {navLink("Pages", "/Admin/PageBuilder")}
                 {navLink("Talent Trees", "/Admin/PageBuilder/TalentTrees")}
                 {navLink("Database", "/Admin/Database")}
