@@ -111,16 +111,18 @@ div[data-tree-key][data-edit-mode] > span[aria-hidden="true"] {
   margin-top: 15.5px !important;
 }
 
-/* Match the original V1 three-column build widths: 650 / 250 / 650 with 15px gaps. */
+/* Keep the V1 650/250/650 proportions, but fit the three panels exactly between
+   the left and right edges of the guide wrapper instead of overflowing it. */
 section[data-build="holy-herald"] > div > div,
 section[data-build="holy-lightsmith"] > div > div,
 section[data-build="protection-lightsmith"] > div > div,
 section[data-build="protection-templar"] > div > div,
 section[data-build="retribution-herald"] > div > div,
 section[data-build="retribution-templar"] > div > div {
-  width: 1580px !important;
-  min-width: 1580px !important;
+  width: 100% !important;
+  min-width: 0 !important;
   gap: 15px !important;
+  justify-content: stretch !important;
 }
 
 section[data-build="holy-herald"] > div > div > section:nth-child(1),
@@ -135,7 +137,8 @@ section[data-build="protection-lightsmith"] > div > div > section:nth-child(3),
 section[data-build="protection-templar"] > div > div > section:nth-child(3),
 section[data-build="retribution-herald"] > div > div > section:nth-child(3),
 section[data-build="retribution-templar"] > div > div > section:nth-child(3) {
-  width: 650px !important;
+  width: auto !important;
+  flex: 650 1 0 !important;
 }
 
 section[data-build="holy-herald"] > div > div > section:nth-child(2),
@@ -144,5 +147,6 @@ section[data-build="protection-lightsmith"] > div > div > section:nth-child(2),
 section[data-build="protection-templar"] > div > div > section:nth-child(2),
 section[data-build="retribution-herald"] > div > div > section:nth-child(2),
 section[data-build="retribution-templar"] > div > div > section:nth-child(2) {
-  width: 250px !important;
+  width: auto !important;
+  flex: 250 1 0 !important;
 }
