@@ -15,28 +15,18 @@ function usesAccountLayout(pathname: string) {
   return path === "/account/login" || path === "/login" || path === "/account/register" || path === "/register" || path === "/account/verifyemail" || path === "/verify-email";
 }
 
-function usesPublicLayoutInsideAdmin(pathname: string) {
+function usesAdminLayout(pathname: string) {
   const path = normalizePath(pathname);
-  return path === "/admin/pagebuilder" || path.startsWith("/admin/pagebuilder/") || path === "/admin/products" || path.startsWith("/admin/products/");
-}
-
-function usesStandaloneAdminLayout(pathname: string) {
-  const path = normalizePath(pathname);
-  return (path === "/admin" || path.startsWith("/admin/")) && !usesPublicLayoutInsideAdmin(path);
-}
-
-function usesFullWidthAdminWorkspace(pathname: string) {
-  return normalizePath(pathname) === "/admin/pagebuilder/talenttrees";
+  return path === "/admin" || path.startsWith("/admin/");
 }
 
 export default function Layout() {
   const { pathname } = useLocation();
   const accountLayout = usesAccountLayout(pathname);
-  const standaloneAdminLayout = usesStandaloneAdminLayout(pathname);
-  const fullWidthAdminWorkspace = usesFullWidthAdminWorkspace(pathname);
+  const adminLayout = usesAdminLayout(pathname);
 
   useEffect(() => {
-    if (accountLayout || standaloneAdminLayout) return;
+    if (accountLayout || adminLayout) return;
 
     const applyCurrentSection = () => {
       const currentHash = window.location.hash;
@@ -57,9 +47,9 @@ export default function Layout() {
     applyCurrentSection();
     window.addEventListener("hashchange", applyCurrentSection);
     return () => window.removeEventListener("hashchange", applyCurrentSection);
-  }, [pathname, accountLayout, standaloneAdminLayout]);
+  }, [pathname, accountLayout, adminLayout]);
 
-  if (accountLayout || standaloneAdminLayout) {
+  if (accountLayout || adminLayout) {
     return <Outlet />;
   }
 
@@ -67,19 +57,12 @@ export default function Layout() {
     <div className="ph-v1-layout">
       <Navbar />
       <div className="ph-v1-layout-content">
-        {!fullWidthAdminWorkspace ? <GuidePageHeader /> : null}
-        <main
-          role="main"
-          className={
-            fullWidthAdminWorkspace
-              ? "w-full max-w-none p-0"
-              : "pb-5 container ph-v1-main-container"
-          }
-        >
+        <GuidePageHeader />
+        <main role="main" className="pb-5 container ph-v1-main-container">
           <Outlet />
         </main>
       </div>
-      {!fullWidthAdminWorkspace ? <br /> : null}
+      <br />
       <Footer />
     </div>
   );
