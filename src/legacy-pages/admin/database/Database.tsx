@@ -162,8 +162,8 @@ export default function Database() {
                 <th>Description</th>
                 <th>Url</th>
                 {entity === "Items" && <><th>ItemLevel</th><th>RequiredLevel</th></>}
-                <th>Quality</th>
-                <th className="w-actions">Actions</th>
+                <th>Type</th>
+                <th className="w-actions text-end">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -179,11 +179,11 @@ export default function Database() {
                   <td className="url-cell">{record.url && <a href={record.url} target="_blank" rel="noopener noreferrer">{record.url}</a>}</td>
                   {entity === "Items" && <><td>{(record as ItemRow).itemLevel}</td><td>{(record as ItemRow).requiredLevel}</td></>}
                   <td>{record.quality}</td>
-                  <td>
-                    <div className="btn-group btn-group-sm">
-                      <Link className="btn btn-outline-info" to={`/Admin/${entity}/Details/${record.id}`}>Detail</Link>
-                      <Link className="btn btn-outline-light" to={`/Admin/${entity}/Edit/${record.id}`}>Edit</Link>
-                      <Link className="btn btn-outline-warning" to={`/Admin/${entity}/Delete/${record.id}`}>Delete</Link>
+                  <td className="text-end">
+                    <div className="btn-group btn-group-sm" role="group" aria-label={`Actions for ${record.name}`}>
+                      <Link className="btn btn-outline-info px-2" to={`/Admin/${entity}/Details/${record.id}`} title="Details" aria-label={`Details for ${record.name}`}><DetailIcon /></Link>
+                      <Link className="btn btn-outline-light px-2" to={`/Admin/${entity}/Edit/${record.id}`} title="Edit" aria-label={`Edit ${record.name}`}><EditIcon /></Link>
+                      <Link className="btn btn-outline-warning px-2" to={`/Admin/${entity}/Delete/${record.id}`} title="Delete" aria-label={`Delete ${record.name}`}><TrashIcon /></Link>
                     </div>
                   </td>
                 </tr>
@@ -216,4 +216,31 @@ export default function Database() {
 
 function Icon({ entity, name, alt }: { entity: EntityKind; name?: string | null; alt: string }) {
   return name ? <><img src={iconPath(entity, name)} alt={alt} title={name} /><div className="icon-name">{name}</div></> : null;
+}
+
+function DetailIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false">
+      <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1Zm0 1a6 6 0 1 1 0 12A6 6 0 0 1 8 2Z" />
+      <path d="M7.25 6.75h1.5v4.5h-1.5zM8 4.25a.875.875 0 1 1 0 1.75.875.875 0 0 1 0-1.75Z" />
+    </svg>
+  );
+}
+
+function EditIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false">
+      <path d="M12.854.146a.5.5 0 0 1 .707 0l2.293 2.293a.5.5 0 0 1 0 .707L6.207 12.793l-3.182.795a.5.5 0 0 1-.606-.606l.795-3.182L12.854.146Zm.353 1.061L4.146 10.268l-.53 2.121 2.121-.53 9.061-9.061-1.591-1.591Z" />
+      <path d="M11.5 2.5 13.5 4.5" stroke="currentColor" strokeWidth="1" />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false">
+      <path d="M5.5 5.5a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z" />
+      <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1 0-2H5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2h2.5a1 1 0 0 1 1 1ZM4 4v9a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4H4Zm2-2h4a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1Z" />
+    </svg>
+  );
 }
