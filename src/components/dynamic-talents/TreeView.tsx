@@ -1,4 +1,5 @@
 "use client";
+import { spellIconSource } from "@/lib/spell-icons";
 import { useState } from "react";
 import {
   changeRank,
@@ -89,7 +90,7 @@ export function TreeGrid({
               height: 68,
             }}
           >
-            {n.icon && <img src={n.icon} alt="" className="h-7 w-7" />}
+            {n.icon && <img src={spellIconSource(n.icon)} alt="" className="h-7 w-7" />}
             <span className="w-full truncate px-1">{n.name}</span>
             <span>
               {ranks[n.id] || 0}/{n.maxRank}

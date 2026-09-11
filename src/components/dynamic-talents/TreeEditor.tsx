@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
+import RecordTypePicker from "@/components/admin/RecordTypePicker";
+import SpellIconPicker from "@/components/admin/SpellIconPicker";
+import { spellIconSource as spellIconPath } from "@/lib/spell-icons";
 import TreeView, { TreeGrid } from "./TreeView";
 import {
   removeTalent,
@@ -10,10 +13,10 @@ import {
   type Tree,
 } from "@/features/dynamic-talents/model";
 
-const field = "w-full rounded border border-slate-600 bg-[#1f2327] px-3 py-2";
+const field = "min-w-0 w-full rounded border border-slate-600 bg-[#1f2327] px-3 py-2";
 
-type LibraryKind = "all" | "spell" | "talent";
-type PieceKind = Exclude<LibraryKind, "all">;
+type LibraryKind = string;
+type PieceKind = string;
 
 type SpellLibraryItem = {
   id: number;
@@ -43,22 +46,7 @@ type PieceDraft = {
 
 function normalizeLibraryKind(item: SpellLibraryItem): PieceKind {
   const value = item.quality?.trim().toLowerCase() ?? "";
-  return value.includes("talent") ? "talent" : "spell";
-}
-
-function spellIconPath(icon?: string | null): string {
-  const value = icon?.trim();
-  if (!value) return "";
-  if (/^(?:https?:)?\/\//i.test(value) || value.startsWith("/")) return value;
-
-  let decoded = value;
-  try {
-    decoded = decodeURIComponent(value);
-  } catch {
-    decoded = value;
-  }
-
-  return `/images/SpellIcons/${encodeURIComponent(decoded)}`;
+  return value || "spell";
 }
 
 function toPieceDraft(item: SpellLibraryItem): PieceDraft {
@@ -84,13 +72,14 @@ export default function TreeEditor({
   const [libraryLoading, setLibraryLoading] = useState(true);
   const [libraryError, setLibraryError] = useState("");
   const [librarySearch, setLibrarySearch] = useState("");
-  const [libraryKind, setLibraryKind] = useState<LibraryKind>("all");
+  const [libraryKind, setLibraryKind] = useState<LibraryKind>("");
   const [armedSourceId, setArmedSourceId] = useState<number | null>(null);
   const [pieceDraft, setPieceDraft] = useState<PieceDraft | null>(null);
   const [pieceSaving, setPieceSaving] = useState(false);
   const [pieceSaved, setPieceSaved] = useState(false);
-  const [iconBrowserOpen, setIconBrowserOpen] = useState(false);
-  const [iconSearch, setIconSearch] = useState("");
+  const [typeBusy, setTypeBusy] = useState(false);
+  const [typeValid, setTypeValid] = useState(false);
+  const [iconUploading, setIconUploading] = useState(false);
 
   const errors = validateTree(tree);
   const node = tree.nodes.find((n) => n.id === selected);
@@ -147,7 +136,7 @@ export default function TreeEditor({
 
     return library.filter((item) => {
       const kind = normalizeLibraryKind(item);
-      if (libraryKind !== "all" && kind !== libraryKind) return false;
+      if (libraryKind !== "" && kind !== libraryKind) return false;
       if (!search) return true;
 
       return (
@@ -157,28 +146,8 @@ export default function TreeEditor({
     });
   }, [library, libraryKind, librarySearch]);
 
-  const libraryCounts = useMemo(
-    () => ({
-      all: library.length,
-      spell: library.filter((item) => normalizeLibraryKind(item) === "spell").length,
-      talent: library.filter((item) => normalizeLibraryKind(item) === "talent").length,
-    }),
-    [library],
-  );
-
-  const databaseIcons = useMemo(() => {
-    const unique = new Map<string, string>();
-    for (const item of library) {
-      const icon = item.icon?.trim();
-      if (!icon || unique.has(icon)) continue;
-      unique.set(icon, spellIconPath(icon));
-    }
-
-    const search = iconSearch.trim().toLowerCase();
-    return [...unique.entries()]
-      .filter(([name]) => !search || name.toLowerCase().includes(search))
-      .sort(([a], [b]) => a.localeCompare(b));
-  }, [library, iconSearch]);
+  const libraryKinds = useMemo(() => ["", ...new Set(library.map(normalizeLibraryKind))], [library]);
+  const libraryCounts = Object.fromEntries(libraryKinds.map(kind => [kind, kind === "" ? library.length : library.filter(item => normalizeLibraryKind(item) === kind).length]));
 
   const updateNode = (patch: Partial<Tree["nodes"][number]>) =>
     onChange({
@@ -192,20 +161,16 @@ export default function TreeEditor({
     setArmedSourceId(item.id);
     setPieceDraft(toPieceDraft(item));
     setPieceSaved(false);
-    setIconBrowserOpen(false);
-    setIconSearch("");
   };
 
   const clearLibraryItem = () => {
     setArmedSourceId(null);
     setPieceDraft(null);
     setPieceSaved(false);
-    setIconBrowserOpen(false);
-    setIconSearch("");
   };
 
   const savePieceChanges = async () => {
-    if (!armedSource || !pieceDraft || pieceSaving) return;
+    if (!armedSource || !pieceDraft || pieceSaving || iconUploading || typeBusy || !typeValid) return;
 
     const name = pieceDraft.name.trim();
     if (!name) {
@@ -268,6 +233,7 @@ export default function TreeEditor({
   };
 
   const addNodeAt = (row: number, column: number) => {
+    if (iconUploading || pieceSaving || typeBusy) return;
     const sourceName = pieceDraft?.name.trim() || armedSource?.name;
     const sourceDescription = pieceDraft?.description ?? armedSource?.description ?? "";
     const sourceIcon = pieceDraft?.icon ?? armedSource?.icon ?? "";
@@ -322,6 +288,7 @@ export default function TreeEditor({
             <button
               type="button"
               className="rounded bg-slate-700 px-2 py-1 text-xs"
+              disabled={iconUploading || pieceSaving || typeBusy}
               onClick={clearLibraryItem}
             >
               Clear
@@ -341,7 +308,7 @@ export default function TreeEditor({
           onChange={(event) => setLibrarySearch(event.target.value)}
         />
 
-        {(["all", "spell", "talent"] as const).map((kind) => (
+        {libraryKinds.map((kind) => (
           <button
             type="button"
             key={kind}
@@ -353,7 +320,7 @@ export default function TreeEditor({
             }`}
             onClick={() => setLibraryKind(kind)}
           >
-            {kind === "all" ? "All" : kind === "spell" ? "Spells" : "Talents"} ({libraryCounts[kind]})
+            {kind === "" ? "All" : kind} ({libraryCounts[kind]})
           </button>
         ))}
       </div>
@@ -365,7 +332,7 @@ export default function TreeEditor({
       {libraryLoading ? (
         <p className="text-slate-400">Loading database pieces...</p>
       ) : (
-        <div className="grid min-w-0 gap-4 lg:grid-cols-[320px_minmax(0,1fr)] lg:items-start">
+        <div className="grid min-w-0 gap-4 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
           <div className="max-h-[560px] overflow-auto pr-1">
             <div className="space-y-2">
               {filteredLibrary.map((item) => {
@@ -384,6 +351,7 @@ export default function TreeEditor({
                         ? "border-amber-400 bg-amber-400/10 ring-1 ring-amber-400"
                         : "border-slate-700 bg-[#151a20] hover:border-slate-500 hover:bg-slate-800"
                     }`}
+                    disabled={iconUploading || pieceSaving || typeBusy}
                     onClick={() => selectLibraryItem(item)}
                   >
                     {icon ? (
@@ -447,24 +415,13 @@ export default function TreeEditor({
                     ID
                     <input className={field} readOnly value={armedSource.id} />
                   </label>
-                  <label className="block">
-                    Type
-                    <select
-                      className={field}
-                      value={pieceDraft.quality}
-                      disabled={pieceSaving}
-                      onChange={(event) => {
-                        setPieceDraft({
-                          ...pieceDraft,
-                          quality: event.target.value as PieceKind,
-                        });
-                        setPieceSaved(false);
-                      }}
-                    >
-                      <option value="spell">spell</option>
-                      <option value="talent">talent</option>
-                    </select>
-                  </label>
+                  <RecordTypePicker key={armedSource.id} value={pieceDraft.quality}
+                    disabled={pieceSaving || iconUploading} onBusyChange={setTypeBusy} onValidityChange={setTypeValid}
+                    onChange={(quality) => { setPieceDraft(current => current ? { ...current, quality } : current); setPieceSaved(false); }}
+                    onCatalogChange={({ previous, next }) => {
+                      setLibrary(current => current.map(item => item.quality === previous ? { ...item, quality: next } : item));
+                      setLibraryKind(current => current === previous ? (next || "") : current);
+                    }} />
                 </div>
 
                 <label className="block">
@@ -472,7 +429,7 @@ export default function TreeEditor({
                   <input
                     className={field}
                     value={pieceDraft.name}
-                    disabled={pieceSaving}
+                    disabled={pieceSaving || iconUploading || typeBusy}
                     onChange={(event) => {
                       setPieceDraft({ ...pieceDraft, name: event.target.value });
                       setPieceSaved(false);
@@ -480,71 +437,10 @@ export default function TreeEditor({
                   />
                 </label>
 
-                <div className="space-y-2">
-                  <label className="block">
-                    Icon
-                    <div className="flex gap-2">
-                      <input
-                        className={field}
-                        value={pieceDraft.icon}
-                        disabled={pieceSaving}
-                        onChange={(event) => {
-                          setPieceDraft({ ...pieceDraft, icon: event.target.value });
-                          setPieceSaved(false);
-                        }}
-                      />
-                      <button
-                        type="button"
-                        className="shrink-0 rounded bg-slate-700 px-3 py-2 hover:bg-slate-600"
-                        onClick={() => setIconBrowserOpen((open) => !open)}
-                      >
-                        {iconBrowserOpen ? "Close icons" : "Browse DB icons"}
-                      </button>
-                    </div>
-                  </label>
-
-                  {iconBrowserOpen ? (
-                    <div className="space-y-2 rounded border border-slate-700 bg-slate-950/70 p-3">
-                      <input
-                        className={field}
-                        type="search"
-                        value={iconSearch}
-                        placeholder="Search icon filenames..."
-                        onChange={(event) => setIconSearch(event.target.value)}
-                      />
-                      <div className="max-h-[300px] overflow-auto pr-1">
-                        <div className="grid grid-cols-[repeat(auto-fill,minmax(70px,1fr))] gap-2">
-                          {databaseIcons.map(([iconName, iconSrc]) => (
-                            <button
-                              type="button"
-                              key={iconName}
-                              title={iconName}
-                              className={`flex min-h-[78px] flex-col items-center justify-center gap-1 rounded border p-1 ${
-                                pieceDraft.icon === iconName
-                                  ? "border-amber-400 bg-amber-400/10"
-                                  : "border-slate-700 bg-[#151a20] hover:border-slate-500"
-                              }`}
-                              onClick={() => {
-                                setPieceDraft({ ...pieceDraft, icon: iconName });
-                                setPieceSaved(false);
-                                setIconBrowserOpen(false);
-                              }}
-                            >
-                              <img
-                                src={iconSrc}
-                                alt=""
-                                className="h-12 w-12 object-cover"
-                              />
-                              <span className="w-full truncate text-center text-[10px] text-slate-400">
-                                {iconName}
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
+                <SpellIconPicker value={pieceDraft.icon} disabled={pieceSaving} onBusyChange={setIconUploading} onChange={(icon) => {
+                  setPieceDraft((current) => current ? { ...current, icon } : current);
+                  setPieceSaved(false);
+                }} />
 
                 <label className="block">
                   Description
@@ -552,7 +448,7 @@ export default function TreeEditor({
                     className={field}
                     rows={6}
                     value={pieceDraft.description}
-                    disabled={pieceSaving}
+                    disabled={pieceSaving || iconUploading || typeBusy}
                     onChange={(event) => {
                       setPieceDraft({ ...pieceDraft, description: event.target.value });
                       setPieceSaved(false);
@@ -565,7 +461,7 @@ export default function TreeEditor({
                   <input
                     className={field}
                     value={pieceDraft.url}
-                    disabled={pieceSaving}
+                    disabled={pieceSaving || iconUploading || typeBusy}
                     onChange={(event) => {
                       setPieceDraft({ ...pieceDraft, url: event.target.value });
                       setPieceSaved(false);
@@ -577,7 +473,7 @@ export default function TreeEditor({
                   <button
                     type="button"
                     className="rounded bg-amber-500 px-4 py-2 font-medium text-slate-950 disabled:opacity-50"
-                    disabled={pieceSaving}
+                    disabled={pieceSaving || iconUploading || typeBusy || !typeValid}
                     onClick={() => void savePieceChanges()}
                   >
                     {pieceSaving ? "Saving..." : "Save changes"}
@@ -585,12 +481,11 @@ export default function TreeEditor({
                   <button
                     type="button"
                     className="rounded bg-slate-700 px-4 py-2 disabled:opacity-50"
-                    disabled={pieceSaving}
+                    disabled={pieceSaving || iconUploading || typeBusy}
                     onClick={() => {
                       setPieceDraft(toPieceDraft(armedSource));
                       setPieceSaved(false);
-                      setIconBrowserOpen(false);
-                    }}
+                                      }}
                   >
                     Reset
                   </button>
@@ -670,7 +565,7 @@ export default function TreeEditor({
             Select a talent to edit or move it. Connections require all parents at maximum rank.
           </p>
 
-          <div className="grid min-w-0 gap-4 xl:grid-cols-[max-content_minmax(420px,1fr)] xl:items-start">
+          <div className="grid min-w-0 gap-4 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:items-start">
             <div className="min-w-0">
               {!errors.length && (
                 <TreeGrid
@@ -687,7 +582,7 @@ export default function TreeEditor({
                 <div className="space-y-3 rounded border border-slate-600 p-4">
                   <h3 className="text-xl">Edit talent</h3>
 
-                  {(["name", "description", "icon"] as const).map((name) => (
+                  {(["name", "description"] as const).map((name) => (
                     <label className="block" key={name}>
                       {name}
                       <textarea
@@ -698,6 +593,8 @@ export default function TreeEditor({
                       />
                     </label>
                   ))}
+
+                  <SpellIconPicker key={node.id} value={node.icon} onChange={(icon) => updateNode({ icon: spellIconPath(icon) })} />
 
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
                     {(["row", "column", "maxRank"] as const).map((name) => (

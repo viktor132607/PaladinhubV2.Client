@@ -17,7 +17,7 @@ function usesAccountLayout(pathname: string) {
 
 function usesAdminLayout(pathname: string) {
   const path = normalizePath(pathname);
-  return path === "/admin" || path.startsWith("/admin/");
+  return path === "/admin" || path.startsWith("/admin/") || path === "/products/create" || path.startsWith("/products/edit/");
 }
 
 export default function Layout() {

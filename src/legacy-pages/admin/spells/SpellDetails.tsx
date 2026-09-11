@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchBackend, readApiJson } from "@/config/api";
+import { spellIconSource } from "@/lib/spell-icons";
 import { Link, useParams } from "@/router/nextCompat";
 
 type SpellDto = {
@@ -56,7 +57,7 @@ export default function SpellDetails() {
   if (loading) return <p>Loading spell...</p>;
   if (!spell) return <><h2>Spell Details</h2><div className="alert alert-danger" role="alert">{error || "Spell not found."}</div><Link className="btn btn-secondary" to="/Admin/Database?entity=Spells">Back</Link></>;
 
-  const iconSource = spell.icon ? `/images/SpellIcons/${encodeURIComponent(spell.icon)}` : "";
+  const iconSource = spellIconSource(spell.icon);
 
   return (
     <>
@@ -78,7 +79,7 @@ export default function SpellDetails() {
           {spell.url ? <a href={spell.url} target="_blank" rel="noopener">{spell.url}</a> : null}
         </dd>
 
-        <dt className="col-sm-3">Quality</dt>
+        <dt className="col-sm-3">Type</dt>
         <dd className="col-sm-9">{spell.quality}</dd>
       </dl>
 

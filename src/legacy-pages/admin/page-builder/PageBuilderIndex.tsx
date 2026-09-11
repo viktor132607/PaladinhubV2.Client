@@ -158,7 +158,7 @@ export default function PageBuilderIndex() {
   );
 
   return (
-    <main className="px-4 py-8 text-slate-100">
+    <main className="admin-page-builder px-4 py-8 text-slate-100">
       <div className="mx-auto max-w-7xl">
         <BuilderNavigation />
 
@@ -209,7 +209,7 @@ export default function PageBuilderIndex() {
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-[940px] text-left text-sm">
+                  <table className="admin-record-table w-full min-w-[940px] text-left text-sm">
                     <thead className="bg-slate-950/70 text-slate-400">
                       <tr>
                         <th className="px-5 py-3 font-medium">Page</th>
@@ -222,16 +222,16 @@ export default function PageBuilderIndex() {
                     <tbody className="divide-y divide-slate-800">
                       {hardcoded.map((page) => (
                         <tr key={`hardcoded:${page.path}`}>
-                          <td className="px-5 py-4 font-medium">{page.title}</td>
-                          <td className="px-5 py-4 font-mono text-slate-300">
+                          <td data-label="Page" className="px-5 py-4 font-medium">{page.title}</td>
+                          <td data-label="Slug" className="px-5 py-4 font-mono text-slate-300">
                             {page.slug}
                           </td>
-                          <td className="px-5 py-4">
+                          <td data-label="Source" className="px-5 py-4">
                             <span className="rounded-full bg-slate-700 px-2.5 py-1 text-xs">
                               Hardcoded constant
                             </span>
                           </td>
-                          <td className="px-5 py-4">
+                          <td data-label="Site status" className="px-5 py-4">
                             <div className="flex items-center gap-2 whitespace-nowrap">
                               <span className="rounded-md bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white">
                                 Active on site
@@ -241,7 +241,7 @@ export default function PageBuilderIndex() {
                               </span>
                             </div>
                           </td>
-                          <td className="px-5 py-4 text-right">
+                          <td data-label="Actions" className="px-5 py-4 text-right">
                             <Link
                               to={page.path}
                               className="rounded bg-slate-700 px-3 py-1.5 hover:bg-slate-600"
@@ -257,16 +257,16 @@ export default function PageBuilderIndex() {
 
                         return (
                           <tr key={`dynamic:${page.id}`}>
-                            <td className="px-5 py-4 font-medium">{page.title}</td>
-                            <td className="px-5 py-4 font-mono text-slate-300">
+                            <td data-label="Page" className="px-5 py-4 font-medium">{page.title}</td>
+                            <td data-label="Slug" className="px-5 py-4 font-mono text-slate-300">
                               {page.slug}
                             </td>
-                            <td className="px-5 py-4">
+                            <td data-label="Source" className="px-5 py-4">
                               <span className="rounded-full bg-amber-500/15 px-2.5 py-1 text-xs text-amber-300">
                                 Page Builder
                               </span>
                             </td>
-                            <td className="px-5 py-4">
+                            <td data-label="Site status" className="px-5 py-4">
                               <div className="flex items-center gap-2 whitespace-nowrap">
                                 <button
                                   type="button"
@@ -294,7 +294,7 @@ export default function PageBuilderIndex() {
                                 </button>
                               </div>
                             </td>
-                            <td className="px-5 py-4">
+                            <td data-label="Actions" className="px-5 py-4">
                               <div className="flex justify-end gap-2">
                                 <Link
                                   to={`/${page.section}/${page.slug}`}

@@ -102,7 +102,7 @@ export default function DeleteSpell() {
             <dt className="col-sm-3">Description</dt>
             <dd className="col-sm-9">{spell.description}</dd>
 
-            <dt className="col-sm-3">Quality</dt>
+            <dt className="col-sm-3">Type</dt>
             <dd className="col-sm-9">{spell.quality}</dd>
           </dl>
 

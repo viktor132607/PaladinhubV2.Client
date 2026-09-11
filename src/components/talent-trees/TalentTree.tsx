@@ -1,4 +1,6 @@
 "use client";
+import { spellIconSource } from "@/lib/spell-icons";
+
 
 import {
   useCallback,
@@ -453,7 +455,7 @@ export default function TalentTree({
                 aria-label={node.name}
               >
                 <img
-                  src={node.icon ?? defaultIconPath(node.name)}
+                  src={node.icon ? spellIconSource(node.icon) : defaultIconPath(node.name)}
                   alt=""
                   aria-hidden="true"
                   className="h-full w-full object-cover"
