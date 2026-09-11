@@ -110,14 +110,14 @@ export default function DeletePage() {
 
   if (loading) {
     return (
-      <main className="px-4 py-12 text-center text-slate-300">
+      <main className="admin-page-builder px-4 py-12 text-center text-slate-300">
         Loading page...
       </main>
     );
   }
 
   return (
-    <main className="px-4 py-8 text-slate-100">
+    <main className="admin-page-builder px-4 py-8 text-slate-100">
       <div className="mx-auto max-w-4xl">
         <BuilderNavigation />
 

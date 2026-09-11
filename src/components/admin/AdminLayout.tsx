@@ -36,6 +36,7 @@ const sidebarSections = [
 
 export default function AdminLayout({ children }: { children?: ReactNode }) {
   const [promoOpen, setPromoOpen] = useState(false);
+  const [sectionsOpen, setSectionsOpen] = useState(false);
   const { pathname } = useLocation();
   const promoRef = useRef<HTMLDivElement>(null);
 
@@ -44,6 +45,7 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
 
   useEffect(() => {
     setPromoOpen(false);
+    setSectionsOpen(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -103,8 +105,11 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
         </nav>
       </header>
 
+      <button type="button" className="admin-sections-toggle" aria-controls="admin-sections" aria-expanded={sectionsOpen} onClick={() => setSectionsOpen((value) => !value)}>
+        Admin sections <span aria-hidden="true">{sectionsOpen ? "−" : "+"}</span>
+      </button>
       <div className="admin-shell">
-        <aside className="admin-shell-sidebar" aria-label="Admin sections">
+        <aside id="admin-sections" className={`admin-shell-sidebar${sectionsOpen ? " is-open" : ""}`} aria-label="Admin sections">
           <div className="admin-shell-sidebar-title">Admin</div>
           {sidebarSections.map((section) => (
             <section className="admin-sidebar-section" key={section.title}>

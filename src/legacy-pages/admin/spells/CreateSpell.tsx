@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
+import RecordTypePicker from "@/components/admin/RecordTypePicker";
+import SpellIconPicker from "@/components/admin/SpellIconPicker";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useNavigate } from "@/router/nextCompat";
 
@@ -44,12 +46,10 @@ export default function CreateSpell() {
   const navigate = useNavigate();
   const [form, setForm] = useState<SpellForm>(initialForm);
   const [saving, setSaving] = useState(false);
+  const [typeBusy, setTypeBusy] = useState(false);
+  const [typeValid, setTypeValid] = useState(false);
+  const [iconUploading, setIconUploading] = useState(false);
   const [error, setError] = useState("");
-
-  const iconSource = useMemo(() => {
-    const icon = form.icon.trim();
-    return icon ? `/images/SpellIcons/${encodeURIComponent(icon)}` : "";
-  }, [form.icon]);
 
   const update = (field: keyof SpellForm, value: string) => {
     setForm((current) => ({ ...current, [field]: value }));
@@ -57,7 +57,7 @@ export default function CreateSpell() {
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (saving) return;
+    if (saving || iconUploading || typeBusy || !typeValid) return;
 
     setError("");
     const name = form.name.trim();
@@ -82,7 +82,7 @@ export default function CreateSpell() {
           icon: form.icon.trim() || null,
           description: form.description.trim() || null,
           url: form.url.trim() || null,
-          quality: form.quality.trim() || "spell",
+          quality: form.quality,
         }),
       });
       await readApiJson<SpellDto>(response);
@@ -109,17 +109,7 @@ export default function CreateSpell() {
           <span className="text-danger">{error === "Name is required." ? error : ""}</span>
         </div>
 
-        <div className="mb-3">
-          <label htmlFor="spell-icon" className="form-label">Icon</label>
-          <input id="spell-icon" name="icon" className="form-control" value={form.icon} onChange={(event) => update("icon", event.target.value)} disabled={saving} />
-          {iconSource ? (
-            <div className="mt-2">
-              <img src={iconSource} alt={form.name} className="img-thumbnail" style={{ maxWidth: 64 }} />
-              <div className="small text-muted">{form.icon}</div>
-            </div>
-          ) : null}
-        </div>
-
+        <div className="mb-3"><SpellIconPicker value={form.icon} onChange={(icon) => update("icon", icon)} disabled={saving} onBusyChange={setIconUploading} /></div>
         <div className="mb-3">
           <label htmlFor="spell-description" className="form-label">Description</label>
           <textarea id="spell-description" name="description" className="form-control" rows={4} value={form.description} onChange={(event) => update("description", event.target.value)} disabled={saving} />
@@ -137,11 +127,10 @@ export default function CreateSpell() {
         </div>
 
         <div className="mb-3">
-          <label htmlFor="spell-quality" className="form-label">Quality</label>
-          <input id="spell-quality" name="quality" className="form-control" value={form.quality} onChange={(event) => update("quality", event.target.value)} disabled={saving} />
+          <RecordTypePicker value={form.quality} onChange={(type) => update("quality", type)} disabled={saving || iconUploading} onBusyChange={setTypeBusy} onValidityChange={setTypeValid} />
         </div>
 
-        <button type="submit" className="btn btn-success" disabled={saving}>{saving ? "Creating..." : "Create"}</button>{" "}
+        <button type="submit" className="btn btn-success" disabled={saving || iconUploading || typeBusy || !typeValid}>{saving ? "Creating..." : "Create"}</button>{" "}
         <Link to="/Admin/Database?entity=Spells" className="btn btn-secondary">Cancel</Link>
       </form>
     </>

@@ -106,7 +106,7 @@ export default function PromoCodes() {
       {message ? <div className="alert alert-success" role="status">{message}</div> : null}
       {error ? <div className="alert alert-danger" role="alert">{error}</div> : null}
 
-      <table className="table table-dark table-striped">
+      <table className="admin-record-table table table-dark table-striped">
         <thead>
           <tr>
             <th>Code</th>
@@ -125,15 +125,15 @@ export default function PromoCodes() {
             <tr><td colSpan={9}>Loading promo codes...</td></tr>
           ) : items.map((promo) => (
             <tr key={promo.id}>
-              <td>{promo.code}</td>
-              <td>{typeLabel(promo.type)}</td>
-              <td>{promo.value}</td>
-              <td>{promo.currency}</td>
-              <td>{promo.maxUses?.toString() ?? "—"}</td>
-              <td>{promo.usedCount}</td>
-              <td>{formatDate(promo.expiresAtUtc)}</td>
-              <td>{promo.isActive ? "Yes" : "No"}</td>
-              <td className="text-end">
+              <td data-label="Code">{promo.code}</td>
+              <td data-label="Type">{typeLabel(promo.type)}</td>
+              <td data-label="Value">{promo.value}</td>
+              <td data-label="Currency">{promo.currency}</td>
+              <td data-label="Max uses">{promo.maxUses?.toString() ?? "—"}</td>
+              <td data-label="Used">{promo.usedCount}</td>
+              <td data-label="Expires">{formatDate(promo.expiresAtUtc)}</td>
+              <td data-label="Active">{promo.isActive ? "Yes" : "No"}</td>
+              <td data-label="Actions" className="text-end">
                 {promo.isActive ? (
                   <form className="d-inline" onSubmit={(event) => { event.preventDefault(); void deactivate(promo.id); }}>
                     <button className="btn btn-sm btn-warning" disabled={Boolean(workingId)}>

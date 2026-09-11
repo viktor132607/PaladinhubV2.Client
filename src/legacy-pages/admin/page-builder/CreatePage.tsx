@@ -455,14 +455,14 @@ export default function CreatePage() {
 
   if (loading) {
     return (
-      <main className="px-4 py-12 text-center text-slate-300">
+      <main className="admin-page-builder px-4 py-12 text-center text-slate-300">
         Loading page...
       </main>
     );
   }
 
   return (
-    <main className="px-4 py-8 text-slate-100">
+    <main className="admin-page-builder px-4 py-8 text-slate-100">
       <div className="mx-auto max-w-7xl">
         <BuilderNavigation />
 
@@ -622,7 +622,7 @@ export default function CreatePage() {
           {blocks.length ? (
             <section className="rounded-xl border border-slate-700 bg-slate-900 p-6">
               <h2 className="mb-5 text-xl font-semibold">Live preview</h2>
-              <div className="rounded-lg bg-slate-950 p-6">
+              <div className="admin-content-preview min-w-0 overflow-x-auto rounded-lg bg-slate-950 p-3 sm:p-6">
                 <DynamicPageContent json={layoutJson} />
               </div>
             </section>

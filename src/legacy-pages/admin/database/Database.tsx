@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { fetchBackend, readApiJson } from "@/config/api";
+import { spellIconSource } from "@/lib/spell-icons";
 import { Link, useSearchParams } from "@/router/nextCompat";
 
 type EntityKind = "Spells" | "Items";
@@ -48,7 +49,7 @@ function positiveInteger(value: unknown, fallback: number): number {
 }
 
 function iconPath(entity: EntityKind, icon: string): string {
-  return `/images/${entity === "Items" ? "ItemIcons" : "SpellIcons"}/${encodeURIComponent(icon)}`;
+  return entity === "Spells" ? spellIconSource(icon) : `/images/ItemIcons/${encodeURIComponent(icon)}`;
 }
 
 export default function Database() {
@@ -152,7 +153,7 @@ export default function Database() {
         {error && <div className="alert alert-danger" role="alert">{error}</div>}
 
         <div className="table-responsive">
-          <table className="table table-dark table-striped align-middle table-wide">
+          <table className="admin-record-table table table-dark table-striped align-middle table-wide">
             <thead>
               <tr>
                 <th className="w-id">Id</th>
@@ -171,15 +172,15 @@ export default function Database() {
                 <tr><td colSpan={entity === "Items" ? 10 : 7}>Loading records...</td></tr>
               ) : records.map((record) => (
                 <tr key={record.id}>
-                  <td>{record.id}</td>
-                  <td className="icon-cell"><Icon entity={entity} name={record.icon} alt={record.name} /></td>
-                  {entity === "Items" && <td className="icon-cell"><Icon entity={entity} name={(record as ItemRow).secondIcon} alt={record.name} /></td>}
-                  <td>{record.name}</td>
-                  <td className="text-trim" title={record.description ?? ""}>{record.description}</td>
-                  <td className="url-cell">{record.url && <a href={record.url} target="_blank" rel="noopener noreferrer">{record.url}</a>}</td>
-                  {entity === "Items" && <><td>{(record as ItemRow).itemLevel}</td><td>{(record as ItemRow).requiredLevel}</td></>}
-                  <td>{record.quality}</td>
-                  <td className="text-end">
+                  <td data-label="Id">{record.id}</td>
+                  <td data-label="Icon" className="icon-cell"><Icon entity={entity} name={record.icon} alt={record.name} /></td>
+                  {entity === "Items" && <td data-label="Second icon" className="icon-cell"><Icon entity={entity} name={(record as ItemRow).secondIcon} alt={record.name} /></td>}
+                  <td data-label="Name">{record.name}</td>
+                  <td data-label="Description" className="text-trim" title={record.description ?? ""}>{record.description}</td>
+                  <td data-label="Url" className="url-cell">{record.url && <a href={record.url} target="_blank" rel="noopener noreferrer">{record.url}</a>}</td>
+                  {entity === "Items" && <><td data-label="Item level">{(record as ItemRow).itemLevel}</td><td data-label="Required level">{(record as ItemRow).requiredLevel}</td></>}
+                  <td data-label="Type">{record.quality}</td>
+                  <td data-label="Actions" className="text-end">
                     <div className="btn-group btn-group-sm" role="group" aria-label={`Actions for ${record.name}`}>
                       <Link className="btn btn-outline-info px-2" to={`/Admin/${entity}/Details/${record.id}`} title="Details" aria-label={`Details for ${record.name}`}><DetailIcon /></Link>
                       <Link className="btn btn-outline-light px-2" to={`/Admin/${entity}/Edit/${record.id}`} title="Edit" aria-label={`Edit ${record.name}`}><EditIcon /></Link>

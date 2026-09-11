@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import Providers from "./providers";
 
@@ -7,6 +7,8 @@ import "../App.css";
 import "../styles/v1-adapter.css";
 import "../styles/v1-navbar-exact.css";
 import "../styles/v1-source-corrections.css";
+
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export const metadata: Metadata = {
   title: "PaladinHub",

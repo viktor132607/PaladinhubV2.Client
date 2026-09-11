@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import RecordTypePicker from "@/components/admin/RecordTypePicker";
+import SpellIconPicker from "@/components/admin/SpellIconPicker";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useNavigate, useParams } from "@/router/nextCompat";
 
@@ -39,14 +41,12 @@ export default function EditSpell() {
   const [spellLoaded, setSpellLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [typeBusy, setTypeBusy] = useState(false);
+  const [typeValid, setTypeValid] = useState(false);
+  const [iconUploading, setIconUploading] = useState(false);
   const [error, setError] = useState("");
   const spellId = Number(id);
   const hasValidId = Number.isInteger(spellId) && spellId > 0;
-
-  const iconSource = useMemo(() => {
-    const icon = form.icon.trim();
-    return icon ? `/images/SpellIcons/${encodeURIComponent(icon)}` : "";
-  }, [form.icon]);
 
   useEffect(() => {
     if (!hasValidId) {
@@ -90,7 +90,7 @@ export default function EditSpell() {
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!hasValidId || !spellLoaded || saving) return;
+    if (!hasValidId || !spellLoaded || saving || iconUploading || typeBusy || !typeValid) return;
     setError("");
     const name = form.name.trim();
     if (!name) {
@@ -114,7 +114,7 @@ export default function EditSpell() {
           icon: form.icon.trim() || null,
           description: form.description.trim() || null,
           url: form.url.trim() || null,
-          quality: form.quality.trim() || "spell",
+          quality: form.quality,
         }),
       });
       await readApiJson<SpellDto>(response);
@@ -139,11 +139,7 @@ export default function EditSpell() {
           <input id="spell-name" name="name" className="form-control" value={form.name} onChange={(event) => update("name", event.target.value)} disabled={saving} />
           <span className="text-danger">{error === "Name is required." ? error : ""}</span>
         </div>
-        <div className="mb-3">
-          <label htmlFor="spell-icon" className="form-label">Icon</label>
-          <input id="spell-icon" name="icon" className="form-control" value={form.icon} onChange={(event) => update("icon", event.target.value)} disabled={saving} />
-          {iconSource ? <div className="mt-2"><img src={iconSource} alt={form.name} className="img-thumbnail" style={{ maxWidth: 64 }} /><div className="small text-muted">{form.icon}</div></div> : null}
-        </div>
+        <div className="mb-3"><SpellIconPicker value={form.icon} onChange={(icon) => update("icon", icon)} disabled={saving} onBusyChange={setIconUploading} /></div>
         <div className="mb-3">
           <label htmlFor="spell-description" className="form-label">Description</label>
           <textarea id="spell-description" name="description" className="form-control" rows={4} value={form.description} onChange={(event) => update("description", event.target.value)} disabled={saving} />
@@ -155,10 +151,9 @@ export default function EditSpell() {
           {form.url.trim() ? <div className="mt-1"><a href={form.url.trim()} target="_blank">{form.url.trim()}</a></div> : null}
         </div>
         <div className="mb-3">
-          <label htmlFor="spell-quality" className="form-label">Quality</label>
-          <input id="spell-quality" name="quality" className="form-control" value={form.quality} onChange={(event) => update("quality", event.target.value)} disabled={saving} />
+          <RecordTypePicker value={form.quality} onChange={(type) => update("quality", type)} disabled={saving || iconUploading} onBusyChange={setTypeBusy} onValidityChange={setTypeValid} />
         </div>
-        <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? "Saving..." : "Save"}</button>{" "}
+        <button type="submit" className="btn btn-primary" disabled={saving || iconUploading || typeBusy || !typeValid}>{saving ? "Saving..." : "Save"}</button>{" "}
         <Link to="/Admin/Database?entity=Spells" className="btn btn-secondary">Cancel</Link>
       </form>
     </>

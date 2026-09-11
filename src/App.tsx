@@ -143,8 +143,8 @@ export default function App() {
           <Route path="/products" element={<Products />} />
           <Route path="/Products/Details/:id" element={<ProductDetails />} />
           <Route path="/products/:id" element={<ProductDetails />} />
-          <Route path="/Products/Create" element={adminPage(<CreateProduct />)} />
-          <Route path="/Products/Edit/:id" element={adminPage(<EditProduct />)} />
+          <Route path="/Products/Create" element={adminPage(<AdminLayout><CreateProduct /></AdminLayout>)} />
+          <Route path="/Products/Edit/:id" element={adminPage(<AdminLayout><EditProduct /></AdminLayout>)} />
 
           <Route path="/Cart/MyCart" element={<Cart />} />
           <Route path="/cart" element={<Cart />} />

@@ -610,9 +610,9 @@ export default function TalentTrees() {
   }
 
   return (
-    <main className="min-h-[calc(100vh-45px)] w-full max-w-none bg-slate-950 text-slate-100">
+    <main className="admin-talent-workspace min-h-[calc(100vh-45px)] w-full max-w-none bg-slate-950 text-slate-100">
       <div className="flex min-h-[calc(100vh-45px)] w-full max-w-none items-stretch">
-        <aside className="sticky top-0 h-screen w-[320px] shrink-0 overflow-y-auto border-r border-slate-700 bg-[#0b1020] p-4">
+        <aside className="admin-talent-sources sticky top-0 h-screen w-[320px] shrink-0 overflow-y-auto border-r border-slate-700 bg-[#0b1020] p-4">
           <BuilderNavigation />
 
           <div className="mb-5 mt-4 flex gap-2">

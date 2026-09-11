@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/auth/AuthContext";
-import { Link } from "@/router/nextCompat";
+import { Link, useLocation } from "@/router/nextCompat";
 import AuthMenu from "./AuthMenu";
 
 const guidePages = [
@@ -22,6 +22,9 @@ function GuideMenu({
   section: "Holy" | "Protection" | "Retribution";
   isAdmin: boolean;
 }) {
+  const [expanded, setExpanded] = useState(false);
+  const { pathname } = useLocation();
+  useEffect(() => setExpanded(false), [pathname]);
   return (
     <li className="nav-item dropdown">
       <Link
@@ -29,14 +32,22 @@ function GuideMenu({
         className="nav-link dropdown-toggle"
         id={`${section.toLowerCase()}Dropdown`}
         role="button"
+        aria-expanded={expanded}
+        onClick={(event) => {
+          if (event.currentTarget.closest(".ph-admin") && window.matchMedia("(max-width: 1199.98px)").matches) {
+            event.preventDefault();
+            setExpanded((value) => !value);
+          }
+        }}
       >
         {label}{" "}
       </Link>
 
       <ul
-        className="dropdown-menu"
+        className={`dropdown-menu${expanded ? " show" : ""}`}
         aria-labelledby={`${section.toLowerCase()}Dropdown`}
       >
+        <li className="guide-mobile-overview"><Link to={`/${section}/Overview`} className="dropdown-item">Overview</Link></li>
         {guidePages.map(([title, slug]) => (
           <li className="position-relative" key={slug}>
             <Link
@@ -82,6 +93,8 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
   const { hasRole } = useAuth();
   const [open, setOpen] = useState(false);
   const isAdmin = hasRole("Admin");
+  const { pathname } = useLocation();
+  useEffect(() => setOpen(false), [pathname]);
 
   useEffect(() => {
     if (forceVisible) return;
@@ -121,13 +134,14 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
             className="navbar-toggler"
             type="button"
             aria-label="Toggle navigation"
+            aria-controls="primary-navigation"
             aria-expanded={open}
             onClick={() => setOpen((value) => !value)}
           >
-            <span className="navbar-toggler-icon" />
+            <span className="navbar-toggler-icon" aria-hidden="true" />
           </button>
 
-          <div className={`navbar-collapse collapse d-sm-inline-flex justify-content-between${open ? " show" : ""}`}>
+          <div id="primary-navigation" className={`navbar-collapse collapse d-sm-inline-flex justify-content-between${open ? " show" : ""}`}>
             <ul className="navbar-nav">
               <li className="nav-item">
                 <Link to="/Home/Home" className="nav-link">Home</Link>

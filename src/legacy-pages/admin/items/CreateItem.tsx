@@ -122,7 +122,6 @@ export default function CreateItem() {
         </div>
 
         <div className="mb-3">
-          dotnet add package Microsoft.Extensions.Caching.Postgresdotnet add package Microsoft.Extensions.Caching.Postgres
           <label htmlFor="item-description" className="form-label">Description</label>
           <textarea id="item-description" name="description" className="form-control" value={form.description} onChange={(event) => update("description", event.target.value)} disabled={saving} />
         </div>

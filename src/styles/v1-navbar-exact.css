@@ -52,3 +52,5 @@
 .ph-v1-navbar .nav-link:has(.ph-v1-nav-icon) {
     white-space: nowrap !important;
 }
+
+.guide-mobile-overview { display: none; }
