@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import TemplateLibrary from "@/components/admin/page-builder/TemplateLibrary";
 import BuilderNavigation from "@/components/admin/page-builder/BuilderNavigation";
 import DynamicPageContent from "@/components/dynamic-talents/DynamicPageContent";
 import {
@@ -588,6 +589,8 @@ export default function CreatePage() {
               ))}
             </div>
           </section>
+
+          <TemplateLibrary content={layoutJson} onInsert={json => setBlocks(current => [...current, ...parseLayout(json)])} />
 
           <section className="rounded-xl border border-slate-700 bg-slate-900 p-6">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
