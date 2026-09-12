@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
+import TemplateLibrary from "@/components/admin/page-builder/TemplateLibrary";
 import RecordTypePicker from "@/components/admin/RecordTypePicker";
 import CategoryPicker from "@/components/admin/CategoryPicker";
 import ClassPicker from "@/components/admin/ClassPicker";
@@ -543,6 +544,12 @@ export default function TreeEditor({
 
   return (
     <div className="min-w-0 space-y-4">
+      <TemplateLibrary kind="talent-tree" content={JSON.stringify([tree])} onInsert={json => {
+        const next = JSON.parse(json)[0] as Tree;
+        const problems = validateTree(next);
+        if (problems.length) throw new Error(problems.join(" "));
+        onChange(next); setSelected(""); setArmedSourceId(null); setPieceDraft(null);
+      }} />
       <label className="block">
         Tree title
         <input

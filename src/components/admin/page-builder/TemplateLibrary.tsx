@@ -86,7 +86,7 @@ export default function TemplateLibrary({ content, onInsert, kind = "block" }: {
       <div className="flex flex-wrap gap-2">
         <button type="button" className={button} disabled={!name.trim() || !blocks.length} onClick={() => void save("create")}>Save as new template</button>
         {selected && <>
-          <button type="button" className={button} disabled={!active} onClick={() => { onInsert(copyTemplate(selected.jsonLayout)); setNotice("Copy loaded in the builder. Save the page to publish your changes."); }}>Insert copy</button>
+          <button type="button" className={button} disabled={!active} onClick={() => { if (kind === "talent-tree" && !window.confirm("Replace the current tree with this template? Unsaved edits to this tree will be replaced.")) return; void run(async () => { onInsert(copyTemplate(selected.jsonLayout)); setNotice("Copy loaded in the builder. Save the page to publish your changes."); }); }}>{kind === "talent-tree" ? "Replace current tree" : "Insert copy"}</button>
           <button type="button" className={button} disabled={!active || !name.trim()} onClick={() => void save("metadata")}>Save name & description</button>
           <button type="button" className={button} disabled={!active || !name.trim() || !blocks.length} onClick={() => { if (window.confirm("Replace template content with the selected builder content?")) void save("content"); }}>Replace template content</button>
           {!selected.isDeleted && <><button type="button" className={button} onClick={() => void change(selected.isArchived ? "unarchive" : "archive")}>{selected.isArchived ? "Unarchive" : "Archive"}</button><button type="button" className={button} onClick={() => void change("delete")}>Delete template</button></>}

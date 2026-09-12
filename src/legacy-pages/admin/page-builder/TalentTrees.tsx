@@ -892,13 +892,10 @@ export default function TalentTrees() {
                   <TreeEditor
                     key={activeTree.id}
                     tree={activeTree}
-                    onChange={(next) =>
-                      markChanged(
-                        trees.map((tree) =>
-                          tree.id === activeTree.id ? next : tree,
-                        ),
-                      )
-                    }
+                    onChange={(next) => {
+                      markChanged(trees.map((tree) => tree.id === activeTree.id ? next : tree));
+                      setActiveTreeId(next.id);
+                    }}
                   />
 
                   <button
