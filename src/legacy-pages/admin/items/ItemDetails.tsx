@@ -1,6 +1,7 @@
 "use client";
 import { CategoryLabel } from "@/components/admin/CategoryPicker";
 import { ClassLabel } from "@/components/admin/ClassPicker";
+import { RarityLabel } from "@/components/admin/RarityPicker";
 import { PatchLabel } from "@/components/admin/PatchPicker";
 import { TagLabel } from "@/components/admin/TagPicker";
 
@@ -11,6 +12,7 @@ import { Link, useParams } from "@/router/nextCompat";
 type ItemDto = {
   tagIds?: number[];
   patchId?: number | null;
+  rarityId?: number | null;
   disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
@@ -126,8 +128,8 @@ export default function ItemDetails() {
         <dt className="col-sm-3">Required Level</dt>
         <dd className="col-sm-9">{item.requiredLevel}</dd>
 
-        <dt className="col-sm-3">Quality</dt>
-        <dd className="col-sm-9">{item.quality}</dd>
+        <dt className="col-sm-3">Rarity</dt>
+        <dd className="col-sm-9"><RarityLabel value={item.rarityId} /></dd>
       </dl>
 
       <Link to="/Admin/Database?entity=Items" className="btn btn-secondary">Back</Link>

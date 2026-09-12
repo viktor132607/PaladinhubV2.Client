@@ -32,6 +32,7 @@ import TransactionHistory from "@/pages/account/TransactionHistory";
 import AdminDatabase from "@/pages/admin/database/Database";
 import AdminCategories from "@/pages/admin/categories/Categories";
 import AdminClasses from "@/pages/admin/classes/Classes";
+import AdminRarities from "@/pages/admin/rarities/Rarities";
 import AdminPatches from "@/pages/admin/patches/Patches";
 import AdminTags from "@/pages/admin/tags/Tags";
 import CreateItem from "@/pages/admin/items/CreateItem";
@@ -200,6 +201,7 @@ export default function App() {
             <Route path="Database" element={<AdminDatabase />} />
             <Route path="Categories" element={<AdminCategories />} />
             <Route path="Classes" element={<AdminClasses />} />
+            <Route path="Rarities" element={<AdminRarities />} />
             <Route path="Patches" element={<AdminPatches />} />
             <Route path="Tags" element={<AdminTags />} />
             <Route path="Database/Index" element={<AdminDatabase />} />

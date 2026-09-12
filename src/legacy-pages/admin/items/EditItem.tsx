@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import CategoryPicker from "@/components/admin/CategoryPicker";
 import ClassPicker from "@/components/admin/ClassPicker";
+import RarityPicker from "@/components/admin/RarityPicker";
 import PatchPicker from "@/components/admin/PatchPicker";
 import TagPicker from "@/components/admin/TagPicker";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
@@ -12,6 +13,7 @@ type ItemDto = {
   disciplineId?: number | null;
   tagIds?: number[];
   patchId?: number | null;
+  rarityId?: number | null;
   categoryId?: number | null;
   id: number;
   name: string;
@@ -71,6 +73,7 @@ export default function EditItem() {
   const [form, setForm] = useState<ItemFormState>(emptyForm);
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [disciplineId, setDisciplineId] = useState<number | null>(null);
+  const [rarityId, setRarityId] = useState<number | null>(null);
   const [patchId, setPatchId] = useState<number | null>(null);
   const [tagIds, setTagIds] = useState<number[]>([]);
   const [itemLoaded, setItemLoaded] = useState(false);
@@ -115,6 +118,7 @@ export default function EditItem() {
         setDisciplineId(item.disciplineId ?? null);
         setTagIds(item.tagIds ?? []);
         setPatchId(item.patchId ?? null);
+        setRarityId(item.rarityId ?? null);
       } catch (caught) {
         if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : "The item could not be loaded.");
       } finally {
@@ -164,6 +168,7 @@ export default function EditItem() {
           disciplineId,
           tagIds,
           patchId,
+          rarityId,
         }),
       });
       await readApiJson<ItemDto>(response);
@@ -236,10 +241,7 @@ export default function EditItem() {
           <input id="item-required-level" name="requiredLevel" className="form-control" type="number" step={1} value={form.requiredLevel} onChange={(event) => update("requiredLevel", event.target.value)} disabled={saving} />
         </div>
 
-        <div className="mb-3">
-          <label htmlFor="item-quality" className="form-label">Quality</label>
-          <input id="item-quality" name="quality" className="form-control" value={form.quality} onChange={(event) => update("quality", event.target.value)} disabled={saving} />
-        </div>
+        <RarityPicker value={rarityId} onChange={setRarityId} disabled={saving} />
 
         <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? "Saving..." : "Save"}</button>{" "}
         <Link to="/Admin/Database?entity=Items" className="btn btn-secondary">Cancel</Link>

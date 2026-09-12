@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import CategoryPicker from "@/components/admin/CategoryPicker";
 import ClassPicker from "@/components/admin/ClassPicker";
+import RarityPicker from "@/components/admin/RarityPicker";
 import PatchPicker from "@/components/admin/PatchPicker";
 import TagPicker from "@/components/admin/TagPicker";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
@@ -54,6 +55,7 @@ export default function CreateItem() {
   const [form, setForm] = useState<ItemFormState>(initialState);
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [disciplineId, setDisciplineId] = useState<number | null>(null);
+  const [rarityId, setRarityId] = useState<number | null>(null);
   const [patchId, setPatchId] = useState<number | null>(null);
   const [tagIds, setTagIds] = useState<number[]>([]);
   const [error, setError] = useState("");
@@ -97,6 +99,7 @@ export default function CreateItem() {
           disciplineId,
           tagIds,
           patchId,
+          rarityId,
         }),
       });
       await readApiJson<unknown>(response);
@@ -157,10 +160,7 @@ export default function CreateItem() {
           <input id="item-required-level" name="requiredLevel" className="form-control" type="number" step={1} value={form.requiredLevel} onChange={(event) => update("requiredLevel", event.target.value)} disabled={saving} />
         </div>
 
-        <div className="mb-3">
-          <label htmlFor="item-quality" className="form-label">Quality</label>
-          <input id="item-quality" name="quality" className="form-control" value={form.quality} onChange={(event) => update("quality", event.target.value)} disabled={saving} />
-        </div>
+        <RarityPicker value={rarityId} onChange={setRarityId} disabled={saving} />
 
         <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? "Saving..." : "Save"}</button>{" "}
         <Link to="/Admin/Database?entity=Items" className="btn btn-secondary">Cancel</Link>

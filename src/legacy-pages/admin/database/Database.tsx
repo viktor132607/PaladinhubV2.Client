@@ -11,6 +11,7 @@ type EntityKind = "Spells" | "Items";
 type ItemRow = {
   tagIds?: number[];
   patchId?: number | null;
+  rarityId?: number | null;
   disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
@@ -27,6 +28,7 @@ type ItemRow = {
 type SpellRow = {
   tagIds?: number[];
   patchId?: number | null;
+  rarityId?: number | null;
   disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
@@ -87,6 +89,16 @@ export default function Database() {
       .catch(error => { if (!controller.signal.aborted) setPatchError(error.message); });
     return () => controller.abort();
   }, []);
+  const rarityId = searchParams.get("rarityId") ?? "";
+  const [rarities, setRarities] = useState<Category[]>([]);
+  const [rarityError, setRarityError] = useState("");
+  useEffect(() => {
+    const controller = new AbortController();
+    void adminRequest<Category[]>("/Admin/api/rarities", "GET", undefined, controller.signal)
+      .then(result => { if (!controller.signal.aborted) setRarities(result); })
+      .catch(error => { if (!controller.signal.aborted) setRarityError(error.message); });
+    return () => controller.abort();
+  }, []);
   const [disciplines, setDisciplines] = useState<Category[]>([]);
   const [disciplineError, setDisciplineError] = useState("");
   useEffect(() => {
@@ -126,6 +138,7 @@ export default function Database() {
         if (disciplineId !== "") query.set("disciplineId", disciplineId);
         if (tagId !== "") query.set("tagId", tagId);
         if (patchId !== "") query.set("patchId", patchId);
+        if (rarityId !== "") query.set("rarityId", rarityId);
         const response = await fetchBackend(`${databaseEndpoint}?${query.toString()}`, {
           headers: { Accept: "application/json" },
           cache: "no-store",
@@ -144,7 +157,7 @@ export default function Database() {
     };
     void load();
     return () => controller.abort();
-  }, [entity, page, pageSize, search, categoryId, disciplineId, tagId, patchId]);
+  }, [entity, page, pageSize, search, categoryId, disciplineId, tagId, patchId, rarityId]);
 
   const records = useMemo<ItemRow[] | SpellRow[]>(
     () => entity === "Items" ? data.items ?? [] : data.spells ?? [],
@@ -171,6 +184,7 @@ export default function Database() {
     if (disciplineId !== "") query.set("disciplineId", disciplineId);
     if (tagId !== "") query.set("tagId", tagId);
     if (patchId !== "") query.set("patchId", patchId);
+    if (rarityId !== "") query.set("rarityId", rarityId);
     Object.entries(changes).forEach(([key, value]) => query.set(key, String(value)));
     return `/Admin/Database?${query.toString()}`;
   };
@@ -182,6 +196,7 @@ export default function Database() {
     if (disciplineId !== "") next.set("disciplineId", disciplineId);
     if (tagId !== "") next.set("tagId", tagId);
     if (patchId !== "") next.set("patchId", patchId);
+    if (rarityId !== "") next.set("rarityId", rarityId);
     const nextSearch = searchInput.trim();
     if (nextSearch) next.set("search", nextSearch);
     setSearchParams(next);
@@ -208,6 +223,12 @@ export default function Database() {
               <option value="">All patches</option><option value="0">No patches</option>
               {patches.filter(patch => !patch.isDeleted).map(patch => <option key={patch.id} value={patch.id}>{patch.name}{patch.isArchived ? " (archived)" : ""}</option>)}
             </select>
+            {entity === "Items" && <>
+            <select className="form-select" aria-label="Filter by rarity" value={rarityId} onChange={event => changeQuery({ rarityId: event.target.value, page: 1 })}>
+              <option value="">All rarities</option><option value="0">No rarities</option>
+              {rarities.filter(rarity => !rarity.isDeleted).map(rarity => <option key={rarity.id} value={rarity.id}>{rarity.name}{rarity.isArchived ? " (archived)" : ""}</option>)}
+            </select>
+            </>}
           </div>
           <div className="col-12 col-md-auto">
             <select className="form-select" aria-label="Filter by class or specialization" value={disciplineId} onChange={event => changeQuery({ disciplineId: event.target.value, page: 1 })}>
@@ -236,6 +257,7 @@ export default function Database() {
         {error && <div className="alert alert-danger" role="alert">{error}</div>}
         {categoryError && <div className="alert alert-danger" role="alert">Categories: {categoryError}</div>}
         {disciplineError && <div className="alert alert-danger" role="alert">Classes: {disciplineError}</div>}
+        {rarityError && <div className="alert alert-danger" role="alert">Rarities: {rarityError}</div>}
         {patchError && <div className="alert alert-danger" role="alert">Patches: {patchError}</div>}
         {tagError && <div className="alert alert-danger" role="alert">Tags: {tagError}</div>}
 
@@ -250,7 +272,7 @@ export default function Database() {
                 <th>Description</th>
                 <th>Url</th>
                 {entity === "Items" && <><th>ItemLevel</th><th>RequiredLevel</th></>}
-                <th>Type</th>
+                <th>{entity === "Items" ? "Rarity" : "Type"}</th>
                 <th>Category</th>
                 <th>Class / specialization</th>
                 <th>Tags</th><th>Patch</th>
@@ -269,7 +291,7 @@ export default function Database() {
                   <td data-label="Description" className="text-trim" title={record.description ?? ""}>{record.description}</td>
                   <td data-label="Url" className="url-cell">{record.url && <a href={record.url} target="_blank" rel="noopener noreferrer">{record.url}</a>}</td>
                   {entity === "Items" && <><td data-label="Item level">{(record as ItemRow).itemLevel}</td><td data-label="Required level">{(record as ItemRow).requiredLevel}</td></>}
-                  <td data-label="Type">{record.quality}</td>
+                  <td data-label={entity === "Items" ? "Rarity" : "Type"} style={entity === "Items" ? { color: (rarities.find(r => r.id === record.rarityId) as Category & { color?: string })?.color } : undefined}>{entity === "Items" ? rarities.find(r => r.id === record.rarityId)?.name ?? record.quality ?? "No rarity" : record.quality}</td>
                   <td data-label="Category">{record.categoryId ? categoryPath(record.categoryId, categories) : "Uncategorized"}</td>
                   <td data-label="Class / specialization">{record.disciplineId ? categoryPath(record.disciplineId, disciplines) : "All classes"}</td>
                   <td data-label="Tags">{record.tagIds?.map(id => tags.find(tag => tag.id === id)?.name ?? `Tag #${id}`).join(", ") || "No tags"}</td>
