@@ -1,11 +1,13 @@
 "use client";
 import { CategoryLabel } from "@/components/admin/CategoryPicker";
+import { ClassLabel } from "@/components/admin/ClassPicker";
 
 import { useEffect, useState } from "react";
 import { fetchBackend, readApiJson } from "@/config/api";
 import { Link, useParams } from "@/router/nextCompat";
 
 type ItemDto = {
+  disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
   name: string;
@@ -75,6 +77,8 @@ export default function ItemDetails() {
       <h2>Item Details</h2>
 
       <dl className="row">
+        <dt className="col-sm-3">Class / specialization</dt>
+        <dd className="col-sm-9"><ClassLabel value={item.disciplineId} /></dd>
         <dt className="col-sm-3">Category</dt>
         <dd className="col-sm-9"><CategoryLabel value={item.categoryId} /></dd>
         <dt className="col-sm-3">Name</dt>

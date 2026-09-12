@@ -31,6 +31,7 @@ import TransactionHistory from "@/pages/account/TransactionHistory";
 
 import AdminDatabase from "@/pages/admin/database/Database";
 import AdminCategories from "@/pages/admin/categories/Categories";
+import AdminClasses from "@/pages/admin/classes/Classes";
 import CreateItem from "@/pages/admin/items/CreateItem";
 import DeleteItem from "@/pages/admin/items/DeleteItem";
 import EditItem from "@/pages/admin/items/EditItem";
@@ -196,6 +197,7 @@ export default function App() {
             <Route index element={<AdminDatabase />} />
             <Route path="Database" element={<AdminDatabase />} />
             <Route path="Categories" element={<AdminCategories />} />
+            <Route path="Classes" element={<AdminClasses />} />
             <Route path="Database/Index" element={<AdminDatabase />} />
 
             <Route path="Items/Create" element={<CreateItem />} />

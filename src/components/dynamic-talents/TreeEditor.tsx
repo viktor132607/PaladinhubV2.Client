@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import RecordTypePicker from "@/components/admin/RecordTypePicker";
 import CategoryPicker from "@/components/admin/CategoryPicker";
+import ClassPicker from "@/components/admin/ClassPicker";
 import SpellIconPicker from "@/components/admin/SpellIconPicker";
 import { spellIconSource as spellIconPath } from "@/lib/spell-icons";
 import TreeView, { TreeGrid } from "./TreeView";
@@ -20,6 +21,7 @@ type LibraryKind = string;
 type PieceKind = string;
 
 type SpellLibraryItem = {
+  disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
   name: string;
@@ -39,6 +41,7 @@ type SpellDatabasePage = {
 type CsrfResponse = { token?: string };
 
 type PieceDraft = {
+  disciplineId: number | null;
   categoryId: number | null;
   name: string;
   icon: string;
@@ -60,6 +63,7 @@ function toPieceDraft(item: SpellLibraryItem): PieceDraft {
     url: item.url ?? "",
     quality: normalizeLibraryKind(item),
     categoryId: item.categoryId ?? null,
+    disciplineId: item.disciplineId ?? null,
   };
 }
 
@@ -209,6 +213,7 @@ export default function TreeEditor({
           url: pieceDraft.url.trim() || null,
           quality: pieceDraft.quality,
           categoryId: pieceDraft.categoryId,
+          disciplineId: pieceDraft.disciplineId,
         }),
       });
 
@@ -222,6 +227,7 @@ export default function TreeEditor({
         url: updated.url ?? (pieceDraft.url.trim() || null),
         quality: updated.quality ?? pieceDraft.quality,
         categoryId: updated.categoryId ?? null,
+        disciplineId: updated.disciplineId ?? null,
       };
 
       setLibrary((current) =>
@@ -445,6 +451,9 @@ export default function TreeEditor({
 
                 <CategoryPicker value={pieceDraft.categoryId} disabled={pieceSaving || iconUploading || typeBusy} onChange={categoryId => {
                   setPieceDraft(current => current ? { ...current, categoryId } : current); setPieceSaved(false);
+                }} />
+                <ClassPicker value={pieceDraft.disciplineId} disabled={pieceSaving || iconUploading || typeBusy} onChange={disciplineId => {
+                  setPieceDraft(current => current ? { ...current, disciplineId } : current); setPieceSaved(false);
                 }} />
                 <SpellIconPicker value={pieceDraft.icon} disabled={pieceSaving} onBusyChange={setIconUploading} onChange={(icon) => {
                   setPieceDraft((current) => current ? { ...current, icon } : current);

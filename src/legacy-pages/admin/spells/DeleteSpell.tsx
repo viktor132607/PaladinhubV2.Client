@@ -1,11 +1,13 @@
 "use client";
 import { CategoryLabel } from "@/components/admin/CategoryPicker";
+import { ClassLabel } from "@/components/admin/ClassPicker";
 
 import { useEffect, useState, type FormEvent } from "react";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useNavigate, useParams } from "@/router/nextCompat";
 
 type SpellDto = {
+  disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
   name: string;
@@ -98,6 +100,8 @@ export default function DeleteSpell() {
         <>
           <p>Are you sure you want to delete this spell?</p>
           <dl className="row">
+            <dt className="col-sm-3">Class / specialization</dt>
+            <dd className="col-sm-9"><ClassLabel value={spell.disciplineId} /></dd>
             <dt className="col-sm-3">Category</dt>
             <dd className="col-sm-9"><CategoryLabel value={spell.categoryId} /></dd>
             <dt className="col-sm-3">Name</dt>

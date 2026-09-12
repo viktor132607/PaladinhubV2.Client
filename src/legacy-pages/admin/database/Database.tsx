@@ -9,6 +9,7 @@ import { Link, useSearchParams } from "@/router/nextCompat";
 type EntityKind = "Spells" | "Items";
 
 type ItemRow = {
+  disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
   name: string;
@@ -22,6 +23,7 @@ type ItemRow = {
 };
 
 type SpellRow = {
+  disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
   name: string;
@@ -60,6 +62,16 @@ export default function Database() {
   const entity = normalizeEntity(searchParams.get("entity"));
   const search = searchParams.get("search")?.trim() ?? "";
   const categoryId = searchParams.get("categoryId") ?? "";
+  const disciplineId = searchParams.get("disciplineId") ?? "";
+  const [disciplines, setDisciplines] = useState<Category[]>([]);
+  const [disciplineError, setDisciplineError] = useState("");
+  useEffect(() => {
+    const controller = new AbortController();
+    void adminRequest<Category[]>("/Admin/api/classes", "GET", undefined, controller.signal)
+      .then(result => { if (!controller.signal.aborted) setDisciplines(result); })
+      .catch(error => { if (!controller.signal.aborted) setDisciplineError(error.message); });
+    return () => controller.abort();
+  }, []);
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryError, setCategoryError] = useState("");
   useEffect(() => {
@@ -87,6 +99,7 @@ export default function Database() {
       try {
         const query = new URLSearchParams({ entity, search, page: String(page), pageSize: String(pageSize) });
         if (categoryId !== "") query.set("categoryId", categoryId);
+        if (disciplineId !== "") query.set("disciplineId", disciplineId);
         const response = await fetchBackend(`${databaseEndpoint}?${query.toString()}`, {
           headers: { Accept: "application/json" },
           cache: "no-store",
@@ -105,7 +118,7 @@ export default function Database() {
     };
     void load();
     return () => controller.abort();
-  }, [entity, page, pageSize, search, categoryId]);
+  }, [entity, page, pageSize, search, categoryId, disciplineId]);
 
   const records = useMemo<ItemRow[] | SpellRow[]>(
     () => entity === "Items" ? data.items ?? [] : data.spells ?? [],
@@ -129,6 +142,7 @@ export default function Database() {
   const queryUrl = (changes: Record<string, string | number>) => {
     const query = new URLSearchParams({ entity, search, page: String(page), pageSize: String(pageSize) });
     if (categoryId !== "") query.set("categoryId", categoryId);
+    if (disciplineId !== "") query.set("disciplineId", disciplineId);
     Object.entries(changes).forEach(([key, value]) => query.set(key, String(value)));
     return `/Admin/Database?${query.toString()}`;
   };
@@ -137,6 +151,7 @@ export default function Database() {
     event.preventDefault();
     const next = new URLSearchParams({ entity });
     if (categoryId !== "") next.set("categoryId", categoryId);
+    if (disciplineId !== "") next.set("disciplineId", disciplineId);
     const nextSearch = searchInput.trim();
     if (nextSearch) next.set("search", nextSearch);
     setSearchParams(next);
@@ -154,6 +169,12 @@ export default function Database() {
         </ul>
 
         <form onSubmit={submitSearch} className="row g-2 mb-3">
+          <div className="col-12 col-md-auto">
+            <select className="form-select" aria-label="Filter by class or specialization" value={disciplineId} onChange={event => changeQuery({ disciplineId: event.target.value, page: 1 })}>
+              <option value="">All classes / specializations</option><option value="0">Unrestricted records</option>
+              {disciplines.filter(entry => !entry.isDeleted).map(entry => <option key={entry.id} value={entry.id}>{categoryPath(entry.id, disciplines)}{entry.isArchived ? " (archived)" : ""}</option>)}
+            </select>
+          </div>
           <div className="col-12 col-md-auto">
             <select className="form-select" aria-label="Filter by category" value={categoryId} onChange={event => changeQuery({ categoryId: event.target.value, page: 1 })}>
               <option value="">All categories</option><option value="0">Uncategorized</option>
@@ -174,6 +195,7 @@ export default function Database() {
 
         {error && <div className="alert alert-danger" role="alert">{error}</div>}
         {categoryError && <div className="alert alert-danger" role="alert">Categories: {categoryError}</div>}
+        {disciplineError && <div className="alert alert-danger" role="alert">Classes: {disciplineError}</div>}
 
         <div className="table-responsive">
           <table className="admin-record-table table table-dark table-striped align-middle table-wide">
@@ -188,12 +210,13 @@ export default function Database() {
                 {entity === "Items" && <><th>ItemLevel</th><th>RequiredLevel</th></>}
                 <th>Type</th>
                 <th>Category</th>
+                <th>Class / specialization</th>
                 <th className="w-actions text-end">Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={entity === "Items" ? 11 : 8}>Loading records...</td></tr>
+                <tr><td colSpan={entity === "Items" ? 12 : 9}>Loading records...</td></tr>
               ) : records.map((record) => (
                 <tr key={record.id}>
                   <td data-label="Id">{record.id}</td>
@@ -205,6 +228,7 @@ export default function Database() {
                   {entity === "Items" && <><td data-label="Item level">{(record as ItemRow).itemLevel}</td><td data-label="Required level">{(record as ItemRow).requiredLevel}</td></>}
                   <td data-label="Type">{record.quality}</td>
                   <td data-label="Category">{record.categoryId ? categoryPath(record.categoryId, categories) : "Uncategorized"}</td>
+                  <td data-label="Class / specialization">{record.disciplineId ? categoryPath(record.disciplineId, disciplines) : "All classes"}</td>
                   <td data-label="Actions" className="text-end">
                     <div className="btn-group btn-group-sm" role="group" aria-label={`Actions for ${record.name}`}>
                       <Link className="btn btn-outline-info px-2" to={`/Admin/${entity}/Details/${record.id}`} title="Details" aria-label={`Details for ${record.name}`}><DetailIcon /></Link>

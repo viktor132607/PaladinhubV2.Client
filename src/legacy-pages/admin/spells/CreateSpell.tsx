@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import RecordTypePicker from "@/components/admin/RecordTypePicker";
 import CategoryPicker from "@/components/admin/CategoryPicker";
+import ClassPicker from "@/components/admin/ClassPicker";
 import SpellIconPicker from "@/components/admin/SpellIconPicker";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useNavigate } from "@/router/nextCompat";
@@ -47,6 +48,7 @@ export default function CreateSpell() {
   const navigate = useNavigate();
   const [form, setForm] = useState<SpellForm>(initialForm);
   const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [disciplineId, setDisciplineId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [typeBusy, setTypeBusy] = useState(false);
   const [typeValid, setTypeValid] = useState(false);
@@ -86,6 +88,7 @@ export default function CreateSpell() {
           url: form.url.trim() || null,
           quality: form.quality,
           categoryId,
+          disciplineId,
         }),
       });
       await readApiJson<SpellDto>(response);
@@ -107,6 +110,7 @@ export default function CreateSpell() {
 
       <form onSubmit={submit}>
         <CategoryPicker value={categoryId} onChange={setCategoryId} disabled={saving} />
+        <ClassPicker value={disciplineId} onChange={setDisciplineId} disabled={saving} />
         <div className="mb-3">
           <label htmlFor="spell-name" className="form-label">Name</label>
           <input id="spell-name" name="name" className="form-control" value={form.name} onChange={(event) => update("name", event.target.value)} disabled={saving} />
