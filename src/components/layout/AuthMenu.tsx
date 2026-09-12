@@ -1,10 +1,12 @@
 "use client";
 
+import { useLocalization } from "@/localization/LocalizationContext";
 import { useState } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import { Link, useNavigate } from "@/router/nextCompat";
 
 export default function AuthMenu() {
+  const { t } = useLocalization();
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -16,10 +18,10 @@ export default function AuthMenu() {
     return (
       <>
         <li className="nav-item">
-          <Link className="nav-link" to="/Account/Login">Login</Link>
+          <Link className="nav-link" to="/Account/Login">{t("Login")}</Link>
         </li>
         <li className="nav-item">
-          <Link className="nav-link" to="/Account/Register">Register</Link>
+          <Link className="nav-link" to="/Account/Register">{t("Register")}</Link>
         </li>
       </>
     );
@@ -66,15 +68,15 @@ export default function AuthMenu() {
         aria-labelledby="userMenu"
       >
         <li>
-          <Link className="dropdown-item" to="/Account/MyAccount">My Account</Link>
+          <Link className="dropdown-item" to="/Account/MyAccount">{t("My Account")}</Link>
         </li>
         <li><hr className="dropdown-divider" /></li>
         <li>
-          <Link className="dropdown-item" to="/Account/Settings">Settings</Link>
+          <Link className="dropdown-item" to="/Account/Settings">{t("Settings")}</Link>
         </li>
         <li><hr className="dropdown-divider" /></li>
         <li>
-          <Link className="dropdown-item" to="/Account/ChangePassword">Change Password</Link>
+          <Link className="dropdown-item" to="/Account/ChangePassword">{t("Change Password")}</Link>
         </li>
         <li><hr className="dropdown-divider" /></li>
         <li className="px-3">
@@ -84,7 +86,7 @@ export default function AuthMenu() {
             disabled={loggingOut}
             onClick={() => void handleLogout()}
           >
-            {loggingOut ? "Logging out..." : "Logout"}
+            {t(loggingOut ? "Logging out..." : "Logout")}
           </button>
         </li>
       </ul>

@@ -22,7 +22,7 @@ const sidebarSections = [
   },
   {
     title: "Data",
-    links: [["Database", "/Admin/Database"], ["Categories", "/Admin/Categories"], ["Classes & specializations", "/Admin/Classes"], ["Tags", "/Admin/Tags"], ["Patches", "/Admin/Patches"], ["Item rarities", "/Admin/Rarities"], ["Media library", "/Admin/Media"], ["Navigation", "/Admin/Navigation"]],
+    links: [["Database", "/Admin/Database"], ["Categories", "/Admin/Categories"], ["Classes & specializations", "/Admin/Classes"], ["Tags", "/Admin/Tags"], ["Patches", "/Admin/Patches"], ["Item rarities", "/Admin/Rarities"], ["Media library", "/Admin/Media"], ["Navigation", "/Admin/Navigation"], ["Languages & translations", "/Admin/Translations"]],
   },
   {
     title: "Commerce",

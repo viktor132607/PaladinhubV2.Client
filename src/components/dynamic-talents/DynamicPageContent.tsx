@@ -1,4 +1,6 @@
 "use client";
+import { useLocalization } from "@/localization/LocalizationContext";
+import { localizeContent } from "@/localization/content";
 import { Component, type ReactNode, type ComponentType } from "react";
 import {
   parseLayout,
@@ -126,9 +128,10 @@ export function canRenderLayout(json: string) {
 }
 
 export default function DynamicPageContent({ json }: { json: string }) {
+  const { t } = useLocalization();
   return (
     <div className="min-w-0 space-y-6">
-      {parseLayout(json).map((block, i) => (
+      {localizeContent(parseLayout(json), t).map((block, i) => (
         <Boundary key={`${i}:${JSON.stringify(block)}`}>
           <RenderBlock block={block} />
         </Boundary>

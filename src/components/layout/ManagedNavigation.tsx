@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useLocalization } from "@/localization/LocalizationContext";
 import { Link, useLocation } from "@/router/nextCompat";
 export type NavigationEntry = { id: number; name: string; href: string; location: string; openNewTab: boolean; parentId: number | null; sortOrder: number };
 function NavAnchor({ item, className }: { item: NavigationEntry; className: string }) {
+  const { t } = useLocalization();
   const props = { className, target: item.openNewTab ? "_blank" : undefined, rel: item.openNewTab ? "noopener noreferrer" : undefined, style: { overflowWrap: "anywhere" as const } };
-  return /^https?:\/\//i.test(item.href) ? <a href={item.href} {...props}>{item.name}</a> : <Link to={item.href} {...props}>{item.name}</Link>;
+  return /^https?:\/\//i.test(item.href) ? <a href={item.href} {...props}>{t(`navigation.${item.id}`, t(item.name))}</a> : <Link to={item.href} {...props}>{t(`navigation.${item.id}`, t(item.name))}</Link>;
 }
 function Menu({ item, children, isAdmin }: { item: NavigationEntry; children: NavigationEntry[]; isAdmin: boolean }) {
   const section = /^\/(Holy|Protection|Retribution)\/Overview$/i.exec(item.href)?.[1];

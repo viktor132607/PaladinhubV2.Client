@@ -3,6 +3,8 @@
 import type { ReactNode } from "react";
 import { BrowserRouter as Router, Route, Routes } from "@/router/nextCompat";
 
+import { LocalizationProvider } from "@/localization/LocalizationContext";
+import AdminTranslations from "@/pages/admin/translations/Translations";
 import AdminLayout from "@/components/admin/AdminLayout";
 import Layout from "@/components/layout/Layout";
 import V1Stylesheets from "@/components/styles/V1Stylesheets";
@@ -112,7 +114,7 @@ function adminPage(page: ReactNode) {
 
 export default function App() {
   return (
-    <Router>
+    <Router><LocalizationProvider>
       <V1Stylesheets />
       <Routes>
         <Route element={<Layout />}>
@@ -205,6 +207,7 @@ export default function App() {
             <Route path="Categories" element={<AdminCategories />} />
             <Route path="Classes" element={<AdminClasses />} />
             <Route path="PageBuilder/History" element={<PageHistory />} />
+            <Route path="Translations" element={<AdminTranslations />} />
             <Route path="Navigation" element={<AdminNavigation />} />
             <Route path="Media" element={<AdminMedia />} />
             <Route path="Rarities" element={<AdminRarities />} />
@@ -242,6 +245,6 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
-    </Router>
+    </LocalizationProvider></Router>
   );
 }
