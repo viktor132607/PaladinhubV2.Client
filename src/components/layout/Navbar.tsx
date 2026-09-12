@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import { Link, useLocation } from "@/router/nextCompat";
+import { fetchBackend, readApiJson } from "@/config/api";
+import ManagedNavigation, { type NavigationEntry } from "./ManagedNavigation";
 import AuthMenu from "./AuthMenu";
 
 const guidePages = [
@@ -91,6 +93,19 @@ function GuideMenu({
 
 export default function Navbar({ forceVisible = false }: { forceVisible?: boolean } = {}) {
   const { hasRole } = useAuth();
+  const [navigation, setNavigation] = useState<NavigationEntry[] | null>(null);
+  useEffect(() => {
+    let controller: AbortController | undefined;
+    const refreshNavigation = () => {
+      controller?.abort();
+      const request = new AbortController(); controller = request;
+      void fetchBackend("/api/navigation", { signal: request.signal, cache: "no-store" })
+        .then(readApiJson<NavigationEntry[]>).then(entries => { if (!request.signal.aborted && Array.isArray(entries)) setNavigation(entries); }).catch(() => {});
+    };
+    refreshNavigation();
+    window.addEventListener("navigation-updated", refreshNavigation);
+    return () => { controller?.abort(); window.removeEventListener("navigation-updated", refreshNavigation); };
+  }, []);
   const [open, setOpen] = useState(false);
   const isAdmin = hasRole("Admin");
   const { pathname } = useLocation();
@@ -143,6 +158,7 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
 
           <div id="primary-navigation" className={`navbar-collapse collapse d-sm-inline-flex justify-content-between${open ? " show" : ""}`}>
             <ul className="navbar-nav">
+              {navigation !== null ? <ManagedNavigation isAdmin={isAdmin} entries={navigation} location="primary" /> : <>
               <li className="nav-item">
                 <Link to="/Home/Home" className="nav-link">Home</Link>
               </li>
@@ -159,6 +175,7 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
                 <Link to="/Home/Privacy" className="nav-link">Privacy</Link>
               </li>
 
+              </>}
               {isAdmin ? (
                 <li className="nav-item">
                   <Link to="/Admin/Database" className="nav-link">Admin</Link>
@@ -167,12 +184,14 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
             </ul>
 
             <ul className="navbar-nav ms-auto">
+              {navigation !== null ? <ManagedNavigation isAdmin={isAdmin} entries={navigation} location="utility" /> : <>
               <li className="nav-item">
                 <Link to="/Merchandise/Merchandise" className="nav-link">
                   <i className="fa-solid fa-store" aria-hidden="true" /> Merchandise
                 </Link>
               </li>
 
+              </>}
               <li id="nav-cart" className="nav-item position-relative">
                 <Link
                   to="/Cart/MyCart"
