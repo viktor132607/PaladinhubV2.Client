@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import CategoryPicker from "@/components/admin/CategoryPicker";
 import ClassPicker from "@/components/admin/ClassPicker";
+import SpellIconPicker from "@/components/admin/SpellIconPicker";
 import RarityPicker from "@/components/admin/RarityPicker";
 import PatchPicker from "@/components/admin/PatchPicker";
 import TagPicker from "@/components/admin/TagPicker";
@@ -60,6 +61,8 @@ export default function CreateItem() {
   const [tagIds, setTagIds] = useState<number[]>([]);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [iconBusy, setIconBusy] = useState(false);
+  const [secondIconBusy, setSecondIconBusy] = useState(false);
 
   const update = (field: keyof ItemFormState, value: string) => {
     setForm((current) => ({ ...current, [field]: value }));
@@ -67,7 +70,7 @@ export default function CreateItem() {
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (saving) return;
+    if (saving || iconBusy || secondIconBusy) return;
 
     setError("");
     if (!form.name.trim()) {
@@ -130,15 +133,9 @@ export default function CreateItem() {
           <span className="text-danger">{error === "Name is required." ? error : ""}</span>
         </div>
 
-        <div className="mb-3">
-          <label htmlFor="item-icon" className="form-label">Icon</label>
-          <input id="item-icon" name="icon" className="form-control" value={form.icon} onChange={(event) => update("icon", event.target.value)} disabled={saving} />
-        </div>
+        <div className="mb-3"><SpellIconPicker kind="item" label="Icon" value={form.icon} onChange={value => update("icon", value)} disabled={saving} onBusyChange={setIconBusy} /></div>
 
-        <div className="mb-3">
-          <label htmlFor="item-second-icon" className="form-label">SecondIcon</label>
-          <input id="item-second-icon" name="secondIcon" className="form-control" value={form.secondIcon} onChange={(event) => update("secondIcon", event.target.value)} disabled={saving} />
-        </div>
+        <div className="mb-3"><SpellIconPicker kind="item" label="Second icon" value={form.secondIcon} onChange={value => update("secondIcon", value)} disabled={saving} onBusyChange={setSecondIconBusy} /></div>
 
         <div className="mb-3">
           <label htmlFor="item-description" className="form-label">Description</label>
@@ -162,7 +159,7 @@ export default function CreateItem() {
 
         <RarityPicker value={rarityId} onChange={setRarityId} disabled={saving} />
 
-        <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? "Saving..." : "Save"}</button>{" "}
+        <button type="submit" className="btn btn-primary" disabled={saving || iconBusy || secondIconBusy}>{saving ? "Saving..." : "Save"}</button>{" "}
         <Link to="/Admin/Database?entity=Items" className="btn btn-secondary">Cancel</Link>
       </form>
     </>

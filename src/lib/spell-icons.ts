@@ -11,3 +11,10 @@ export function spellIconSource(value?: string | null): string {
   try { filename = decodeURIComponent(icon); } catch { /* Keep a literal filename. */ }
   return `/images/SpellIcons/${encodeURIComponent(filename)}`;
 }
+
+export function itemIconSource(value?: string | null): string {
+  const icon = value?.trim() ?? "";
+  if (!icon) return "";
+  if (icon.startsWith("/") || /^https?:\/\//i.test(icon)) return spellIconSource(icon);
+  return `/images/ItemIcons/${encodeURIComponent(icon)}`;
+}

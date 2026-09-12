@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { fetchBackend, readApiJson } from "@/config/api";
-import { spellIconSource } from "@/lib/spell-icons";
+import { spellIconSource, itemIconSource } from "@/lib/spell-icons";
 import { adminRequest, categoryPath, type Category } from "@/lib/admin-categories";
 import { Link, useSearchParams } from "@/router/nextCompat";
 
@@ -60,7 +60,7 @@ function positiveInteger(value: unknown, fallback: number): number {
 }
 
 function iconPath(entity: EntityKind, icon: string): string {
-  return entity === "Spells" ? spellIconSource(icon) : `/images/ItemIcons/${encodeURIComponent(icon)}`;
+  return entity === "Spells" ? spellIconSource(icon) : itemIconSource(icon);
 }
 
 export default function Database() {

@@ -1,6 +1,7 @@
 "use client";
 import { CategoryLabel } from "@/components/admin/CategoryPicker";
 import { ClassLabel } from "@/components/admin/ClassPicker";
+import { itemIconSource } from "@/lib/spell-icons";
 import { RarityLabel } from "@/components/admin/RarityPicker";
 import { PatchLabel } from "@/components/admin/PatchPicker";
 import { TagLabel } from "@/components/admin/TagPicker";
@@ -98,7 +99,7 @@ export default function ItemDetails() {
         <dd className="col-sm-9">
           {item.icon ? (
             <>
-              <img src={`/images/ItemIcons/${encodeURIComponent(item.icon)}`} alt={item.name} className="img-thumbnail" style={{ maxWidth: 64 }} />
+              <img src={itemIconSource(item.icon)} alt={item.name} className="img-thumbnail" style={{ maxWidth: 64 }} />
               <div>{item.icon}</div>
             </>
           ) : null}
@@ -108,7 +109,7 @@ export default function ItemDetails() {
         <dd className="col-sm-9">
           {item.secondIcon ? (
             <>
-              <img src={`/images/ItemIcons/${encodeURIComponent(item.secondIcon)}`} alt={item.name} className="img-thumbnail" style={{ maxWidth: 64 }} />
+              <img src={itemIconSource(item.secondIcon)} alt={item.name} className="img-thumbnail" style={{ maxWidth: 64 }} />
               <div>{item.secondIcon}</div>
             </>
           ) : null}

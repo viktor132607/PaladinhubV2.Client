@@ -2,13 +2,15 @@
 
 import { useEffect, useId, useRef, useState, type ClipboardEvent } from "react";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
-import { spellIconSource } from "@/lib/spell-icons";
+import { spellIconSource, itemIconSource } from "@/lib/spell-icons";
 
 type IconEntry = { name: string; icon: string; kind: string };
 type Catalog = { icons: IconEntry[]; page: number; pages: number; total: number };
 const acceptedTypes = new Set(["image/png", "image/jpeg", "image/gif", "image/webp"]);
 
-export default function SpellIconPicker({ value, onChange, disabled = false, onBusyChange }: {
+export default function SpellIconPicker({ value, onChange, disabled = false, onBusyChange, label = "Icon", kind = "spell" }: {
+  label?: string;
+  kind?: "spell" | "item";
   value: string;
   onChange: (icon: string) => void;
   disabled?: boolean;
@@ -27,7 +29,7 @@ export default function SpellIconPicker({ value, onChange, disabled = false, onB
   const [error, setError] = useState("");
   const [revision, setRevision] = useState(0);
   const [failedSource, setFailedSource] = useState("");
-  const source = spellIconSource(value);
+  const source = kind === "item" ? itemIconSource(value) : spellIconSource(value);
 
   useEffect(() => {
     alive.current = true;
@@ -112,19 +114,20 @@ export default function SpellIconPicker({ value, onChange, disabled = false, onB
 
   return (
     <div className="spell-icon-picker min-w-0 space-y-2" onPaste={paste}>
-      <label htmlFor={`${id}-value`} className="block">Icon</label>
+      <label htmlFor={`${id}-value`} className="block">{label}</label>
       <input id={`${id}-value`} className="form-control w-full min-w-0 rounded border border-slate-600 px-3 py-2" value={value} maxLength={2048} placeholder="Image URL or existing filename" onChange={(event) => onChange(event.target.value)} disabled={disabled || uploading} aria-describedby={`${id}-help`} />
       <div className="flex flex-wrap gap-2">
         <button type="button" className="btn btn-secondary" aria-expanded={open} aria-controls={`${id}-browser`} disabled={disabled || uploading} onClick={() => setOpen((current) => !current)}>{open ? "Close database" : "Browse database"}</button>
         <button type="button" className="btn btn-secondary" disabled={disabled || uploading} onClick={() => void pasteClipboard()}>Paste image / URL</button>
         <button type="button" className="btn btn-secondary" disabled={disabled || uploading} onClick={() => fileInput.current?.click()}>Upload image</button>
+        <a className="btn btn-outline-secondary" href="/Admin/Media" target="_blank" rel="noopener noreferrer">Manage media</a>
         {value ? <button type="button" className="btn btn-outline-warning" disabled={disabled || uploading} onClick={() => onChange("")}>Clear icon</button> : null}
       </div>
-      <input ref={fileInput} type="file" accept="image/png,image/jpeg,image/gif,image/webp" className="hidden" aria-label="Upload spell icon" disabled={disabled || uploading} onChange={(event) => { const file = event.target.files?.[0]; event.target.value = ""; if (file) void upload(file); }} />
-      <p id={`${id}-help`} className="text-sm text-slate-400">Choose from the database, paste an image or URL, or upload a file (up to 5 MB). Save the spell or talent to apply it.</p>
+      <input ref={fileInput} type="file" accept="image/png,image/jpeg,image/gif,image/webp" className="hidden" aria-label={`Upload ${label.toLowerCase()}`} disabled={disabled || uploading} onChange={(event) => { const file = event.target.files?.[0]; event.target.value = ""; if (file) void upload(file); }} />
+      <p id={`${id}-help`} className="text-sm text-slate-400">Choose from the database, paste an image or URL, or upload a file (up to 5 MB). Save the record to apply it.</p>
       {uploading ? <p role="status">Uploading image…</p> : null}
       {error ? <p role="alert" className="text-danger">{error}</p> : null}
-      {source && source !== failedSource ? <img src={source} alt="Selected spell icon" className="h-16 w-16 rounded border border-slate-600 object-contain" onError={() => setFailedSource(source)} /> : source ? <p className="text-sm text-slate-400">Image unavailable. Choose another icon or upload the file.</p> : null}
+      {source && source !== failedSource ? <img src={source} alt={`Selected ${label.toLowerCase()}`} className="h-16 w-16 rounded border border-slate-600 object-contain" onError={() => setFailedSource(source)} /> : source ? <p className="text-sm text-slate-400">Image unavailable. Choose another icon or upload the file.</p> : null}
       {open ? (
         <section id={`${id}-browser`} aria-label="Spell icon database" className="rounded border border-slate-600 p-3">
           <label htmlFor={`${id}-search`} className="block mb-2">Search spell, talent or filename</label>
