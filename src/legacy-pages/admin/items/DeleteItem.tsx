@@ -1,12 +1,14 @@
 "use client";
 import { CategoryLabel } from "@/components/admin/CategoryPicker";
 import { ClassLabel } from "@/components/admin/ClassPicker";
+import { TagLabel } from "@/components/admin/TagPicker";
 
 import { useEffect, useState, type FormEvent } from "react";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useNavigate, useParams } from "@/router/nextCompat";
 
 type ItemDto = {
+  tagIds?: number[];
   disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
@@ -102,6 +104,8 @@ export default function DeleteItem() {
           <p>Are you sure you want to delete this item?</p>
 
           <dl className="row">
+            <dt className="col-sm-3">Tags</dt>
+            <dd className="col-sm-9"><TagLabel value={item.tagIds} /></dd>
             <dt className="col-sm-3">Class / specialization</dt>
             <dd className="col-sm-9"><ClassLabel value={item.disciplineId} /></dd>
             <dt className="col-sm-3">Category</dt>

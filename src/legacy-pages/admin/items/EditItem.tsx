@@ -3,10 +3,13 @@
 import { useEffect, useState, type FormEvent } from "react";
 import CategoryPicker from "@/components/admin/CategoryPicker";
 import ClassPicker from "@/components/admin/ClassPicker";
+import TagPicker from "@/components/admin/TagPicker";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useNavigate, useParams } from "@/router/nextCompat";
 
 type ItemDto = {
+  disciplineId?: number | null;
+  tagIds?: number[];
   categoryId?: number | null;
   id: number;
   name: string;
@@ -66,6 +69,7 @@ export default function EditItem() {
   const [form, setForm] = useState<ItemFormState>(emptyForm);
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [disciplineId, setDisciplineId] = useState<number | null>(null);
+  const [tagIds, setTagIds] = useState<number[]>([]);
   const [itemLoaded, setItemLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -105,6 +109,8 @@ export default function EditItem() {
         });
         setItemLoaded(true);
         setCategoryId(item.categoryId ?? null);
+        setDisciplineId(item.disciplineId ?? null);
+        setTagIds(item.tagIds ?? []);
       } catch (caught) {
         if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : "The item could not be loaded.");
       } finally {
@@ -152,6 +158,7 @@ export default function EditItem() {
           quality: form.quality.trim() || null,
           categoryId,
           disciplineId,
+          tagIds,
         }),
       });
       await readApiJson<ItemDto>(response);
@@ -186,6 +193,7 @@ export default function EditItem() {
       <form onSubmit={submit}>
         <CategoryPicker value={categoryId} onChange={setCategoryId} disabled={saving} />
         <ClassPicker value={disciplineId} onChange={setDisciplineId} disabled={saving} />
+        <TagPicker value={tagIds} onChange={setTagIds} disabled={saving} />
         <div className="mb-3">
           <label htmlFor="item-name" className="form-label">Name</label>
           <input id="item-name" name="name" className="form-control" value={form.name} onChange={(event) => update("name", event.target.value)} disabled={saving} required />

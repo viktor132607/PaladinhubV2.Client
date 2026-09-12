@@ -4,11 +4,13 @@ import { useEffect, useState, type FormEvent } from "react";
 import RecordTypePicker from "@/components/admin/RecordTypePicker";
 import CategoryPicker from "@/components/admin/CategoryPicker";
 import ClassPicker from "@/components/admin/ClassPicker";
+import TagPicker from "@/components/admin/TagPicker";
 import SpellIconPicker from "@/components/admin/SpellIconPicker";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useNavigate, useParams } from "@/router/nextCompat";
 
 type SpellDto = {
+  tagIds?: number[];
   disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
@@ -44,6 +46,7 @@ export default function EditSpell() {
   const [form, setForm] = useState<SpellForm>(emptyForm);
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [disciplineId, setDisciplineId] = useState<number | null>(null);
+  const [tagIds, setTagIds] = useState<number[]>([]);
   const [spellLoaded, setSpellLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -84,6 +87,7 @@ export default function EditSpell() {
         setSpellLoaded(true);
         setCategoryId(spell.categoryId ?? null);
         setDisciplineId(spell.disciplineId ?? null);
+        setTagIds(spell.tagIds ?? []);
       } catch (caught) {
         if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : "The spell could not be loaded.");
       } finally {
@@ -125,6 +129,7 @@ export default function EditSpell() {
           quality: form.quality,
           categoryId,
           disciplineId,
+          tagIds,
         }),
       });
       await readApiJson<SpellDto>(response);
@@ -146,6 +151,7 @@ export default function EditSpell() {
       <form onSubmit={submit}>
         <CategoryPicker value={categoryId} onChange={setCategoryId} disabled={saving} />
         <ClassPicker value={disciplineId} onChange={setDisciplineId} disabled={saving} />
+        <TagPicker value={tagIds} onChange={setTagIds} disabled={saving} />
         <div className="mb-3">
           <label htmlFor="spell-name" className="form-label">Name</label>
           <input id="spell-name" name="name" className="form-control" value={form.name} onChange={(event) => update("name", event.target.value)} disabled={saving} />

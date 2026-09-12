@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import CategoryPicker from "@/components/admin/CategoryPicker";
 import ClassPicker from "@/components/admin/ClassPicker";
+import TagPicker from "@/components/admin/TagPicker";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useNavigate } from "@/router/nextCompat";
 
@@ -52,6 +53,7 @@ export default function CreateItem() {
   const [form, setForm] = useState<ItemFormState>(initialState);
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [disciplineId, setDisciplineId] = useState<number | null>(null);
+  const [tagIds, setTagIds] = useState<number[]>([]);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -91,6 +93,7 @@ export default function CreateItem() {
           quality: form.quality.trim() || null,
           categoryId,
           disciplineId,
+          tagIds,
         }),
       });
       await readApiJson<unknown>(response);
@@ -113,6 +116,7 @@ export default function CreateItem() {
       <form onSubmit={submit}>
         <CategoryPicker value={categoryId} onChange={setCategoryId} disabled={saving} />
         <ClassPicker value={disciplineId} onChange={setDisciplineId} disabled={saving} />
+        <TagPicker value={tagIds} onChange={setTagIds} disabled={saving} />
         <div className="mb-3">
           <label htmlFor="item-name" className="form-label">Name</label>
           <input id="item-name" name="name" className="form-control" value={form.name} onChange={(event) => update("name", event.target.value)} disabled={saving} required />

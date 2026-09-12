@@ -9,6 +9,7 @@ import { Link, useSearchParams } from "@/router/nextCompat";
 type EntityKind = "Spells" | "Items";
 
 type ItemRow = {
+  tagIds?: number[];
   disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
@@ -23,6 +24,7 @@ type ItemRow = {
 };
 
 type SpellRow = {
+  tagIds?: number[];
   disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
@@ -63,6 +65,16 @@ export default function Database() {
   const search = searchParams.get("search")?.trim() ?? "";
   const categoryId = searchParams.get("categoryId") ?? "";
   const disciplineId = searchParams.get("disciplineId") ?? "";
+  const tagId = searchParams.get("tagId") ?? "";
+  const [tags, setTags] = useState<Category[]>([]);
+  const [tagError, setTagError] = useState("");
+  useEffect(() => {
+    const controller = new AbortController();
+    void adminRequest<Category[]>("/Admin/api/tags", "GET", undefined, controller.signal)
+      .then(result => { if (!controller.signal.aborted) setTags(result); })
+      .catch(error => { if (!controller.signal.aborted) setTagError(error.message); });
+    return () => controller.abort();
+  }, []);
   const [disciplines, setDisciplines] = useState<Category[]>([]);
   const [disciplineError, setDisciplineError] = useState("");
   useEffect(() => {
@@ -100,6 +112,7 @@ export default function Database() {
         const query = new URLSearchParams({ entity, search, page: String(page), pageSize: String(pageSize) });
         if (categoryId !== "") query.set("categoryId", categoryId);
         if (disciplineId !== "") query.set("disciplineId", disciplineId);
+        if (tagId !== "") query.set("tagId", tagId);
         const response = await fetchBackend(`${databaseEndpoint}?${query.toString()}`, {
           headers: { Accept: "application/json" },
           cache: "no-store",
@@ -118,7 +131,7 @@ export default function Database() {
     };
     void load();
     return () => controller.abort();
-  }, [entity, page, pageSize, search, categoryId, disciplineId]);
+  }, [entity, page, pageSize, search, categoryId, disciplineId, tagId]);
 
   const records = useMemo<ItemRow[] | SpellRow[]>(
     () => entity === "Items" ? data.items ?? [] : data.spells ?? [],
@@ -143,6 +156,7 @@ export default function Database() {
     const query = new URLSearchParams({ entity, search, page: String(page), pageSize: String(pageSize) });
     if (categoryId !== "") query.set("categoryId", categoryId);
     if (disciplineId !== "") query.set("disciplineId", disciplineId);
+    if (tagId !== "") query.set("tagId", tagId);
     Object.entries(changes).forEach(([key, value]) => query.set(key, String(value)));
     return `/Admin/Database?${query.toString()}`;
   };
@@ -152,6 +166,7 @@ export default function Database() {
     const next = new URLSearchParams({ entity });
     if (categoryId !== "") next.set("categoryId", categoryId);
     if (disciplineId !== "") next.set("disciplineId", disciplineId);
+    if (tagId !== "") next.set("tagId", tagId);
     const nextSearch = searchInput.trim();
     if (nextSearch) next.set("search", nextSearch);
     setSearchParams(next);
@@ -169,6 +184,12 @@ export default function Database() {
         </ul>
 
         <form onSubmit={submitSearch} className="row g-2 mb-3">
+          <div className="col-12 col-md-auto">
+            <select className="form-select" aria-label="Filter by tag" value={tagId} onChange={event => changeQuery({ tagId: event.target.value, page: 1 })}>
+              <option value="">All tags</option><option value="0">No tags</option>
+              {tags.filter(tag => !tag.isDeleted).map(tag => <option key={tag.id} value={tag.id}>{tag.name}{tag.isArchived ? " (archived)" : ""}</option>)}
+            </select>
+          </div>
           <div className="col-12 col-md-auto">
             <select className="form-select" aria-label="Filter by class or specialization" value={disciplineId} onChange={event => changeQuery({ disciplineId: event.target.value, page: 1 })}>
               <option value="">All classes / specializations</option><option value="0">Unrestricted records</option>
@@ -196,6 +217,7 @@ export default function Database() {
         {error && <div className="alert alert-danger" role="alert">{error}</div>}
         {categoryError && <div className="alert alert-danger" role="alert">Categories: {categoryError}</div>}
         {disciplineError && <div className="alert alert-danger" role="alert">Classes: {disciplineError}</div>}
+        {tagError && <div className="alert alert-danger" role="alert">Tags: {tagError}</div>}
 
         <div className="table-responsive">
           <table className="admin-record-table table table-dark table-striped align-middle table-wide">
@@ -211,12 +233,13 @@ export default function Database() {
                 <th>Type</th>
                 <th>Category</th>
                 <th>Class / specialization</th>
+                <th>Tags</th>
                 <th className="w-actions text-end">Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={entity === "Items" ? 12 : 9}>Loading records...</td></tr>
+                <tr><td colSpan={entity === "Items" ? 13 : 10}>Loading records...</td></tr>
               ) : records.map((record) => (
                 <tr key={record.id}>
                   <td data-label="Id">{record.id}</td>
@@ -229,6 +252,7 @@ export default function Database() {
                   <td data-label="Type">{record.quality}</td>
                   <td data-label="Category">{record.categoryId ? categoryPath(record.categoryId, categories) : "Uncategorized"}</td>
                   <td data-label="Class / specialization">{record.disciplineId ? categoryPath(record.disciplineId, disciplines) : "All classes"}</td>
+                  <td data-label="Tags">{record.tagIds?.map(id => tags.find(tag => tag.id === id)?.name ?? `Tag #${id}`).join(", ") || "No tags"}</td>
                   <td data-label="Actions" className="text-end">
                     <div className="btn-group btn-group-sm" role="group" aria-label={`Actions for ${record.name}`}>
                       <Link className="btn btn-outline-info px-2" to={`/Admin/${entity}/Details/${record.id}`} title="Details" aria-label={`Details for ${record.name}`}><DetailIcon /></Link>

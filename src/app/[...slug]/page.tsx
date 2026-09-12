@@ -61,6 +61,7 @@ export function generateStaticParams() {
   { slug: ["Admin", "Database"] },
   { slug: ["Admin", "Categories"] },
   { slug: ["Admin", "Classes"] },
+  { slug: ["Admin", "Tags"] },
   { slug: ["Admin", "Database", "Index"] },
   { slug: ["Admin", "Items", "Create"] },
   { slug: ["Admin", "Spells", "Create"] },

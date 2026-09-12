@@ -1,12 +1,14 @@
 "use client";
 import { CategoryLabel } from "@/components/admin/CategoryPicker";
 import { ClassLabel } from "@/components/admin/ClassPicker";
+import { TagLabel } from "@/components/admin/TagPicker";
 
 import { useEffect, useState } from "react";
 import { fetchBackend, readApiJson } from "@/config/api";
 import { Link, useParams } from "@/router/nextCompat";
 
 type ItemDto = {
+  tagIds?: number[];
   disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
@@ -77,6 +79,8 @@ export default function ItemDetails() {
       <h2>Item Details</h2>
 
       <dl className="row">
+        <dt className="col-sm-3">Tags</dt>
+        <dd className="col-sm-9"><TagLabel value={item.tagIds} /></dd>
         <dt className="col-sm-3">Class / specialization</dt>
         <dd className="col-sm-9"><ClassLabel value={item.disciplineId} /></dd>
         <dt className="col-sm-3">Category</dt>
