@@ -3,11 +3,13 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { fetchBackend, readApiJson } from "@/config/api";
 import { spellIconSource } from "@/lib/spell-icons";
+import { adminRequest, categoryPath, type Category } from "@/lib/admin-categories";
 import { Link, useSearchParams } from "@/router/nextCompat";
 
 type EntityKind = "Spells" | "Items";
 
 type ItemRow = {
+  categoryId?: number | null;
   id: number;
   name: string;
   icon?: string | null;
@@ -20,6 +22,7 @@ type ItemRow = {
 };
 
 type SpellRow = {
+  categoryId?: number | null;
   id: number;
   name: string;
   icon?: string | null;
@@ -56,6 +59,16 @@ export default function Database() {
   const [searchParams, setSearchParams] = useSearchParams();
   const entity = normalizeEntity(searchParams.get("entity"));
   const search = searchParams.get("search")?.trim() ?? "";
+  const categoryId = searchParams.get("categoryId") ?? "";
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryError, setCategoryError] = useState("");
+  useEffect(() => {
+    const controller = new AbortController();
+    void adminRequest<Category[]>("/Admin/api/categories", "GET", undefined, controller.signal)
+      .then(result => { if (!controller.signal.aborted) setCategories(result); })
+      .catch(error => { if (!controller.signal.aborted) setCategoryError(error.message); });
+    return () => controller.abort();
+  }, []);
   const page = positiveInteger(searchParams.get("page"), 1);
   const pageSize = Math.min(100, positiveInteger(searchParams.get("pageSize"), 20));
 
@@ -73,6 +86,7 @@ export default function Database() {
       setError("");
       try {
         const query = new URLSearchParams({ entity, search, page: String(page), pageSize: String(pageSize) });
+        if (categoryId !== "") query.set("categoryId", categoryId);
         const response = await fetchBackend(`${databaseEndpoint}?${query.toString()}`, {
           headers: { Accept: "application/json" },
           cache: "no-store",
@@ -91,7 +105,7 @@ export default function Database() {
     };
     void load();
     return () => controller.abort();
-  }, [entity, page, pageSize, search]);
+  }, [entity, page, pageSize, search, categoryId]);
 
   const records = useMemo<ItemRow[] | SpellRow[]>(
     () => entity === "Items" ? data.items ?? [] : data.spells ?? [],
@@ -114,6 +128,7 @@ export default function Database() {
 
   const queryUrl = (changes: Record<string, string | number>) => {
     const query = new URLSearchParams({ entity, search, page: String(page), pageSize: String(pageSize) });
+    if (categoryId !== "") query.set("categoryId", categoryId);
     Object.entries(changes).forEach(([key, value]) => query.set(key, String(value)));
     return `/Admin/Database?${query.toString()}`;
   };
@@ -121,6 +136,7 @@ export default function Database() {
   const submitSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const next = new URLSearchParams({ entity });
+    if (categoryId !== "") next.set("categoryId", categoryId);
     const nextSearch = searchInput.trim();
     if (nextSearch) next.set("search", nextSearch);
     setSearchParams(next);
@@ -138,6 +154,12 @@ export default function Database() {
         </ul>
 
         <form onSubmit={submitSearch} className="row g-2 mb-3">
+          <div className="col-12 col-md-auto">
+            <select className="form-select" aria-label="Filter by category" value={categoryId} onChange={event => changeQuery({ categoryId: event.target.value, page: 1 })}>
+              <option value="">All categories</option><option value="0">Uncategorized</option>
+              {categories.filter(category => !category.isDeleted).map(category => <option key={category.id} value={category.id}>{categoryPath(category.id, categories)}{category.isArchived ? " (archived)" : ""}</option>)}
+            </select>
+          </div>
           <div className="col-auto">
             <input className="form-control" type="text" name="search" value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="Search..." aria-label="Search database records" />
           </div>
@@ -151,6 +173,7 @@ export default function Database() {
         </form>
 
         {error && <div className="alert alert-danger" role="alert">{error}</div>}
+        {categoryError && <div className="alert alert-danger" role="alert">Categories: {categoryError}</div>}
 
         <div className="table-responsive">
           <table className="admin-record-table table table-dark table-striped align-middle table-wide">
@@ -164,12 +187,13 @@ export default function Database() {
                 <th>Url</th>
                 {entity === "Items" && <><th>ItemLevel</th><th>RequiredLevel</th></>}
                 <th>Type</th>
+                <th>Category</th>
                 <th className="w-actions text-end">Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={entity === "Items" ? 10 : 7}>Loading records...</td></tr>
+                <tr><td colSpan={entity === "Items" ? 11 : 8}>Loading records...</td></tr>
               ) : records.map((record) => (
                 <tr key={record.id}>
                   <td data-label="Id">{record.id}</td>
@@ -180,6 +204,7 @@ export default function Database() {
                   <td data-label="Url" className="url-cell">{record.url && <a href={record.url} target="_blank" rel="noopener noreferrer">{record.url}</a>}</td>
                   {entity === "Items" && <><td data-label="Item level">{(record as ItemRow).itemLevel}</td><td data-label="Required level">{(record as ItemRow).requiredLevel}</td></>}
                   <td data-label="Type">{record.quality}</td>
+                  <td data-label="Category">{record.categoryId ? categoryPath(record.categoryId, categories) : "Uncategorized"}</td>
                   <td data-label="Actions" className="text-end">
                     <div className="btn-group btn-group-sm" role="group" aria-label={`Actions for ${record.name}`}>
                       <Link className="btn btn-outline-info px-2" to={`/Admin/${entity}/Details/${record.id}`} title="Details" aria-label={`Details for ${record.name}`}><DetailIcon /></Link>

@@ -2,11 +2,13 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import RecordTypePicker from "@/components/admin/RecordTypePicker";
+import CategoryPicker from "@/components/admin/CategoryPicker";
 import SpellIconPicker from "@/components/admin/SpellIconPicker";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useNavigate, useParams } from "@/router/nextCompat";
 
 type SpellDto = {
+  categoryId?: number | null;
   id: number;
   name: string;
   icon?: string | null;
@@ -38,6 +40,7 @@ export default function EditSpell() {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   const [form, setForm] = useState<SpellForm>(emptyForm);
+  const [categoryId, setCategoryId] = useState<number | null>(null);
   const [spellLoaded, setSpellLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -76,6 +79,7 @@ export default function EditSpell() {
           quality: spell.quality ?? "spell",
         });
         setSpellLoaded(true);
+        setCategoryId(spell.categoryId ?? null);
       } catch (caught) {
         if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : "The spell could not be loaded.");
       } finally {
@@ -115,6 +119,7 @@ export default function EditSpell() {
           description: form.description.trim() || null,
           url: form.url.trim() || null,
           quality: form.quality,
+          categoryId,
         }),
       });
       await readApiJson<SpellDto>(response);
@@ -134,6 +139,7 @@ export default function EditSpell() {
       <h2>Edit Spell</h2>
       {error && error !== "Name is required." ? <div className="text-danger mb-3" role="alert">{error}</div> : null}
       <form onSubmit={submit}>
+        <CategoryPicker value={categoryId} onChange={setCategoryId} disabled={saving} />
         <div className="mb-3">
           <label htmlFor="spell-name" className="form-label">Name</label>
           <input id="spell-name" name="name" className="form-control" value={form.name} onChange={(event) => update("name", event.target.value)} disabled={saving} />

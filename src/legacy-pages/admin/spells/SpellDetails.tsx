@@ -1,4 +1,5 @@
 "use client";
+import { CategoryLabel } from "@/components/admin/CategoryPicker";
 
 import { useEffect, useState } from "react";
 import { fetchBackend, readApiJson } from "@/config/api";
@@ -6,6 +7,7 @@ import { spellIconSource } from "@/lib/spell-icons";
 import { Link, useParams } from "@/router/nextCompat";
 
 type SpellDto = {
+  categoryId?: number | null;
   id: number;
   name: string;
   icon?: string | null;
@@ -63,6 +65,8 @@ export default function SpellDetails() {
     <>
       <h2>Spell Details</h2>
       <dl className="row">
+        <dt className="col-sm-3">Category</dt>
+        <dd className="col-sm-9"><CategoryLabel value={spell.categoryId} /></dd>
         <dt className="col-sm-3">Name</dt>
         <dd className="col-sm-9">{spell.name}</dd>
 

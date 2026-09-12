@@ -22,7 +22,7 @@ const sidebarSections = [
   },
   {
     title: "Data",
-    links: [["Database", "/Admin/Database"]],
+    links: [["Database", "/Admin/Database"], ["Categories", "/Admin/Categories"]],
   },
   {
     title: "Commerce",

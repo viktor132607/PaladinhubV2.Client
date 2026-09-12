@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import CategoryPicker from "@/components/admin/CategoryPicker";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useNavigate } from "@/router/nextCompat";
 
@@ -48,6 +49,7 @@ function nullableInteger(value: string, fieldName: string): number | null {
 export default function CreateItem() {
   const navigate = useNavigate();
   const [form, setForm] = useState<ItemFormState>(initialState);
+  const [categoryId, setCategoryId] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -85,6 +87,7 @@ export default function CreateItem() {
           itemLevel: nullableInteger(form.itemLevel, "Item level"),
           requiredLevel: nullableInteger(form.requiredLevel, "Required level"),
           quality: form.quality.trim() || null,
+          categoryId,
         }),
       });
       await readApiJson<unknown>(response);
@@ -105,6 +108,7 @@ export default function CreateItem() {
       ) : null}
 
       <form onSubmit={submit}>
+        <CategoryPicker value={categoryId} onChange={setCategoryId} disabled={saving} />
         <div className="mb-3">
           <label htmlFor="item-name" className="form-label">Name</label>
           <input id="item-name" name="name" className="form-control" value={form.name} onChange={(event) => update("name", event.target.value)} disabled={saving} required />

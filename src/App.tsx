@@ -30,6 +30,7 @@ import AccountSettings from "@/pages/account/Settings";
 import TransactionHistory from "@/pages/account/TransactionHistory";
 
 import AdminDatabase from "@/pages/admin/database/Database";
+import AdminCategories from "@/pages/admin/categories/Categories";
 import CreateItem from "@/pages/admin/items/CreateItem";
 import DeleteItem from "@/pages/admin/items/DeleteItem";
 import EditItem from "@/pages/admin/items/EditItem";
@@ -194,6 +195,7 @@ export default function App() {
           <Route path="/Admin" element={adminPage(<AdminLayout />)}>
             <Route index element={<AdminDatabase />} />
             <Route path="Database" element={<AdminDatabase />} />
+            <Route path="Categories" element={<AdminCategories />} />
             <Route path="Database/Index" element={<AdminDatabase />} />
 
             <Route path="Items/Create" element={<CreateItem />} />
