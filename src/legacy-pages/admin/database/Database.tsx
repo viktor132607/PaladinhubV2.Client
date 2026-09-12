@@ -10,6 +10,7 @@ type EntityKind = "Spells" | "Items";
 
 type ItemRow = {
   tagIds?: number[];
+  patchId?: number | null;
   disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
@@ -25,6 +26,7 @@ type ItemRow = {
 
 type SpellRow = {
   tagIds?: number[];
+  patchId?: number | null;
   disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
@@ -75,6 +77,16 @@ export default function Database() {
       .catch(error => { if (!controller.signal.aborted) setTagError(error.message); });
     return () => controller.abort();
   }, []);
+  const patchId = searchParams.get("patchId") ?? "";
+  const [patches, setPatches] = useState<Category[]>([]);
+  const [patchError, setPatchError] = useState("");
+  useEffect(() => {
+    const controller = new AbortController();
+    void adminRequest<Category[]>("/Admin/api/patches", "GET", undefined, controller.signal)
+      .then(result => { if (!controller.signal.aborted) setPatches(result); })
+      .catch(error => { if (!controller.signal.aborted) setPatchError(error.message); });
+    return () => controller.abort();
+  }, []);
   const [disciplines, setDisciplines] = useState<Category[]>([]);
   const [disciplineError, setDisciplineError] = useState("");
   useEffect(() => {
@@ -113,6 +125,7 @@ export default function Database() {
         if (categoryId !== "") query.set("categoryId", categoryId);
         if (disciplineId !== "") query.set("disciplineId", disciplineId);
         if (tagId !== "") query.set("tagId", tagId);
+        if (patchId !== "") query.set("patchId", patchId);
         const response = await fetchBackend(`${databaseEndpoint}?${query.toString()}`, {
           headers: { Accept: "application/json" },
           cache: "no-store",
@@ -131,7 +144,7 @@ export default function Database() {
     };
     void load();
     return () => controller.abort();
-  }, [entity, page, pageSize, search, categoryId, disciplineId, tagId]);
+  }, [entity, page, pageSize, search, categoryId, disciplineId, tagId, patchId]);
 
   const records = useMemo<ItemRow[] | SpellRow[]>(
     () => entity === "Items" ? data.items ?? [] : data.spells ?? [],
@@ -157,6 +170,7 @@ export default function Database() {
     if (categoryId !== "") query.set("categoryId", categoryId);
     if (disciplineId !== "") query.set("disciplineId", disciplineId);
     if (tagId !== "") query.set("tagId", tagId);
+    if (patchId !== "") query.set("patchId", patchId);
     Object.entries(changes).forEach(([key, value]) => query.set(key, String(value)));
     return `/Admin/Database?${query.toString()}`;
   };
@@ -167,6 +181,7 @@ export default function Database() {
     if (categoryId !== "") next.set("categoryId", categoryId);
     if (disciplineId !== "") next.set("disciplineId", disciplineId);
     if (tagId !== "") next.set("tagId", tagId);
+    if (patchId !== "") next.set("patchId", patchId);
     const nextSearch = searchInput.trim();
     if (nextSearch) next.set("search", nextSearch);
     setSearchParams(next);
@@ -188,6 +203,10 @@ export default function Database() {
             <select className="form-select" aria-label="Filter by tag" value={tagId} onChange={event => changeQuery({ tagId: event.target.value, page: 1 })}>
               <option value="">All tags</option><option value="0">No tags</option>
               {tags.filter(tag => !tag.isDeleted).map(tag => <option key={tag.id} value={tag.id}>{tag.name}{tag.isArchived ? " (archived)" : ""}</option>)}
+            </select>
+            <select className="form-select" aria-label="Filter by patch" value={patchId} onChange={event => changeQuery({ patchId: event.target.value, page: 1 })}>
+              <option value="">All patches</option><option value="0">No patches</option>
+              {patches.filter(patch => !patch.isDeleted).map(patch => <option key={patch.id} value={patch.id}>{patch.name}{patch.isArchived ? " (archived)" : ""}</option>)}
             </select>
           </div>
           <div className="col-12 col-md-auto">
@@ -217,6 +236,7 @@ export default function Database() {
         {error && <div className="alert alert-danger" role="alert">{error}</div>}
         {categoryError && <div className="alert alert-danger" role="alert">Categories: {categoryError}</div>}
         {disciplineError && <div className="alert alert-danger" role="alert">Classes: {disciplineError}</div>}
+        {patchError && <div className="alert alert-danger" role="alert">Patches: {patchError}</div>}
         {tagError && <div className="alert alert-danger" role="alert">Tags: {tagError}</div>}
 
         <div className="table-responsive">
@@ -233,7 +253,7 @@ export default function Database() {
                 <th>Type</th>
                 <th>Category</th>
                 <th>Class / specialization</th>
-                <th>Tags</th>
+                <th>Tags</th><th>Patch</th>
                 <th className="w-actions text-end">Actions</th>
               </tr>
             </thead>
@@ -253,6 +273,7 @@ export default function Database() {
                   <td data-label="Category">{record.categoryId ? categoryPath(record.categoryId, categories) : "Uncategorized"}</td>
                   <td data-label="Class / specialization">{record.disciplineId ? categoryPath(record.disciplineId, disciplines) : "All classes"}</td>
                   <td data-label="Tags">{record.tagIds?.map(id => tags.find(tag => tag.id === id)?.name ?? `Tag #${id}`).join(", ") || "No tags"}</td>
+                  <td data-label="Patch">{patches.find(p => p.id === record.patchId)?.name ?? (record.patchId ? `Patch #${record.patchId}` : "Any patch")}</td>
                   <td data-label="Actions" className="text-end">
                     <div className="btn-group btn-group-sm" role="group" aria-label={`Actions for ${record.name}`}>
                       <Link className="btn btn-outline-info px-2" to={`/Admin/${entity}/Details/${record.id}`} title="Details" aria-label={`Details for ${record.name}`}><DetailIcon /></Link>

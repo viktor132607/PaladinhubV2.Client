@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import CategoryPicker from "@/components/admin/CategoryPicker";
 import ClassPicker from "@/components/admin/ClassPicker";
+import PatchPicker from "@/components/admin/PatchPicker";
 import TagPicker from "@/components/admin/TagPicker";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useNavigate, useParams } from "@/router/nextCompat";
@@ -10,6 +11,7 @@ import { Link, useNavigate, useParams } from "@/router/nextCompat";
 type ItemDto = {
   disciplineId?: number | null;
   tagIds?: number[];
+  patchId?: number | null;
   categoryId?: number | null;
   id: number;
   name: string;
@@ -69,6 +71,7 @@ export default function EditItem() {
   const [form, setForm] = useState<ItemFormState>(emptyForm);
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [disciplineId, setDisciplineId] = useState<number | null>(null);
+  const [patchId, setPatchId] = useState<number | null>(null);
   const [tagIds, setTagIds] = useState<number[]>([]);
   const [itemLoaded, setItemLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -111,6 +114,7 @@ export default function EditItem() {
         setCategoryId(item.categoryId ?? null);
         setDisciplineId(item.disciplineId ?? null);
         setTagIds(item.tagIds ?? []);
+        setPatchId(item.patchId ?? null);
       } catch (caught) {
         if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : "The item could not be loaded.");
       } finally {
@@ -159,6 +163,7 @@ export default function EditItem() {
           categoryId,
           disciplineId,
           tagIds,
+          patchId,
         }),
       });
       await readApiJson<ItemDto>(response);
@@ -193,6 +198,7 @@ export default function EditItem() {
       <form onSubmit={submit}>
         <CategoryPicker value={categoryId} onChange={setCategoryId} disabled={saving} />
         <ClassPicker value={disciplineId} onChange={setDisciplineId} disabled={saving} />
+        <PatchPicker value={patchId} onChange={setPatchId} disabled={saving} />
         <TagPicker value={tagIds} onChange={setTagIds} disabled={saving} />
         <div className="mb-3">
           <label htmlFor="item-name" className="form-label">Name</label>

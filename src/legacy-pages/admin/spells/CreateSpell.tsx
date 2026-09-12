@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import RecordTypePicker from "@/components/admin/RecordTypePicker";
 import CategoryPicker from "@/components/admin/CategoryPicker";
 import ClassPicker from "@/components/admin/ClassPicker";
+import PatchPicker from "@/components/admin/PatchPicker";
 import TagPicker from "@/components/admin/TagPicker";
 import SpellIconPicker from "@/components/admin/SpellIconPicker";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
@@ -50,6 +51,7 @@ export default function CreateSpell() {
   const [form, setForm] = useState<SpellForm>(initialForm);
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [disciplineId, setDisciplineId] = useState<number | null>(null);
+  const [patchId, setPatchId] = useState<number | null>(null);
   const [tagIds, setTagIds] = useState<number[]>([]);
   const [saving, setSaving] = useState(false);
   const [typeBusy, setTypeBusy] = useState(false);
@@ -92,6 +94,7 @@ export default function CreateSpell() {
           categoryId,
           disciplineId,
           tagIds,
+          patchId,
         }),
       });
       await readApiJson<SpellDto>(response);
@@ -114,6 +117,7 @@ export default function CreateSpell() {
       <form onSubmit={submit}>
         <CategoryPicker value={categoryId} onChange={setCategoryId} disabled={saving} />
         <ClassPicker value={disciplineId} onChange={setDisciplineId} disabled={saving} />
+        <PatchPicker value={patchId} onChange={setPatchId} disabled={saving} />
         <TagPicker value={tagIds} onChange={setTagIds} disabled={saving} />
         <div className="mb-3">
           <label htmlFor="spell-name" className="form-label">Name</label>

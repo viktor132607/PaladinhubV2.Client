@@ -1,6 +1,7 @@
 "use client";
 import { CategoryLabel } from "@/components/admin/CategoryPicker";
 import { ClassLabel } from "@/components/admin/ClassPicker";
+import { PatchLabel } from "@/components/admin/PatchPicker";
 import { TagLabel } from "@/components/admin/TagPicker";
 
 import { useEffect, useState } from "react";
@@ -9,6 +10,7 @@ import { Link, useParams } from "@/router/nextCompat";
 
 type ItemDto = {
   tagIds?: number[];
+  patchId?: number | null;
   disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
@@ -81,6 +83,8 @@ export default function ItemDetails() {
       <dl className="row">
         <dt className="col-sm-3">Tags</dt>
         <dd className="col-sm-9"><TagLabel value={item.tagIds} /></dd>
+        <dt className="col-sm-3">Patch</dt>
+        <dd className="col-sm-9"><PatchLabel value={item.patchId} /></dd>
         <dt className="col-sm-3">Class / specialization</dt>
         <dd className="col-sm-9"><ClassLabel value={item.disciplineId} /></dd>
         <dt className="col-sm-3">Category</dt>

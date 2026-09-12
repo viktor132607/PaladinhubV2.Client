@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import CategoryPicker from "@/components/admin/CategoryPicker";
 import ClassPicker from "@/components/admin/ClassPicker";
+import PatchPicker from "@/components/admin/PatchPicker";
 import TagPicker from "@/components/admin/TagPicker";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useNavigate } from "@/router/nextCompat";
@@ -53,6 +54,7 @@ export default function CreateItem() {
   const [form, setForm] = useState<ItemFormState>(initialState);
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [disciplineId, setDisciplineId] = useState<number | null>(null);
+  const [patchId, setPatchId] = useState<number | null>(null);
   const [tagIds, setTagIds] = useState<number[]>([]);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -94,6 +96,7 @@ export default function CreateItem() {
           categoryId,
           disciplineId,
           tagIds,
+          patchId,
         }),
       });
       await readApiJson<unknown>(response);
@@ -116,6 +119,7 @@ export default function CreateItem() {
       <form onSubmit={submit}>
         <CategoryPicker value={categoryId} onChange={setCategoryId} disabled={saving} />
         <ClassPicker value={disciplineId} onChange={setDisciplineId} disabled={saving} />
+        <PatchPicker value={patchId} onChange={setPatchId} disabled={saving} />
         <TagPicker value={tagIds} onChange={setTagIds} disabled={saving} />
         <div className="mb-3">
           <label htmlFor="item-name" className="form-label">Name</label>

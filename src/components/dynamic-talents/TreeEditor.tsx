@@ -5,6 +5,7 @@ import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import RecordTypePicker from "@/components/admin/RecordTypePicker";
 import CategoryPicker from "@/components/admin/CategoryPicker";
 import ClassPicker from "@/components/admin/ClassPicker";
+import PatchPicker from "@/components/admin/PatchPicker";
 import TagPicker from "@/components/admin/TagPicker";
 import SpellIconPicker from "@/components/admin/SpellIconPicker";
 import { spellIconSource as spellIconPath } from "@/lib/spell-icons";
@@ -23,6 +24,7 @@ type PieceKind = string;
 
 type SpellLibraryItem = {
   tagIds?: number[];
+  patchId?: number | null;
   disciplineId?: number | null;
   categoryId?: number | null;
   id: number;
@@ -44,6 +46,7 @@ type CsrfResponse = { token?: string };
 
 type PieceDraft = {
   tagIds: number[];
+  patchId: number | null;
   disciplineId: number | null;
   categoryId: number | null;
   name: string;
@@ -68,6 +71,7 @@ function toPieceDraft(item: SpellLibraryItem): PieceDraft {
     categoryId: item.categoryId ?? null,
     disciplineId: item.disciplineId ?? null,
     tagIds: item.tagIds ?? [],
+        patchId: item.patchId ?? null,
   };
 }
 
@@ -219,6 +223,7 @@ export default function TreeEditor({
           categoryId: pieceDraft.categoryId,
           disciplineId: pieceDraft.disciplineId,
           tagIds: pieceDraft.tagIds,
+        patchId: pieceDraft.patchId,
         }),
       });
 
@@ -234,6 +239,7 @@ export default function TreeEditor({
         categoryId: updated.categoryId ?? null,
         disciplineId: updated.disciplineId ?? null,
         tagIds: updated.tagIds ?? [],
+        patchId: updated.patchId ?? null,
       };
 
       setLibrary((current) =>
@@ -460,6 +466,9 @@ export default function TreeEditor({
                 }} />
                 <ClassPicker value={pieceDraft.disciplineId} disabled={pieceSaving || iconUploading || typeBusy} onChange={disciplineId => {
                   setPieceDraft(current => current ? { ...current, disciplineId } : current); setPieceSaved(false);
+                }} />
+                <PatchPicker value={pieceDraft.patchId} disabled={pieceSaving || iconUploading || typeBusy} onChange={patchId => {
+                  setPieceDraft(current => current ? { ...current, patchId } : current); setPieceSaved(false);
                 }} />
                 <TagPicker value={pieceDraft.tagIds} disabled={pieceSaving || iconUploading || typeBusy} onChange={tagIds => {
                   setPieceDraft(current => current ? { ...current, tagIds } : current); setPieceSaved(false);
