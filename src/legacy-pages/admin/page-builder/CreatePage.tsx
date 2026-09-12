@@ -289,6 +289,7 @@ export default function CreatePage() {
   );
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
+  const [rowVersionBase64, setRowVersionBase64] = useState("");
   const [isPublished, setIsPublished] = useState(true);
   const [blocks, setBlocks] = useState<BuilderBlock[]>([]);
   const [loading, setLoading] = useState(isEditing);
@@ -318,6 +319,7 @@ export default function CreatePage() {
         setTitle(page.title);
         setSlug(page.slug);
         setIsPublished(page.isPublished);
+        setRowVersionBase64(page.rowVersionBase64 ?? "");
         setBlocks(parseLayout(page.jsonLayout));
       } catch (caught) {
         if (!controller.signal.aborted) {
@@ -409,6 +411,7 @@ export default function CreatePage() {
             title: normalizedTitle,
             slug: normalizedSlug,
             isPublished,
+            rowVersionBase64,
           }),
         },
       );
@@ -419,6 +422,7 @@ export default function CreatePage() {
 
       const savedPage = await readApiJson<ManagedPage>(metadataResponse);
 
+      setRowVersionBase64(savedPage.rowVersionBase64 ?? "");
       if (!savedPage.rowVersionBase64) {
         throw new Error("The server did not return a page version for content saving.");
       }

@@ -14,6 +14,7 @@ type DynamicPage = {
   slug: string;
   isPublished: boolean;
   updatedAt?: string;
+  rowVersionBase64: string;
 };
 
 type HardcodedPage = {
@@ -117,6 +118,7 @@ export default function PageBuilderIndex() {
             title: page.title,
             slug: page.slug,
             isPublished,
+            rowVersionBase64: page.rowVersionBase64,
           }),
         },
       );

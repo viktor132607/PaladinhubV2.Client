@@ -32,6 +32,7 @@ import TransactionHistory from "@/pages/account/TransactionHistory";
 import AdminDatabase from "@/pages/admin/database/Database";
 import AdminCategories from "@/pages/admin/categories/Categories";
 import AdminClasses from "@/pages/admin/classes/Classes";
+import PageHistory from "@/pages/admin/page-builder/PageHistory";
 import AdminNavigation from "@/pages/admin/navigation/Navigation";
 import AdminMedia from "@/pages/admin/media/Media";
 import AdminRarities from "@/pages/admin/rarities/Rarities";
@@ -203,6 +204,7 @@ export default function App() {
             <Route path="Database" element={<AdminDatabase />} />
             <Route path="Categories" element={<AdminCategories />} />
             <Route path="Classes" element={<AdminClasses />} />
+            <Route path="PageBuilder/History" element={<PageHistory />} />
             <Route path="Navigation" element={<AdminNavigation />} />
             <Route path="Media" element={<AdminMedia />} />
             <Route path="Rarities" element={<AdminRarities />} />

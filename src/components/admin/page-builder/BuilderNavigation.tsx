@@ -8,11 +8,9 @@ export default function BuilderNavigation() {
       {[
         ["Page Builder", "/Admin/PageBuilder/Index"],
         ["Talent Tree Builder", "/Admin/PageBuilder/TalentTrees"],
+        ["History & recovery", "/Admin/PageBuilder/History"],
       ].map(([label, path]) => {
-        const active =
-          path.endsWith("/TalentTrees")
-            ? talentBuilderActive
-            : pathname.startsWith("/Admin/PageBuilder") && !talentBuilderActive;
+        const active = path.endsWith("/Index") ? pathname === "/Admin/PageBuilder" || pathname === path : pathname === path;
 
         return (
           <Link
