@@ -107,7 +107,10 @@ function configuredApiUrl(): string {
 }
 
 function normalizePath(value: string): string {
-  const rawPath = value.split(/[?#]/, 1)[0]?.trim() || "/";
+  const candidate = value.trim();
+  if (candidate === "*") return "*";
+
+  const rawPath = candidate.split(/[?#]/, 1)[0] || "/";
   const withSlash = rawPath.startsWith("/") ? rawPath : `/${rawPath}`;
   const collapsed = withSlash.replace(/\/{2,}/g, "/");
   return collapsed.length > 1 ? collapsed.replace(/\/+$/, "") : "/";
@@ -225,6 +228,7 @@ export function resolveEffectiveSeo(
 
   const globalEntry = snapshot.entries.find(entry => entry.path === "*");
   const specificEntry = snapshot.entries.find(entry =>
+    entry.path !== "*" &&
     normalizePath(entry.path).toLowerCase() === publicPath.toLowerCase());
 
   const title = firstText(
@@ -314,7 +318,7 @@ export function metadataForPath(
 
 export function pathToStaticSlug(path: string): string[] | null {
   const normalized = normalizePath(path);
-  if (normalized === "/") return null;
+  if (normalized === "/" || normalized === "*") return null;
 
   return normalized
     .split("/")
