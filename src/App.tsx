@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Routes } from "@/router/nextCompat";
 
 import { LocalizationProvider } from "@/localization/LocalizationContext";
 import AdminTranslations from "@/pages/admin/translations/Translations";
+import FooterAdmin from "@/pages/admin/footer/FooterAdmin";
 import BannersAdmin from "@/pages/admin/banners/Banners";
 import AdminLayout from "@/components/admin/AdminLayout";
 import Layout from "@/components/layout/Layout";
@@ -208,6 +209,7 @@ export default function App() {
             <Route path="Categories" element={<AdminCategories />} />
             <Route path="Classes" element={<AdminClasses />} />
             <Route path="PageBuilder/History" element={<PageHistory />} />
+            <Route path="Footer" element={<FooterAdmin />} />
             <Route path="Banners" element={<BannersAdmin />} />
             <Route path="Translations" element={<AdminTranslations />} />
             <Route path="Navigation" element={<AdminNavigation />} />

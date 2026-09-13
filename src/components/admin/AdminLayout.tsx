@@ -19,6 +19,7 @@ const sidebarSections = [
       ["Talent Tree Builder", "/Admin/PageBuilder/TalentTrees"],
       ["Add Page", "/Admin/PageBuilder/Create"],
       ["Banners & messages", "/Admin/Banners"],
+      ["Footer & contacts", "/Admin/Footer"],
     ],
   },
   {
