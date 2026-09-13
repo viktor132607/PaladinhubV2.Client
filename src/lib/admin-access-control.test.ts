@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { groupPermissions, parseRoleSnapshot } from "./admin-access-control";
+import { groupPermissions, parseRoleSnapshot } from "./admin-access-control-helpers";
 
 describe("access-control client helpers", () => {
   it("groups permission definitions by resource and operation", () => {
