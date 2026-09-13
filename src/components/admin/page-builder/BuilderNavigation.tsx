@@ -1,17 +1,21 @@
 "use client";
+import { useAuth } from "@/auth/AuthContext";
+import { adminPermissions } from "@/auth/adminPermissions";
 import { Link, useLocation } from "@/router/nextCompat";
+
 export default function BuilderNavigation() {
+  const { hasPermission } = useAuth();
   const { pathname } = useLocation();
-  const talentBuilderActive = pathname === "/Admin/PageBuilder/TalentTrees";
+  const links = [
+    { label: "Page Builder", path: "/Admin/PageBuilder/Index", permission: adminPermissions.pages.read },
+    { label: "Talent Tree Builder", path: "/Admin/PageBuilder/TalentTrees", permission: adminPermissions.talentTrees.read },
+    { label: "History & recovery", path: "/Admin/PageBuilder/History", permission: adminPermissions.pages.read },
+  ].filter((link) => hasPermission(link.permission));
+
   return (
     <nav aria-label="Page Builder tabs" className="mb-6 flex flex-wrap gap-2">
-      {[
-        ["Page Builder", "/Admin/PageBuilder/Index"],
-        ["Talent Tree Builder", "/Admin/PageBuilder/TalentTrees"],
-        ["History & recovery", "/Admin/PageBuilder/History"],
-      ].map(([label, path]) => {
+      {links.map(({ label, path }) => {
         const active = path.endsWith("/Index") ? pathname === "/Admin/PageBuilder" || pathname === path : pathname === path;
-
         return (
           <Link
             key={path}
