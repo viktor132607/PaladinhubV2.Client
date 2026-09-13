@@ -154,6 +154,15 @@ function normalizeSnapshot(payload: SeoPublicSnapshot): SeoPublicSnapshot {
   };
 }
 
+function unitTestFallbackSnapshot(): SeoPublicSnapshot {
+  return {
+    ...SEO_BUILD_FIXTURE,
+    registryVersion: "fallback-client-routes",
+    snapshotVersion: "fallback",
+    generatedAtUtc: new Date(0).toISOString(),
+  };
+}
+
 function retryDelayMs(): number {
   const configured = Number(process.env.SEO_BUILD_RETRY_DELAY_MS);
   return Number.isFinite(configured) && configured >= 0
@@ -208,6 +217,11 @@ export function resetSeoSnapshotCacheForTests(): void {
 
 export async function getSeoSnapshot(): Promise<SeoPublicSnapshot> {
   if (snapshotPromise) return snapshotPromise;
+
+  if (!process.env.SEO_BUILD_SOURCE && process.env.NODE_ENV === "test") {
+    snapshotPromise = Promise.resolve(normalizeSnapshot(unitTestFallbackSnapshot()));
+    return snapshotPromise;
+  }
 
   snapshotPromise = configuredSeoBuildSource() === "fixture"
     ? Promise.resolve(normalizeSnapshot(SEO_BUILD_FIXTURE))
