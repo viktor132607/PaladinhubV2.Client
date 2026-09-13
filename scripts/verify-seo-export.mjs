@@ -1,5 +1,6 @@
 import { access, readFile } from "node:fs/promises";
 import path from "node:path";
+import process from "node:process";
 
 const root = process.cwd();
 const out = path.join(root, "out");
@@ -54,4 +55,4 @@ assertIncludes(robots, "Disallow: /Admin", "robots.txt");
 assertIncludes(robots, "Disallow: /Account", "robots.txt");
 assertIncludes(robots, "Sitemap:", "robots.txt");
 
-console.log("SEO static export verification passed.");
+process.stdout.write("SEO static export verification passed.\n");
