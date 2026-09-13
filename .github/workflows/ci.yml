@@ -19,7 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      NEXT_PUBLIC_API_URL: https://paladinhubv2-api.onrender.com
+      NEXT_PUBLIC_API_URL: https://paladinhubv2-server.onrender.com
+      NEXT_PUBLIC_SITE_URL: https://paladinhubv2-client.onrender.com
 
     steps:
       - name: Checkout
@@ -46,3 +47,6 @@ jobs:
 
       - name: Build static export
         run: npm run build
+
+      - name: Verify SEO export artifacts
+        run: npm run verify:seo-export
