@@ -15,10 +15,15 @@ import {
   type UserRoleSummary,
 } from "@/lib/admin-access-control";
 
+function isStaleConflict(error: unknown): boolean {
+  return error instanceof Error &&
+    error.message.toLowerCase().includes("changed by another request");
+}
+
 function errorMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : "Access-control request failed.";
-  return message.toLowerCase().includes("changed by another request")
-    ? "This role changed on the server. Your unsaved draft was preserved; reload the role before retrying."
+  return isStaleConflict(error)
+    ? "This role changed on the server. Your unsaved draft was preserved."
     : message;
 }
 
@@ -55,6 +60,7 @@ export default function RolesAdmin() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [conflict, setConflict] = useState(false);
 
   const groupedCatalog = useMemo(() => groupPermissions(catalog), [catalog]);
   const assignedIds = useMemo(() => new Set(roleUsers.map((user) => user.id)), [roleUsers]);
@@ -93,18 +99,44 @@ export default function RolesAdmin() {
   }, [canReadAssignments, canReadPermissions, canReadUsers, canUpdateAssignments]);
 
   useEffect(() => { void loadRoles().catch((reason) => setError(errorMessage(reason))); }, [loadRoles]);
-  useEffect(() => { setError(""); setMessage(""); void loadSelected(selectedId).catch((reason) => setError(errorMessage(reason))); }, [loadSelected, selectedId]);
+  useEffect(() => {
+    setError(""); setMessage(""); setConflict(false);
+    void loadSelected(selectedId).catch((reason) => setError(errorMessage(reason)));
+  }, [loadSelected, selectedId]);
 
   const run = async (operation: () => Promise<void>, success: string) => {
     setBusy(true); setError(""); setMessage("");
-    try { await operation(); setMessage(success); }
-    catch (reason) { setError(errorMessage(reason)); }
-    finally { setBusy(false); }
+    try {
+      await operation();
+      setConflict(false);
+      setMessage(success);
+    } catch (reason) {
+      setConflict(isStaleConflict(reason));
+      setError(errorMessage(reason));
+    } finally {
+      setBusy(false);
+    }
   };
 
   const replaceSelected = async (role: AccessRole, success: string) => {
+    setConflict(false);
     setSelected(role); setDraftName(role.name); setDraftDisabled(role.isDisabled); setDraftPermissions([...role.permissions]);
     await loadRoles(role.id); await loadSelected(role.id); setMessage(success);
+  };
+
+  const loadLatest = async () => {
+    if (!selected) return;
+    setBusy(true); setError(""); setMessage("");
+    try {
+      await loadRoles(selected.id);
+      await loadSelected(selected.id);
+      setConflict(false);
+      setMessage("Latest role version loaded. Your previous local draft was replaced only after this action.");
+    } catch (reason) {
+      setError(errorMessage(reason));
+    } finally {
+      setBusy(false);
+    }
   };
 
   const togglePermission = (permissionId: string) => {
@@ -117,7 +149,11 @@ export default function RolesAdmin() {
       <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
         <div><h1 className="h3 mb-1">Roles & permissions</h1><p className="text-muted mb-0">Manage custom roles, effective grants, assignments, history and audit records.</p></div>
       </div>
-      <div aria-live="polite">{error ? <div className="alert alert-danger">{error}</div> : null}{message ? <div className="alert alert-success">{message}</div> : null}</div>
+      <div aria-live="polite">
+        {error ? <div className="alert alert-danger">{error}</div> : null}
+        {conflict && selected ? <div className="alert alert-warning d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2"><span>The server has a newer version. Review your current draft before replacing it.</span><button className="btn btn-sm btn-outline-dark" type="button" disabled={busy} onClick={() => void loadLatest()}>Load latest</button></div> : null}
+        {message ? <div className="alert alert-success">{message}</div> : null}
+      </div>
 
       {canCreate ? <form className="card card-body mb-3" onSubmit={(event) => { event.preventDefault(); const name = newRoleName.trim(); if (!name) return; void run(async () => { const created = await accessControlApi.createRole(name, []); setNewRoleName(""); await loadRoles(created.id); setSelectedId(created.id); }, "Role created."); }}>
         <label className="form-label" htmlFor="new-role-name">Create custom role</label>
