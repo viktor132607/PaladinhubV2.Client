@@ -1,0 +1,48 @@
+import { access, readFile } from "node:fs/promises";
+import path from "node:path";
+
+const root = process.cwd();
+const out = path.join(root, "out");
+
+async function read(relativePath) {
+  const filePath = path.join(out, relativePath);
+  await access(filePath);
+  return readFile(filePath, "utf8");
+}
+
+async function readRoute(...candidates) {
+  for (const candidate of candidates) {
+    try {
+      return await read(candidate);
+    } catch {
+      // Try the next static-export filename shape.
+    }
+  }
+  throw new Error(`Missing exported route. Tried: ${candidates.join(", ")}`);
+}
+
+function assertIncludes(content, expected, label) {
+  if (!content.includes(expected)) {
+    throw new Error(`${label} is missing expected output: ${expected}`);
+  }
+}
+
+const home = await read("index.html");
+assertIncludes(home, 'rel="canonical"', "Home HTML");
+assertIncludes(home, 'property="og:title"', "Home HTML");
+assertIncludes(home, 'name="twitter:card"', "Home HTML");
+
+const adminSeo = await readRoute("Admin/Seo.html", "Admin/Seo/index.html");
+assertIncludes(adminSeo, "noindex", "Admin SEO HTML");
+assertIncludes(adminSeo, "nofollow", "Admin SEO HTML");
+
+const sitemap = await read("sitemap.xml");
+assertIncludes(sitemap, "<urlset", "sitemap.xml");
+assertIncludes(sitemap, "<loc>", "sitemap.xml");
+
+const robots = await read("robots.txt");
+assertIncludes(robots, "User-Agent: *", "robots.txt");
+assertIncludes(robots, "Disallow: /Admin", "robots.txt");
+assertIncludes(robots, "Sitemap:", "robots.txt");
+
+console.log("SEO static export verification passed.");
