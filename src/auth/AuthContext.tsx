@@ -14,6 +14,11 @@ import {
   fetchBackend,
   readApiJson,
 } from "@/config/api";
+import {
+  canEnterAdmin,
+  hasAnyEffectivePermission,
+  hasEffectivePermission,
+} from "@/auth/adminPermissions";
 
 export type AuthUser = {
   id: string;
@@ -22,6 +27,7 @@ export type AuthUser = {
   fullName: string;
   avatarPath?: string | null;
   roles: string[];
+  permissions: string[];
 };
 
 type AuthSession = {
@@ -55,7 +61,9 @@ type LoginResult = {
 
 type AuthContextValue = {
   user: AuthUser | null;
+  permissions: string[];
   isAuthenticated: boolean;
+  canAccessAdmin: boolean;
   loading: boolean;
   refresh: () => Promise<void>;
   login: (input: LoginInput) => Promise<LoginResult>;
@@ -64,6 +72,8 @@ type AuthContextValue = {
   loginWithRecoveryCode: (recoveryCode: string) => Promise<void>;
   logout: () => Promise<void>;
   hasRole: (role: string) => boolean;
+  hasPermission: (permission: string) => boolean;
+  hasAnyPermission: (permissions: readonly string[]) => boolean;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -97,9 +107,26 @@ async function postAuth<T>(path: string, body: unknown): Promise<T> {
   return readApiJson<T>(response);
 }
 
+function normalizeSessionUser(user: AuthUser | null): AuthUser | null {
+  if (!user) return null;
+  return {
+    ...user,
+    roles: Array.isArray(user.roles) ? user.roles : [],
+    permissions: Array.isArray(user.permissions) ? user.permissions : [],
+  };
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const applySession = useCallback((session: AuthSession | null | undefined) => {
+    setUser(
+      session?.isAuthenticated
+        ? normalizeSessionUser(session.user)
+        : null,
+    );
+  }, []);
 
   const refresh = useCallback(async () => {
     try {
@@ -107,15 +134,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         cache: "no-store",
       });
 
-      const session = await readApiJson<AuthSession>(response);
-
-      setUser(session?.isAuthenticated ? session.user : null);
+      applySession(await readApiJson<AuthSession>(response));
     } catch {
       setUser(null);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [applySession]);
 
   useEffect(() => {
     void refresh();
@@ -144,45 +169,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
       }
 
-      const session = await readApiJson<AuthSession>(response);
-
-      setUser(session.user);
+      applySession(await readApiJson<AuthSession>(response));
 
       return {
         requiresTwoFactor: false,
       };
     },
-    [],
+    [applySession],
   );
 
   const register = useCallback(async (input: RegisterInput) => {
-    const session = await postAuth<AuthSession>(
+    applySession(await postAuth<AuthSession>(
       backendEndpoints.auth.register,
       input,
-    );
-
-    setUser(session.user);
-  }, []);
+    ));
+  }, [applySession]);
 
   const loginWithTwoFactor = useCallback(async (input: TwoFactorInput) => {
-    const session = await postAuth<AuthSession>(
+    applySession(await postAuth<AuthSession>(
       backendEndpoints.auth.loginWithTwoFactor,
       input,
-    );
-
-    setUser(session.user);
-  }, []);
+    ));
+  }, [applySession]);
 
   const loginWithRecoveryCode = useCallback(
     async (recoveryCode: string) => {
-      const session = await postAuth<AuthSession>(
+      applySession(await postAuth<AuthSession>(
         backendEndpoints.auth.loginWithRecoveryCode,
         { recoveryCode },
-      );
-
-      setUser(session.user);
+      ));
     },
-    [],
+    [applySession],
   );
 
   const logout = useCallback(async () => {
@@ -202,10 +219,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [user],
   );
 
+  const permissions = useMemo(
+    () => user?.permissions ?? [],
+    [user],
+  );
+
+  const hasPermission = useCallback(
+    (permission: string): boolean =>
+      hasEffectivePermission(permissions, permission),
+    [permissions],
+  );
+
+  const hasAnyPermission = useCallback(
+    (required: readonly string[]): boolean =>
+      hasAnyEffectivePermission(permissions, required),
+    [permissions],
+  );
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
+      permissions,
       isAuthenticated: Boolean(user),
+      canAccessAdmin: canEnterAdmin(permissions),
       loading,
       refresh,
       login,
@@ -214,9 +250,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loginWithRecoveryCode,
       logout,
       hasRole,
+      hasPermission,
+      hasAnyPermission,
     }),
     [
       user,
+      permissions,
       loading,
       refresh,
       login,
@@ -225,6 +264,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loginWithRecoveryCode,
       logout,
       hasRole,
+      hasPermission,
+      hasAnyPermission,
     ],
   );
 
