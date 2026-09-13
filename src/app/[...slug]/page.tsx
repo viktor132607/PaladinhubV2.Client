@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
 import AppEntry from "@/app/AppEntry";
+import {
+  getSeoSnapshot,
+  metadataForPath,
+  pathToStaticSlug,
+} from "@/lib/seo-public";
 
-export function generateStaticParams() {
-  return [
+const applicationStaticParams = [
   { slug: ["Home", "Home"] },
   { slug: ["Holy", "Overview"] },
   { slug: ["Holy", "Gear"] },
@@ -93,8 +98,34 @@ export function generateStaticParams() {
   { slug: ["products"] },
   { slug: ["discussions"] },
   { slug: ["privacy"] },
-  { slug: ["admin"] }
-  ];
+  { slug: ["admin"] },
+];
+
+export async function generateStaticParams(): Promise<Array<{ slug: string[] }>> {
+  const snapshot = await getSeoSnapshot();
+  const result = applicationStaticParams.map(item => ({ slug: [...item.slug] }));
+  const seen = new Set(result.map(item => item.slug.join("/").toLowerCase()));
+
+  for (const page of snapshot.pages) {
+    const slug = pathToStaticSlug(page.path);
+    if (!slug?.length) continue;
+    const key = slug.join("/").toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push({ slug });
+  }
+
+  return result;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string[] }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const requestedPath = `/${slug.join("/")}`;
+  return metadataForPath(await getSeoSnapshot(), requestedPath);
 }
 
 export default function Page() { return <AppEntry />; }
