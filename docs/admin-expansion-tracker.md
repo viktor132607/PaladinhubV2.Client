@@ -38,7 +38,7 @@ Banner fixes published: Server `d66019fa7ebc73f689b2eaa9bc6baaab2c1d2acb`; Clien
 
 ## Point 14 — SEO admin and static publishing
 
-Status: verified implementation; ready for coordinated publication after the final branch CI remains green.
+Status: verified implementation and published to `main`.
 
 Implemented:
 - responsive `/Admin/Seo` editor with global defaults, static/database targets, media selection, lifecycle/history/restore, stale-version handling and SEO preview;
@@ -53,13 +53,39 @@ Implemented:
 - no `hreflang` is emitted because the current language selector does not provide real locale-specific public URLs.
 
 Verification evidence:
-- Client CI run 22 completed successfully;
-- typecheck succeeded;
-- unit suite: 24 total, 24 passed;
+- point-14 final Client main CI completed successfully;
+- typecheck and unit suite succeeded;
 - deterministic Next static export generated 99 pages;
 - actual exported HTML verified canonical, Open Graph, Twitter, Page Builder metadata, private/admin `noindex` and a public route-specific `noindex` case;
 - exported sitemap includes the published Page Builder fixture and excludes aliases, private routes and the fixture `noindex` route;
 - exported `robots.txt` and `/seo-build-manifest` passed post-build assertions;
 - a second CI build intentionally pointed the API-backed SEO source at an unreachable endpoint and correctly failed after three attempts with `SEO build failed`, proving fail-closed production behavior.
 
-The existing repository lint debt remains non-blocking and unchanged by point 14. Main publication is source-control publication only; it is not proof that Render has deployed the resulting commits. Final server/client publication SHAs are recorded after the coordinated fast-forward.
+The existing repository lint/package debt remains non-blocking. Main publication is source-control publication only; it is not proof that Render has deployed the resulting commits.
+
+## Point 15 — roles and permissions
+
+### 15.5 — effective-permission client and access-control UI
+
+Status: implementation complete on `work/roles-permissions-15-5`; publication is gated on final Server + Client CI and fresh main ancestry checks.
+
+Implemented:
+- `/api/auth/me` effective permissions consumed by the client alongside existing Identity roles;
+- `AuthContext` helpers for one permission, any permission and general Admin-area eligibility;
+- `PermissionRoute` replacing the hardcoded Admin-role shell, with authenticated redirect and `/Error/403` handling;
+- granular route guards for the full mapped admin surface, including admin product/cart routes outside `/Admin`;
+- permission-filtered admin navigation, dashboard cards and Page Builder tabs;
+- responsive `/Admin/Roles` and `/Admin/Users` screens for role CRUD, permission grants, role membership, history/restore and audit;
+- role-permission editing requires permission-catalog read access as well as update authority, avoiding an unauthorized hidden catalog request;
+- current-session refresh after changing the signed-in user's role membership;
+- per-action create/update/archive/delete/restore controls on Categories, Classes, Tags, Patches, Rarities, Navigation, Banners, Footer, Media, Localization, Page history and Promo Codes;
+- Media upload/paste follows `spell_icons.create`, while media metadata/delete/restore use their respective media permissions;
+- Database action links follow Items/Spells read/create/update/delete rights and auxiliary filter data is loaded only when the corresponding Categories/Classes/Tags/Patches/Rarities read permission exists;
+- read-only roles receive read-only presentation rather than mutation controls that merely fail with 403.
+
+Security boundary:
+- client hiding/disable logic is for usability only;
+- server middleware still independently resolves current database memberships and grants on every protected request;
+- no client role name is treated as authorization authority.
+
+Point 15 is marked complete only after the final branch CI gates pass and both point-15 branches are safely fast-forwarded to current `main` without being behind it. GitHub `main` publication does not by itself prove a Render deployment.
