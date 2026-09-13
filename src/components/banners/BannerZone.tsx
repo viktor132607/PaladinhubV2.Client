@@ -10,9 +10,9 @@ type Response={items:Banner[];nextChangeAtUtc?:string|null};
 
 export default function BannerZone({position}:{position:Position}){
  const {pathname}=useLocation();const {t}=useLocalization();const [data,setData]=useState<Response>({items:[]});const [tick,setTick]=useState(0);const [failed,setFailed]=useState(false);
- useEffect(()=>{const c=new AbortController();fetchBackend(`/api/banners?path=${encodeURIComponent(pathname)}`,{signal:c.signal,cache:"no-store"}).then(readApiJson<Response>).then(v=>{if(!c.signal.aborted){setData(v);setFailed(false);}}).catch(()=>{if(!c.signal.aborted){setData({items:[]});setFailed(true);}});return()=>c.abort();},[pathname,tick]);
- useEffect(()=>{if(!data.nextChangeAtUtc)return;const at=Date.parse(data.nextChangeAtUtc);if(!Number.isFinite(at))return;const delay=Math.max(25,Math.min(2147483000,at-Date.now()+25));const timer=window.setTimeout(()=>setTick(v=>v+1),delay);return()=>clearTimeout(timer);},[data.nextChangeAtUtc]);
- const rows=useMemo(()=>data.items.filter(x=>x.position===position).filter(x=>{try{return localStorage.getItem(`ph-banner-dismissed:${x.id}:v${x.version}`)!=="1";}catch{return true;}}),[data.items,position,tick]);
+ useEffect(()=>{setData({items:[]});const c=new AbortController();fetchBackend(`/api/banners?path=${encodeURIComponent(pathname)}`,{signal:c.signal,cache:"no-store"}).then(readApiJson<Response>).then(v=>{if(!c.signal.aborted){setData(v);setFailed(false);}}).catch(()=>{if(!c.signal.aborted){setData({items:[]});setFailed(true);}});return()=>c.abort();},[pathname,tick]);
+ useEffect(()=>{if(!data.nextChangeAtUtc)return;const at=Date.parse(data.nextChangeAtUtc);if(!Number.isFinite(at))return;const delay=Math.max(25,Math.min(2147483000,at-Date.now()+25));const timer=window.setTimeout(()=>setTick(v=>v+1),delay);return()=>clearTimeout(timer);},[data.nextChangeAtUtc,tick]);
+ const rows=useMemo(()=>(data.items??[]).filter(x=>x.position===position&&(!x.endAtUtc||Date.parse(x.endAtUtc)>Date.now())).filter(x=>{try{return localStorage.getItem(`ph-banner-dismissed:${x.id}:v${x.version}`)!=="1";}catch{return true;}}),[data.items,position,tick]);
  if(failed||rows.length===0)return null;
  return <div className={`ph-banner-zone ph-banner-zone--${position}`} role="region" aria-label={t("banners.region","Site messages")}>
   {rows.map(x=><article key={`${x.id}:${x.version}`} className={`ph-site-banner ph-site-banner--${x.kind}`}>
