@@ -21,6 +21,9 @@ jobs:
     env:
       NEXT_PUBLIC_API_URL: https://paladinhubv2-server.onrender.com
       NEXT_PUBLIC_SITE_URL: https://paladinhubv2-client.onrender.com
+      SEO_BUILD_SOURCE: fixture
+      SEO_BUILD_COMMIT: ${{ github.sha }}
+      SEO_BUILD_RETRY_DELAY_MS: "0"
 
     steps:
       - name: Checkout
@@ -45,8 +48,25 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Build static export
+      - name: Build deterministic static export
         run: npm run build
 
       - name: Verify SEO export artifacts
         run: npm run verify:seo-export
+
+      - name: Verify production SEO snapshot failure blocks export
+        env:
+          SEO_BUILD_SOURCE: api
+          SEO_BUILD_RETRY_DELAY_MS: "0"
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:9
+        run: |
+          set +e
+          npm run build > /tmp/seo-fail-closed.log 2>&1
+          status=$?
+          set -e
+          cat /tmp/seo-fail-closed.log
+          if [ "$status" -eq 0 ]; then
+            echo "Expected the API-backed SEO build to fail when its snapshot endpoint is unavailable."
+            exit 1
+          fi
+          grep -q "SEO build failed" /tmp/seo-fail-closed.log
