@@ -35,3 +35,31 @@ Remaining sequence: 13 footer, 14 SEO, 15 roles/permissions, complete translatio
 Implemented versioned entries with section FKs, typed links and contacts, ordering/moving, archive and revision restore. Section deletion is blocked while entries remain. Added responsive admin editor, public data rendering, intentional-empty vs failure fallback, copyright year replacement, and stable translation keys. Default V1/V2 copyright is seeded once. Verification: client/server builds, 11 focused tests, actual SQL idempotency/preservation/FK checks in PGlite. Browser checks passed: section/contact CRUD, history restore, typed mailto links, empty-response versus outage fallback, and portrait/landscape/desktop dimensions. Explicit form-label associations were corrected after the browser checks caught ambiguous labels.
 
 Banner fixes published: Server `d66019fa7ebc73f689b2eaa9bc6baaab2c1d2acb`; Client `527684ff7c2f235c21fe16b5ade9dbd23d19dbae`.
+
+## Point 14 — SEO admin and static publishing
+
+Status: verified implementation; ready for coordinated publication after the final branch CI remains green.
+
+Implemented:
+- responsive `/Admin/Seo` editor with global defaults, static/database targets, media selection, lifecycle/history/restore, stale-version handling and SEO preview;
+- build-time public SEO snapshot resolution for home, static public routes and published Page Builder routes;
+- exported title, description, canonical, Open Graph, Twitter and robots directives in actual prerendered HTML;
+- generated `sitemap.xml` limited to canonical public indexable routes and `robots.txt` blocking private/admin/account/cart/checkout areas;
+- deterministic repository fixture for tests/CI, including a published Page Builder route and a route-specific `noindex` case;
+- production `SEO_BUILD_SOURCE=api` policy with three bounded retries and explicit build failure when the validated SEO snapshot is unavailable or invalid; no silent production fallback;
+- static `/seo-build-manifest` recording the exact snapshot/registry version included in that build, the build commit and whether another rebuild is required for database changes;
+- current Render API/site origins in production examples, while deployment environment overrides remain authoritative;
+- no deploy hook is claimed because none is configured in the repository;
+- no `hreflang` is emitted because the current language selector does not provide real locale-specific public URLs.
+
+Verification evidence:
+- Client CI run 22 completed successfully;
+- typecheck succeeded;
+- unit suite: 24 total, 24 passed;
+- deterministic Next static export generated 99 pages;
+- actual exported HTML verified canonical, Open Graph, Twitter, Page Builder metadata, private/admin `noindex` and a public route-specific `noindex` case;
+- exported sitemap includes the published Page Builder fixture and excludes aliases, private routes and the fixture `noindex` route;
+- exported `robots.txt` and `/seo-build-manifest` passed post-build assertions;
+- a second CI build intentionally pointed the API-backed SEO source at an unreachable endpoint and correctly failed after three attempts with `SEO build failed`, proving fail-closed production behavior.
+
+The existing repository lint debt remains non-blocking and unchanged by point 14. Main publication is source-control publication only; it is not proof that Render has deployed the resulting commits. Final server/client publication SHAs are recorded after the coordinated fast-forward.
