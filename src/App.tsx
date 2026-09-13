@@ -7,6 +7,7 @@ import { LocalizationProvider } from "@/localization/LocalizationContext";
 import AdminTranslations from "@/pages/admin/translations/Translations";
 import FooterAdmin from "@/pages/admin/footer/FooterAdmin";
 import BannersAdmin from "@/pages/admin/banners/Banners";
+import AdminSeo from "@/pages/admin/seo/Seo";
 import AdminLayout from "@/components/admin/AdminLayout";
 import Layout from "@/components/layout/Layout";
 import V1Stylesheets from "@/components/styles/V1Stylesheets";
@@ -214,6 +215,7 @@ export default function App() {
             <Route path="Translations" element={<AdminTranslations />} />
             <Route path="Navigation" element={<AdminNavigation />} />
             <Route path="Media" element={<AdminMedia />} />
+            <Route path="Seo" element={<AdminSeo />} />
             <Route path="Rarities" element={<AdminRarities />} />
             <Route path="Patches" element={<AdminPatches />} />
             <Route path="Tags" element={<AdminTags />} />
