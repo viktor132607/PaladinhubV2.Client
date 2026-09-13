@@ -1,6 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import Providers from "./providers";
+import {
+  configuredSiteUrl,
+  DEFAULT_SEO_DESCRIPTION,
+  DEFAULT_SEO_TITLE,
+} from "@/lib/seo-public";
 
 import "../index.css";
 import "../App.css";
@@ -12,9 +17,9 @@ import "../styles/banners.css";
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export const metadata: Metadata = {
-  title: "PaladinHub",
-  description:
-    "World of Warcraft Paladin guides, builds, discussions and merchandise.",
+  metadataBase: new URL(configuredSiteUrl()),
+  title: DEFAULT_SEO_TITLE,
+  description: DEFAULT_SEO_DESCRIPTION,
   icons: {
     icon: {
       url: "/images/WoW_icon.svg.png",
