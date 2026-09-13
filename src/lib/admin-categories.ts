@@ -1,5 +1,7 @@
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 
+export const ADMIN_PERMISSION_REFRESH_EVENT = "paladinhub:admin-permissions-stale";
+
 export type Category = {
   id: number; name: string; description: string; parentId: number | null;
   sortOrder: number; isArchived: boolean; isDeleted: boolean; version: number;
@@ -38,6 +40,18 @@ export async function adminRequest<T>(path: string, method = "GET", body?: unkno
     headers["X-CSRF-TOKEN"] = csrf.token;
     headers["Content-Type"] = "application/json";
   }
-  return readApiJson<T>(await fetchBackend(path, { method, headers, cache: "no-store", signal,
-    ...(body !== undefined ? { body: JSON.stringify(body) } : {}) }));
+
+  const response = await fetchBackend(path, {
+    method,
+    headers,
+    cache: "no-store",
+    signal,
+    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+  });
+
+  if (response.status === 403 && typeof window !== "undefined") {
+    window.dispatchEvent(new Event(ADMIN_PERMISSION_REFRESH_EVENT));
+  }
+
+  return readApiJson<T>(response);
 }
