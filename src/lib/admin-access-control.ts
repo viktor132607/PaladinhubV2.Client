@@ -1,4 +1,4 @@
-import { adminRequest } from "@/lib/admin-categories";
+import { adminRequest } from "./admin-categories";
 
 const root = "/Admin/api/access-control";
 const encode = (value: string | number) => encodeURIComponent(String(value));
