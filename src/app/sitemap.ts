@@ -5,6 +5,8 @@ import {
   resolveEffectiveSeo,
 } from "@/lib/seo-public";
 
+export const dynamic = "force-static";
+
 function pageUrl(siteUrl: string, path: string): string {
   return path === "/" ? siteUrl : `${siteUrl}${path}`;
 }
