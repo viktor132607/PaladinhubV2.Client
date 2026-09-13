@@ -21,7 +21,6 @@ jobs:
     env:
       NEXT_PUBLIC_API_URL: https://paladinhubv2-server.onrender.com
       NEXT_PUBLIC_SITE_URL: https://paladinhubv2-client.onrender.com
-      SEO_BUILD_SOURCE: fixture
       SEO_BUILD_COMMIT: ${{ github.sha }}
       SEO_BUILD_RETRY_DELAY_MS: "0"
 
@@ -49,6 +48,8 @@ jobs:
         run: npm test
 
       - name: Build deterministic static export
+        env:
+          SEO_BUILD_SOURCE: fixture
         run: npm run build
 
       - name: Verify SEO export artifacts
