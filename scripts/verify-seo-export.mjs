@@ -27,6 +27,12 @@ function assertIncludes(content, expected, label) {
   }
 }
 
+function assertNotIncludes(content, unexpected, label) {
+  if (content.includes(unexpected)) {
+    throw new Error(`${label} contains forbidden output: ${unexpected}`);
+  }
+}
+
 const home = await read("index.html");
 assertIncludes(home, 'rel="canonical"', "Home HTML");
 assertIncludes(home, 'property="og:title"', "Home HTML");
@@ -39,10 +45,13 @@ assertIncludes(adminSeo, "nofollow", "Admin SEO HTML");
 const sitemap = await read("sitemap.xml");
 assertIncludes(sitemap, "<urlset", "sitemap.xml");
 assertIncludes(sitemap, "<loc>", "sitemap.xml");
+assertNotIncludes(sitemap.toLowerCase(), "/admin", "sitemap.xml");
+assertNotIncludes(sitemap.toLowerCase(), "/account", "sitemap.xml");
 
 const robots = await read("robots.txt");
 assertIncludes(robots, "User-Agent: *", "robots.txt");
 assertIncludes(robots, "Disallow: /Admin", "robots.txt");
+assertIncludes(robots, "Disallow: /Account", "robots.txt");
 assertIncludes(robots, "Sitemap:", "robots.txt");
 
 console.log("SEO static export verification passed.");
