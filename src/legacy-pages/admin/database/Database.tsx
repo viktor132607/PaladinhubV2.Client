@@ -1,6 +1,8 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useAuth } from "@/auth/AuthContext";
+import { adminPermissions } from "@/auth/adminPermissions";
 import { fetchBackend, readApiJson } from "@/config/api";
 import { spellIconSource, itemIconSource } from "@/lib/spell-icons";
 import { adminRequest, categoryPath, type Category } from "@/lib/admin-categories";
@@ -64,8 +66,20 @@ function iconPath(entity: EntityKind, icon: string): string {
 }
 
 export default function Database() {
+  const { hasPermission } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const entity = normalizeEntity(searchParams.get("entity"));
+  const entityPermissions = entity === "Items" ? adminPermissions.items : adminPermissions.spells;
+  const canReadEntity = hasPermission(entityPermissions.read);
+  const canCreateEntity = hasPermission(entityPermissions.create);
+  const canUpdateEntity = hasPermission(entityPermissions.update);
+  const canDeleteEntity = hasPermission(entityPermissions.delete);
+  const canReadTags = hasPermission(adminPermissions.tags.read);
+  const canReadPatches = hasPermission(adminPermissions.patches.read);
+  const canReadRarities = hasPermission(adminPermissions.rarities.read);
+  const canReadClasses = hasPermission(adminPermissions.classes.read);
+  const canReadCategories = hasPermission(adminPermissions.categories.read);
+
   const search = searchParams.get("search")?.trim() ?? "";
   const categoryId = searchParams.get("categoryId") ?? "";
   const disciplineId = searchParams.get("disciplineId") ?? "";
@@ -73,50 +87,55 @@ export default function Database() {
   const [tags, setTags] = useState<Category[]>([]);
   const [tagError, setTagError] = useState("");
   useEffect(() => {
+    if (!canReadTags) { setTags([]); setTagError(""); return; }
     const controller = new AbortController();
     void adminRequest<Category[]>("/Admin/api/tags", "GET", undefined, controller.signal)
       .then(result => { if (!controller.signal.aborted) setTags(result); })
       .catch(error => { if (!controller.signal.aborted) setTagError(error.message); });
     return () => controller.abort();
-  }, []);
+  }, [canReadTags]);
   const patchId = searchParams.get("patchId") ?? "";
   const [patches, setPatches] = useState<Category[]>([]);
   const [patchError, setPatchError] = useState("");
   useEffect(() => {
+    if (!canReadPatches) { setPatches([]); setPatchError(""); return; }
     const controller = new AbortController();
     void adminRequest<Category[]>("/Admin/api/patches", "GET", undefined, controller.signal)
       .then(result => { if (!controller.signal.aborted) setPatches(result); })
       .catch(error => { if (!controller.signal.aborted) setPatchError(error.message); });
     return () => controller.abort();
-  }, []);
+  }, [canReadPatches]);
   const rarityId = searchParams.get("rarityId") ?? "";
   const [rarities, setRarities] = useState<Category[]>([]);
   const [rarityError, setRarityError] = useState("");
   useEffect(() => {
+    if (!canReadRarities) { setRarities([]); setRarityError(""); return; }
     const controller = new AbortController();
     void adminRequest<Category[]>("/Admin/api/rarities", "GET", undefined, controller.signal)
       .then(result => { if (!controller.signal.aborted) setRarities(result); })
       .catch(error => { if (!controller.signal.aborted) setRarityError(error.message); });
     return () => controller.abort();
-  }, []);
+  }, [canReadRarities]);
   const [disciplines, setDisciplines] = useState<Category[]>([]);
   const [disciplineError, setDisciplineError] = useState("");
   useEffect(() => {
+    if (!canReadClasses) { setDisciplines([]); setDisciplineError(""); return; }
     const controller = new AbortController();
     void adminRequest<Category[]>("/Admin/api/classes", "GET", undefined, controller.signal)
       .then(result => { if (!controller.signal.aborted) setDisciplines(result); })
       .catch(error => { if (!controller.signal.aborted) setDisciplineError(error.message); });
     return () => controller.abort();
-  }, []);
+  }, [canReadClasses]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryError, setCategoryError] = useState("");
   useEffect(() => {
+    if (!canReadCategories) { setCategories([]); setCategoryError(""); return; }
     const controller = new AbortController();
     void adminRequest<Category[]>("/Admin/api/categories", "GET", undefined, controller.signal)
       .then(result => { if (!controller.signal.aborted) setCategories(result); })
       .catch(error => { if (!controller.signal.aborted) setCategoryError(error.message); });
     return () => controller.abort();
-  }, []);
+  }, [canReadCategories]);
   const page = positiveInteger(searchParams.get("page"), 1);
   const pageSize = Math.min(100, positiveInteger(searchParams.get("pageSize"), 20));
 
@@ -214,34 +233,32 @@ export default function Database() {
         </ul>
 
         <form onSubmit={submitSearch} className="row g-2 mb-3">
-          <div className="col-12 col-md-auto">
-            <select className="form-select" aria-label="Filter by tag" value={tagId} onChange={event => changeQuery({ tagId: event.target.value, page: 1 })}>
+          {canReadTags || canReadPatches || (entity === "Items" && canReadRarities) ? <div className="col-12 col-md-auto">
+            {canReadTags ? <select className="form-select" aria-label="Filter by tag" value={tagId} onChange={event => changeQuery({ tagId: event.target.value, page: 1 })}>
               <option value="">All tags</option><option value="0">No tags</option>
               {tags.filter(tag => !tag.isDeleted).map(tag => <option key={tag.id} value={tag.id}>{tag.name}{tag.isArchived ? " (archived)" : ""}</option>)}
-            </select>
-            <select className="form-select" aria-label="Filter by patch" value={patchId} onChange={event => changeQuery({ patchId: event.target.value, page: 1 })}>
+            </select> : null}
+            {canReadPatches ? <select className="form-select" aria-label="Filter by patch" value={patchId} onChange={event => changeQuery({ patchId: event.target.value, page: 1 })}>
               <option value="">All patches</option><option value="0">No patches</option>
               {patches.filter(patch => !patch.isDeleted).map(patch => <option key={patch.id} value={patch.id}>{patch.name}{patch.isArchived ? " (archived)" : ""}</option>)}
-            </select>
-            {entity === "Items" && <>
-            <select className="form-select" aria-label="Filter by rarity" value={rarityId} onChange={event => changeQuery({ rarityId: event.target.value, page: 1 })}>
+            </select> : null}
+            {entity === "Items" && canReadRarities ? <select className="form-select" aria-label="Filter by rarity" value={rarityId} onChange={event => changeQuery({ rarityId: event.target.value, page: 1 })}>
               <option value="">All rarities</option><option value="0">No rarities</option>
               {rarities.filter(rarity => !rarity.isDeleted).map(rarity => <option key={rarity.id} value={rarity.id}>{rarity.name}{rarity.isArchived ? " (archived)" : ""}</option>)}
-            </select>
-            </>}
-          </div>
-          <div className="col-12 col-md-auto">
+            </select> : null}
+          </div> : null}
+          {canReadClasses ? <div className="col-12 col-md-auto">
             <select className="form-select" aria-label="Filter by class or specialization" value={disciplineId} onChange={event => changeQuery({ disciplineId: event.target.value, page: 1 })}>
               <option value="">All classes / specializations</option><option value="0">Unrestricted records</option>
               {disciplines.filter(entry => !entry.isDeleted).map(entry => <option key={entry.id} value={entry.id}>{categoryPath(entry.id, disciplines)}{entry.isArchived ? " (archived)" : ""}</option>)}
             </select>
-          </div>
-          <div className="col-12 col-md-auto">
+          </div> : null}
+          {canReadCategories ? <div className="col-12 col-md-auto">
             <select className="form-select" aria-label="Filter by category" value={categoryId} onChange={event => changeQuery({ categoryId: event.target.value, page: 1 })}>
               <option value="">All categories</option><option value="0">Uncategorized</option>
               {categories.filter(category => !category.isDeleted).map(category => <option key={category.id} value={category.id}>{categoryPath(category.id, categories)}{category.isArchived ? " (archived)" : ""}</option>)}
             </select>
-          </div>
+          </div> : null}
           <div className="col-auto">
             <input className="form-control" type="text" name="search" value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="Search..." aria-label="Search database records" />
           </div>
@@ -249,9 +266,9 @@ export default function Database() {
             <button className="btn btn-primary" type="submit">Search</button>{" "}
             <Link className="btn btn-secondary" to={`/Admin/Database?entity=${entity}`}>Clear</Link>
           </div>
-          <div className="col ms-auto text-end">
+          {canCreateEntity ? <div className="col ms-auto text-end">
             <Link className="btn btn-success" to={`/Admin/${entity}/Create`}>Create</Link>
-          </div>
+          </div> : null}
         </form>
 
         {error && <div className="alert alert-danger" role="alert">{error}</div>}
@@ -292,15 +309,15 @@ export default function Database() {
                   <td data-label="Url" className="url-cell">{record.url && <a href={record.url} target="_blank" rel="noopener noreferrer">{record.url}</a>}</td>
                   {entity === "Items" && <><td data-label="Item level">{(record as ItemRow).itemLevel}</td><td data-label="Required level">{(record as ItemRow).requiredLevel}</td></>}
                   <td data-label={entity === "Items" ? "Rarity" : "Type"} style={entity === "Items" ? { color: (rarities.find(r => r.id === record.rarityId) as Category & { color?: string })?.color } : undefined}>{entity === "Items" ? rarities.find(r => r.id === record.rarityId)?.name ?? record.quality ?? "No rarity" : record.quality}</td>
-                  <td data-label="Category">{record.categoryId ? categoryPath(record.categoryId, categories) : "Uncategorized"}</td>
-                  <td data-label="Class / specialization">{record.disciplineId ? categoryPath(record.disciplineId, disciplines) : "All classes"}</td>
-                  <td data-label="Tags">{record.tagIds?.map(id => tags.find(tag => tag.id === id)?.name ?? `Tag #${id}`).join(", ") || "No tags"}</td>
-                  <td data-label="Patch">{patches.find(p => p.id === record.patchId)?.name ?? (record.patchId ? `Patch #${record.patchId}` : "Any patch")}</td>
+                  <td data-label="Category">{record.categoryId && canReadCategories ? categoryPath(record.categoryId, categories) : record.categoryId ? `Category #${record.categoryId}` : "Uncategorized"}</td>
+                  <td data-label="Class / specialization">{record.disciplineId && canReadClasses ? categoryPath(record.disciplineId, disciplines) : record.disciplineId ? `Class #${record.disciplineId}` : "All classes"}</td>
+                  <td data-label="Tags">{canReadTags ? record.tagIds?.map(id => tags.find(tag => tag.id === id)?.name ?? `Tag #${id}`).join(", ") || "No tags" : record.tagIds?.length ? `${record.tagIds.length} assigned` : "No tags"}</td>
+                  <td data-label="Patch">{canReadPatches ? patches.find(p => p.id === record.patchId)?.name ?? (record.patchId ? `Patch #${record.patchId}` : "Any patch") : record.patchId ? `Patch #${record.patchId}` : "Any patch"}</td>
                   <td data-label="Actions" className="text-end">
                     <div className="btn-group btn-group-sm" role="group" aria-label={`Actions for ${record.name}`}>
-                      <Link className="btn btn-outline-info px-2" to={`/Admin/${entity}/Details/${record.id}`} title="Details" aria-label={`Details for ${record.name}`}><DetailIcon /></Link>
-                      <Link className="btn btn-outline-light px-2" to={`/Admin/${entity}/Edit/${record.id}`} title="Edit" aria-label={`Edit ${record.name}`}><EditIcon /></Link>
-                      <Link className="btn btn-outline-warning px-2" to={`/Admin/${entity}/Delete/${record.id}`} title="Delete" aria-label={`Delete ${record.name}`}><TrashIcon /></Link>
+                      {canReadEntity ? <Link className="btn btn-outline-info px-2" to={`/Admin/${entity}/Details/${record.id}`} title="Details" aria-label={`Details for ${record.name}`}><DetailIcon /></Link> : null}
+                      {canUpdateEntity ? <Link className="btn btn-outline-light px-2" to={`/Admin/${entity}/Edit/${record.id}`} title="Edit" aria-label={`Edit ${record.name}`}><EditIcon /></Link> : null}
+                      {canDeleteEntity ? <Link className="btn btn-outline-warning px-2" to={`/Admin/${entity}/Delete/${record.id}`} title="Delete" aria-label={`Delete ${record.name}`}><TrashIcon /></Link> : null}
                     </div>
                   </td>
                 </tr>
