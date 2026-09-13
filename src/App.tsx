@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { BrowserRouter as Router, Route, Routes } from "@/router/nextCompat";
 
 import { LocalizationProvider } from "@/localization/LocalizationContext";
+import { adminPermissions } from "@/auth/adminPermissions";
 import AdminTranslations from "@/pages/admin/translations/Translations";
 import FooterAdmin from "@/pages/admin/footer/FooterAdmin";
 import BannersAdmin from "@/pages/admin/banners/Banners";
@@ -13,7 +14,7 @@ import Layout from "@/components/layout/Layout";
 import V1Stylesheets from "@/components/styles/V1Stylesheets";
 
 import PrivateRoute from "@/routes/PrivateRoute";
-import RoleRoute from "@/routes/RoleRoute";
+import PermissionRoute from "@/routes/PermissionRoute";
 
 import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
@@ -59,6 +60,9 @@ import CreateSpell from "@/pages/admin/spells/CreateSpell";
 import DeleteSpell from "@/pages/admin/spells/DeleteSpell";
 import EditSpell from "@/pages/admin/spells/EditSpell";
 import SpellDetails from "@/pages/admin/spells/SpellDetails";
+import AdminHome from "@/pages/admin/access/AdminHome";
+import RolesAdmin from "@/pages/admin/access/Roles";
+import UsersAdmin from "@/pages/admin/access/Users";
 
 import Login from "@/pages/auth/Login";
 import LoginWith2FA from "@/pages/auth/LoginWith2FA";
@@ -86,6 +90,7 @@ import CreateDiscussion from "@/pages/discussions/CreateDiscussion";
 import DiscussionDetails from "@/pages/discussions/DiscussionDetails";
 import Discussions from "@/pages/discussions/Discussions";
 import ErrorPage from "@/pages/errors/ErrorPage";
+import Forbidden from "@/pages/errors/Forbidden";
 import ServerError from "@/pages/errors/ServerError";
 
 import HolyConsumables from "@/pages/guides/holy/Consumables";
@@ -111,8 +116,12 @@ function protectedPage(page: ReactNode) {
   return <PrivateRoute>{page}</PrivateRoute>;
 }
 
-function adminPage(page: ReactNode) {
-  return <RoleRoute role="Admin">{page}</RoleRoute>;
+function permissionPage(page: ReactNode, permission: string) {
+  return <PermissionRoute permission={permission}>{page}</PermissionRoute>;
+}
+
+function adminShell(page: ReactNode) {
+  return <PermissionRoute allowAnyAdminPermission>{page}</PermissionRoute>;
 }
 
 export default function App() {
@@ -156,13 +165,13 @@ export default function App() {
           <Route path="/products" element={<Products />} />
           <Route path="/Products/Details/:id" element={<ProductDetails />} />
           <Route path="/products/:id" element={<ProductDetails />} />
-          <Route path="/Products/Create" element={adminPage(<AdminLayout><CreateProduct /></AdminLayout>)} />
-          <Route path="/Products/Edit/:id" element={adminPage(<AdminLayout><EditProduct /></AdminLayout>)} />
+          <Route path="/Products/Create" element={permissionPage(<AdminLayout><CreateProduct /></AdminLayout>, adminPermissions.products.create)} />
+          <Route path="/Products/Edit/:id" element={permissionPage(<AdminLayout><EditProduct /></AdminLayout>, adminPermissions.products.update)} />
 
           <Route path="/Cart/MyCart" element={<Cart />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/Cart/Details/:id" element={<CartDetails />} />
-          <Route path="/Cart/Archive" element={<CartArchive />} />
+          <Route path="/Cart/Archive" element={permissionPage(<CartArchive />, adminPermissions.carts.read)} />
           <Route path="/Products/Add/:id" element={<AddProduct />} />
 
           <Route path="/Checkout/Start" element={<Checkout />} />
@@ -200,51 +209,54 @@ export default function App() {
 
           <Route path="/Home/Privacy" element={<SitePrivacy />} />
           <Route path="/privacy" element={<SitePrivacy />} />
+          <Route path="/Error/403" element={<Forbidden />} />
           <Route path="/Error/404" element={<NotFound />} />
           <Route path="/Error/500" element={<ServerError />} />
           <Route path="/error" element={<ErrorPage />} />
 
-          <Route path="/Admin" element={adminPage(<AdminLayout />)}>
-            <Route index element={<AdminDatabase />} />
-            <Route path="Database" element={<AdminDatabase />} />
-            <Route path="Categories" element={<AdminCategories />} />
-            <Route path="Classes" element={<AdminClasses />} />
-            <Route path="PageBuilder/History" element={<PageHistory />} />
-            <Route path="Footer" element={<FooterAdmin />} />
-            <Route path="Banners" element={<BannersAdmin />} />
-            <Route path="Translations" element={<AdminTranslations />} />
-            <Route path="Navigation" element={<AdminNavigation />} />
-            <Route path="Media" element={<AdminMedia />} />
-            <Route path="Seo" element={<AdminSeo />} />
-            <Route path="Rarities" element={<AdminRarities />} />
-            <Route path="Patches" element={<AdminPatches />} />
-            <Route path="Tags" element={<AdminTags />} />
-            <Route path="Database/Index" element={<AdminDatabase />} />
+          <Route path="/Admin" element={adminShell(<AdminLayout />)}>
+            <Route index element={<AdminHome />} />
+            <Route path="Database" element={permissionPage(<AdminDatabase />, adminPermissions.database.read)} />
+            <Route path="Categories" element={permissionPage(<AdminCategories />, adminPermissions.categories.read)} />
+            <Route path="Classes" element={permissionPage(<AdminClasses />, adminPermissions.classes.read)} />
+            <Route path="PageBuilder/History" element={permissionPage(<PageHistory />, adminPermissions.pages.read)} />
+            <Route path="Footer" element={permissionPage(<FooterAdmin />, adminPermissions.footer.read)} />
+            <Route path="Banners" element={permissionPage(<BannersAdmin />, adminPermissions.banners.read)} />
+            <Route path="Translations" element={permissionPage(<AdminTranslations />, adminPermissions.localization.read)} />
+            <Route path="Navigation" element={permissionPage(<AdminNavigation />, adminPermissions.navigation.read)} />
+            <Route path="Media" element={permissionPage(<AdminMedia />, adminPermissions.media.read)} />
+            <Route path="Seo" element={permissionPage(<AdminSeo />, adminPermissions.seo.read)} />
+            <Route path="Rarities" element={permissionPage(<AdminRarities />, adminPermissions.rarities.read)} />
+            <Route path="Patches" element={permissionPage(<AdminPatches />, adminPermissions.patches.read)} />
+            <Route path="Tags" element={permissionPage(<AdminTags />, adminPermissions.tags.read)} />
+            <Route path="Database/Index" element={permissionPage(<AdminDatabase />, adminPermissions.database.read)} />
+            <Route path="Roles" element={permissionPage(<RolesAdmin />, adminPermissions.roles.read)} />
+            <Route path="Users" element={permissionPage(<UsersAdmin />, adminPermissions.users.read)} />
 
-            <Route path="Items/Create" element={<CreateItem />} />
-            <Route path="Items/Edit/:id" element={<EditItem />} />
-            <Route path="Items/Details/:id" element={<ItemDetails />} />
-            <Route path="Items/Delete/:id" element={<DeleteItem />} />
+            <Route path="Items/Create" element={permissionPage(<CreateItem />, adminPermissions.items.create)} />
+            <Route path="Items/Edit/:id" element={permissionPage(<EditItem />, adminPermissions.items.update)} />
+            <Route path="Items/Details/:id" element={permissionPage(<ItemDetails />, adminPermissions.items.read)} />
+            <Route path="Items/Delete/:id" element={permissionPage(<DeleteItem />, adminPermissions.items.delete)} />
 
-            <Route path="Spells/Create" element={<CreateSpell />} />
-            <Route path="Spells/Edit/:id" element={<EditSpell />} />
-            <Route path="Spells/Details/:id" element={<SpellDetails />} />
-            <Route path="Spells/Delete/:id" element={<DeleteSpell />} />
+            <Route path="Spells/Create" element={permissionPage(<CreateSpell />, adminPermissions.spells.create)} />
+            <Route path="Spells/Edit/:id" element={permissionPage(<EditSpell />, adminPermissions.spells.update)} />
+            <Route path="Spells/Details/:id" element={permissionPage(<SpellDetails />, adminPermissions.spells.read)} />
+            <Route path="Spells/Delete/:id" element={permissionPage(<DeleteSpell />, adminPermissions.spells.delete)} />
 
-            <Route path="PageBuilder" element={<PageBuilderIndex />} />
-            <Route path="PageBuilder/Index" element={<PageBuilderIndex />} />
-            <Route path="PageBuilder/TalentTrees" element={<TalentTreesBuilder />} />
-            <Route path="PageBuilder/Create" element={<CreatePage />} />
-            <Route path="PageBuilder/Edit" element={<CreatePage />} />
-            <Route path="PageBuilder/DeleteConfirm" element={<DeletePage />} />
-            <Route path="PageBuilder/Delete" element={<DeletePage />} />
+            <Route path="PageBuilder" element={permissionPage(<PageBuilderIndex />, adminPermissions.pages.read)} />
+            <Route path="PageBuilder/Index" element={permissionPage(<PageBuilderIndex />, adminPermissions.pages.read)} />
+            <Route path="PageBuilder/TalentTrees" element={permissionPage(<TalentTreesBuilder />, adminPermissions.talentTrees.read)} />
+            <Route path="PageBuilder/Create" element={permissionPage(<CreatePage />, adminPermissions.pages.create)} />
+            <Route path="PageBuilder/Edit" element={permissionPage(<CreatePage />, adminPermissions.pages.update)} />
+            <Route path="PageBuilder/DeleteConfirm" element={permissionPage(<DeletePage />, adminPermissions.pages.delete)} />
+            <Route path="PageBuilder/Delete" element={permissionPage(<DeletePage />, adminPermissions.pages.delete)} />
 
-            <Route path="Products/Create" element={<CreateProduct />} />
-            <Route path="Products/Edit/:id" element={<EditProduct />} />
+            <Route path="Products/Create" element={permissionPage(<CreateProduct />, adminPermissions.products.create)} />
+            <Route path="Products/Edit/:id" element={permissionPage(<EditProduct />, adminPermissions.products.update)} />
 
-            <Route path="PromoCodes" element={<PromoCodes />} />
-            <Route path="PromoCodes/Index" element={<PromoCodes />} />
-            <Route path="PromoCodes/Create" element={<CreatePromoCode />} />
+            <Route path="PromoCodes" element={permissionPage(<PromoCodes />, adminPermissions.promoCodes.read)} />
+            <Route path="PromoCodes/Index" element={permissionPage(<PromoCodes />, adminPermissions.promoCodes.read)} />
+            <Route path="PromoCodes/Create" element={permissionPage(<CreatePromoCode />, adminPermissions.promoCodes.create)} />
           </Route>
 
           <Route path="/:section/:slug" element={<ContentPage />} />
