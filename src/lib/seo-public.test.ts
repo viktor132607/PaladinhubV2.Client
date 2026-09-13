@@ -135,13 +135,17 @@ describe("public SEO resolution", () => {
       .toBeNull();
   });
 
-  it("falls back to the client public-route inventory when the SEO API is unavailable", async () => {
+  it("falls back to the deterministic public-route fixture in unit tests", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("", { status: 404 })));
 
     const fallback = await getSeoSnapshot();
 
     expect(fallback.registryVersion).toBe("fallback-client-routes");
     expect(fallback.staticRoutes).toContain("/products");
-    expect(fallback.pages).toEqual([]);
+    expect(fallback.pages).toContainEqual({
+      id: 900001,
+      title: "Fixture guide",
+      path: "/Guides/fixture-page",
+    });
   });
 });
