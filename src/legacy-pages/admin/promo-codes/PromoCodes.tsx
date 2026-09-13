@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "@/auth/AuthContext";
+import { adminPermissions } from "@/auth/adminPermissions";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import { Link } from "@/router/nextCompat";
 
@@ -42,6 +44,9 @@ function formatDate(value?: string | null): string {
 }
 
 export default function PromoCodes() {
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission(adminPermissions.promoCodes.create);
+  const canUpdate = hasPermission(adminPermissions.promoCodes.update);
   const [items, setItems] = useState<PromoCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [workingId, setWorkingId] = useState("");
@@ -75,7 +80,7 @@ export default function PromoCodes() {
   }, [load]);
 
   const deactivate = async (id: string) => {
-    if (workingId) return;
+    if (!canUpdate || workingId) return;
     setWorkingId(id);
     setError("");
     setMessage("");
@@ -100,7 +105,7 @@ export default function PromoCodes() {
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2>Promo Codes</h2>
-        <Link className="btn btn-primary" to="/Admin/PromoCodes/Create">New Code</Link>
+        {canCreate ? <Link className="btn btn-primary" to="/Admin/PromoCodes/Create">New Code</Link> : null}
       </div>
 
       {message ? <div className="alert alert-success" role="status">{message}</div> : null}
@@ -134,7 +139,7 @@ export default function PromoCodes() {
               <td data-label="Expires">{formatDate(promo.expiresAtUtc)}</td>
               <td data-label="Active">{promo.isActive ? "Yes" : "No"}</td>
               <td data-label="Actions" className="text-end">
-                {promo.isActive ? (
+                {promo.isActive && canUpdate ? (
                   <form className="d-inline" onSubmit={(event) => { event.preventDefault(); void deactivate(promo.id); }}>
                     <button className="btn btn-sm btn-warning" disabled={Boolean(workingId)}>
                       {workingId === promo.id ? "Working..." : "Deactivate"}
