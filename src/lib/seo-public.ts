@@ -1,35 +1,13 @@
 import type { Metadata } from "next";
+import { SEO_BUILD_FIXTURE } from "./seo-build-fixture";
 
 const DEFAULT_SITE_URL = "https://paladinhubv2-client.onrender.com";
 const DEFAULT_API_URL = "http://localhost:10000";
+const SEO_FETCH_ATTEMPTS = 3;
+const SEO_FETCH_RETRY_DELAY_MS = 250;
 export const DEFAULT_SEO_TITLE = "PaladinHub";
 export const DEFAULT_SEO_DESCRIPTION =
   "World of Warcraft Paladin guides, builds, discussions and merchandise.";
-
-const FALLBACK_STATIC_ROUTES = [
-  "/",
-  "/Holy/Overview",
-  "/Holy/Gear",
-  "/Holy/Talents",
-  "/Holy/Consumables",
-  "/Holy/Rotation",
-  "/Holy/Stats",
-  "/Protection/Overview",
-  "/Protection/Gear",
-  "/Protection/Talents",
-  "/Protection/Consumables",
-  "/Protection/Rotation",
-  "/Protection/Stats",
-  "/Retribution/Overview",
-  "/Retribution/Gear",
-  "/Retribution/Talents",
-  "/Retribution/Consumables",
-  "/Retribution/Rotation",
-  "/Retribution/Stats",
-  "/discussions",
-  "/products",
-  "/privacy",
-] as const;
 
 const STATIC_ALIASES: Record<string, string> = {
   "/home/home": "/",
@@ -39,6 +17,8 @@ const STATIC_ALIASES: Record<string, string> = {
   "/merchandise/list": "/products",
   "/home/privacy": "/privacy",
 };
+
+export type SeoBuildSource = "api" | "fixture";
 
 export type SeoPublicEntry = {
   id: string;
@@ -84,6 +64,21 @@ export type EffectiveSeo = {
   follow: boolean;
 };
 
+export type SeoBuildManifest = {
+  schemaVersion: 1;
+  status: "included-in-this-build";
+  source: SeoBuildSource;
+  snapshotVersion: string;
+  registryVersion: string;
+  snapshotGeneratedAtUtc: string;
+  builtAtUtc: string;
+  buildCommit: string;
+  siteUrl: string;
+  apiSnapshotUrl: string;
+  requiresRebuildForChanges: true;
+  deployHookConfigured: boolean;
+};
+
 function normalizeOrigin(value?: string | null): string {
   if (!value?.trim()) return "";
   try {
@@ -100,10 +95,31 @@ export function configuredSiteUrl(): string {
   return normalizeOrigin(process.env.NEXT_PUBLIC_SITE_URL) || DEFAULT_SITE_URL;
 }
 
-function configuredApiUrl(): string {
-  return (process.env.NEXT_PUBLIC_API_URL?.trim() || DEFAULT_API_URL)
+export function configuredSeoBuildSource(): SeoBuildSource {
+  const value = process.env.SEO_BUILD_SOURCE?.trim().toLowerCase();
+  if (!value || value === "api") return "api";
+  if (value === "fixture") return "fixture";
+  throw new Error(
+    `Invalid SEO_BUILD_SOURCE '${process.env.SEO_BUILD_SOURCE}'. Use 'api' or 'fixture'.`,
+  );
+}
+
+export function configuredApiUrl(): string {
+  const explicit = process.env.NEXT_PUBLIC_API_URL?.trim();
+  if (!explicit && process.env.NODE_ENV === "production" && configuredSeoBuildSource() === "api") {
+    throw new Error(
+      "NEXT_PUBLIC_API_URL is required for a production SEO build when SEO_BUILD_SOURCE=api.",
+    );
+  }
+
+  const candidate = (explicit || DEFAULT_API_URL)
     .replace(/\/api\/?$/i, "")
     .replace(/\/+$/, "");
+  const normalized = normalizeOrigin(candidate);
+  if (!normalized) {
+    throw new Error("NEXT_PUBLIC_API_URL must be a valid HTTP/HTTPS origin.");
+  }
+  return normalized;
 }
 
 function normalizePath(value: string): string {
@@ -116,24 +132,72 @@ function normalizePath(value: string): string {
   return collapsed.length > 1 ? collapsed.replace(/\/+$/, "") : "/";
 }
 
-function fallbackSnapshot(): SeoPublicSnapshot {
-  return {
-    siteUrl: configuredSiteUrl(),
-    registryVersion: "fallback-client-routes",
-    snapshotVersion: "fallback",
-    generatedAtUtc: new Date(0).toISOString(),
-    staticRoutes: [...FALLBACK_STATIC_ROUTES],
-    pages: [],
-    entries: [],
-  };
-}
-
 function isSnapshot(value: unknown): value is SeoPublicSnapshot {
   if (!value || typeof value !== "object") return false;
   const candidate = value as Partial<SeoPublicSnapshot>;
-  return Array.isArray(candidate.staticRoutes) &&
+  return typeof candidate.siteUrl === "string" &&
+    typeof candidate.registryVersion === "string" &&
+    typeof candidate.snapshotVersion === "string" &&
+    typeof candidate.generatedAtUtc === "string" &&
+    Array.isArray(candidate.staticRoutes) &&
     Array.isArray(candidate.pages) &&
     Array.isArray(candidate.entries);
+}
+
+function normalizeSnapshot(payload: SeoPublicSnapshot): SeoPublicSnapshot {
+  return {
+    ...payload,
+    siteUrl: normalizeOrigin(payload.siteUrl) || configuredSiteUrl(),
+    staticRoutes: payload.staticRoutes.map(normalizePath),
+    pages: payload.pages.map(page => ({ ...page, path: normalizePath(page.path) })),
+    entries: payload.entries.map(entry => ({ ...entry, path: normalizePath(entry.path) })),
+  };
+}
+
+function retryDelayMs(): number {
+  const configured = Number(process.env.SEO_BUILD_RETRY_DELAY_MS);
+  return Number.isFinite(configured) && configured >= 0
+    ? configured
+    : SEO_FETCH_RETRY_DELAY_MS;
+}
+
+async function delay(ms: number): Promise<void> {
+  if (ms <= 0) return;
+  await new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function fetchSeoSnapshotFromApi(): Promise<SeoPublicSnapshot> {
+  const snapshotUrl = `${configuredApiUrl()}/api/seo/snapshot`;
+  let lastError: unknown = null;
+
+  for (let attempt = 1; attempt <= SEO_FETCH_ATTEMPTS; attempt++) {
+    try {
+      const response = await fetch(snapshotUrl, {
+        headers: { Accept: "application/json" },
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        throw new Error(`SEO snapshot request returned HTTP ${response.status}.`);
+      }
+
+      const payload: unknown = await response.json();
+      if (!isSnapshot(payload)) {
+        throw new Error("SEO snapshot payload is invalid.");
+      }
+
+      return normalizeSnapshot(payload);
+    } catch (error) {
+      lastError = error;
+      if (attempt < SEO_FETCH_ATTEMPTS) {
+        await delay(retryDelayMs() * attempt);
+      }
+    }
+  }
+
+  const detail = lastError instanceof Error ? ` ${lastError.message}` : "";
+  throw new Error(
+    `SEO build failed: could not load a valid public snapshot from ${snapshotUrl} after ${SEO_FETCH_ATTEMPTS} attempts.${detail}`,
+  );
 }
 
 let snapshotPromise: Promise<SeoPublicSnapshot> | null = null;
@@ -145,30 +209,35 @@ export function resetSeoSnapshotCacheForTests(): void {
 export async function getSeoSnapshot(): Promise<SeoPublicSnapshot> {
   if (snapshotPromise) return snapshotPromise;
 
-  snapshotPromise = (async () => {
-    try {
-      const response = await fetch(`${configuredApiUrl()}/api/seo/snapshot`, {
-        headers: { Accept: "application/json" },
-        cache: "force-cache",
-      });
-      if (!response.ok) return fallbackSnapshot();
-
-      const payload: unknown = await response.json();
-      if (!isSnapshot(payload)) return fallbackSnapshot();
-
-      return {
-        ...payload,
-        siteUrl: normalizeOrigin(payload.siteUrl) || configuredSiteUrl(),
-        staticRoutes: payload.staticRoutes.map(normalizePath),
-        pages: payload.pages.map(page => ({ ...page, path: normalizePath(page.path) })),
-        entries: payload.entries.map(entry => ({ ...entry, path: normalizePath(entry.path) })),
-      };
-    } catch {
-      return fallbackSnapshot();
-    }
-  })();
+  snapshotPromise = configuredSeoBuildSource() === "fixture"
+    ? Promise.resolve(normalizeSnapshot(SEO_BUILD_FIXTURE))
+    : fetchSeoSnapshotFromApi();
 
   return snapshotPromise;
+}
+
+export function buildSeoBuildManifest(
+  snapshot: SeoPublicSnapshot,
+  builtAtUtc = new Date().toISOString(),
+): SeoBuildManifest {
+  return {
+    schemaVersion: 1,
+    status: "included-in-this-build",
+    source: configuredSeoBuildSource(),
+    snapshotVersion: snapshot.snapshotVersion,
+    registryVersion: snapshot.registryVersion,
+    snapshotGeneratedAtUtc: snapshot.generatedAtUtc,
+    builtAtUtc,
+    buildCommit:
+      process.env.SEO_BUILD_COMMIT?.trim() ||
+      process.env.RENDER_GIT_COMMIT?.trim() ||
+      process.env.GITHUB_SHA?.trim() ||
+      "unknown",
+    siteUrl: configuredSiteUrl(),
+    apiSnapshotUrl: `${configuredApiUrl()}/api/seo/snapshot`,
+    requiresRebuildForChanges: true,
+    deployHookConfigured: process.env.SEO_DEPLOY_HOOK_CONFIGURED === "true",
+  };
 }
 
 function siteUrlFor(snapshot: SeoPublicSnapshot): string {
