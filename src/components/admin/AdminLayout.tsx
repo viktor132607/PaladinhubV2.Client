@@ -7,6 +7,7 @@ import Navbar from "@/components/layout/Navbar";
 const secondaryLinks = [
   ["Pages", "/Admin/PageBuilder"],
   ["Talent Trees", "/Admin/PageBuilder/TalentTrees"],
+  ["SEO", "/Admin/Seo"],
   ["Database", "/Admin/Database"],
   ["Products", "/Merchandise/Merchandise"],
 ] as const;
@@ -18,6 +19,7 @@ const sidebarSections = [
       ["Page Builder", "/Admin/PageBuilder"],
       ["Talent Tree Builder", "/Admin/PageBuilder/TalentTrees"],
       ["Add Page", "/Admin/PageBuilder/Create"],
+      ["SEO", "/Admin/Seo"],
       ["Banners & messages", "/Admin/Banners"],
       ["Footer & contacts", "/Admin/Footer"],
     ],
