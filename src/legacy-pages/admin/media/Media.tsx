@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useAuth } from "@/auth/AuthContext";
+import { adminPermissions } from "@/auth/adminPermissions";
 import { adminRequest } from "@/lib/admin-categories";
 import { fetchBackend, readApiJson } from "@/config/api";
 import { spellIconSource } from "@/lib/spell-icons";
@@ -11,6 +13,11 @@ type Revision = { id: string; version: number; action: string; actor: string; cr
 const empty = { name: "", altText: "", description: "", isArchived: false };
 
 export default function Media() {
+  const { hasPermission } = useAuth();
+  const canUpload = hasPermission(adminPermissions.spellIcons.create);
+  const canUpdate = hasPermission(adminPermissions.media.update);
+  const canDelete = hasPermission(adminPermissions.media.delete);
+  const canRestore = hasPermission(adminPermissions.media.restore);
   const [catalog, setCatalog] = useState<Catalog>({ media: [], page: 1, pages: 1, total: 0 });
   const [search, setSearch] = useState(""); const [status, setStatus] = useState("active"); const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<MediaEntry | null>(null); const [draft, setDraft] = useState(empty);
@@ -43,7 +50,7 @@ export default function Media() {
     finally { busyRef.current = false; setBusy(false); }
   }
   async function upload(file: File) {
-    if (busyRef.current) return;
+    if (!canUpload || busyRef.current) return;
     if (!["image/png", "image/jpeg", "image/gif", "image/webp"].includes(file.type) || file.size <= 0 || file.size > 5 * 1024 * 1024) { setError("Choose PNG, JPEG, GIF or WebP up to 5 MB."); return; }
     busyRef.current = true; setBusy(true); setError(""); setNotice("");
     try {
@@ -55,16 +62,16 @@ export default function Media() {
     } catch (e) { setError(e instanceof Error ? e.message : "Could not upload image."); }
     finally { busyRef.current = false; setBusy(false); }
   }
-  function submit(event: FormEvent) { event.preventDefault(); if (selected) void mutate(`/Admin/api/media/${selected.id}`, "PUT", { ...draft, version: selected.version }); }
-  return <section onPaste={event => { const file = Array.from(event.clipboardData.items).find(item => item.type.startsWith("image/"))?.getAsFile(); if (file) { event.preventDefault(); void upload(file); } }}>
+  function submit(event: FormEvent) { event.preventDefault(); if (selected && canUpdate) void mutate(`/Admin/api/media/${selected.id}`, "PUT", { ...draft, version: selected.version }); }
+  return <section onPaste={event => { if (!canUpload) return; const file = Array.from(event.clipboardData.items).find(item => item.type.startsWith("image/"))?.getAsFile(); if (file) { event.preventDefault(); void upload(file); } }}>
     <h2>Media library</h2>
     {error ? <p className="alert alert-danger" role="alert">{error}</p> : null}
     {notice ? <p className="alert alert-success" role="status">{notice}</p> : null}
-    <div className="border rounded p-3 mb-3" tabIndex={0} aria-label="Paste an image here">
+    {canUpload ? <div className="border rounded p-3 mb-3" tabIndex={0} aria-label="Paste an image here">
       <label className="form-label" htmlFor="media-upload">Upload image</label>
       <input id="media-upload" type="file" accept="image/png,image/jpeg,image/gif,image/webp" className="form-control" disabled={busy} onChange={event => { const file = event.target.files?.[0]; event.target.value = ""; if (file) void upload(file); }} />
       <p className="mt-2 mb-0">PNG, JPEG, GIF or WebP, up to 5 MB. You can also paste a copied image here.</p>
-    </div>
+    </div> : null}
     <div className="d-flex flex-wrap gap-2 mb-3">
       <input type="search" className="form-control" style={{ flex: "1 1 180px", minWidth: 0 }} aria-label="Search media" placeholder="Search name, alt text or description" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
       <select className="form-select" style={{ flex: "1 1 140px", minWidth: 0 }} aria-label="Media status" value={status} onChange={e => { setStatus(e.target.value); setPage(1); }}><option value="active">Active</option><option value="archived">Archived</option><option value="deleted">Deleted</option><option value="all">All</option></select>
@@ -84,23 +91,23 @@ export default function Media() {
       </div>
       <div className="col-12 col-xl-5" style={{ minWidth: 0 }}>
         {selected ? <>
-          <h3>{selected.isDeleted ? "Deleted image" : "Edit image"}</h3>
+          <h3>{selected.isDeleted ? "Deleted image" : canUpdate ? "Edit image" : "Image details"}</h3>
           <label htmlFor="media-url" className="form-label">Image URL</label>
           <input id="media-url" className="form-control mb-2" value={spellIconSource(selected.icon)} readOnly onFocus={event => event.target.select()} />
           <button className="btn btn-secondary mb-3" onClick={() => { void navigator.clipboard?.writeText(spellIconSource(selected.icon)).then(() => setNotice("Image URL copied.")).catch(() => setError("Select the Image URL field and copy it.")); }}>Copy URL</button>
-          <form onSubmit={submit}><fieldset disabled={busy || selected.isDeleted}>
+          <form onSubmit={submit}><fieldset disabled={busy || selected.isDeleted || !canUpdate}>
             <label htmlFor="media-name" className="form-label">Name</label><input id="media-name" className="form-control mb-3" required maxLength={255} value={draft.name} onChange={e => setDraft({ ...draft, name: e.target.value })} />
             <label htmlFor="media-alt" className="form-label">Alt text</label><input id="media-alt" className="form-control mb-3" maxLength={500} value={draft.altText} onChange={e => setDraft({ ...draft, altText: e.target.value })} />
             <label htmlFor="media-description" className="form-label">Description</label><textarea id="media-description" className="form-control mb-3" rows={3} maxLength={2000} value={draft.description} onChange={e => setDraft({ ...draft, description: e.target.value })} />
             <label className="d-flex align-items-center gap-2 mb-3"><input type="checkbox" checked={draft.isArchived} onChange={e => setDraft({ ...draft, isArchived: e.target.checked })} />Archived</label>
-            <div className="d-flex flex-wrap gap-2"><button type="submit" className="btn btn-success">Save image</button><button type="button" className="btn btn-danger" disabled={selected.usageCount > 0} onClick={() => { if (window.confirm("Move this image to Deleted? You can restore it from history.")) void mutate(`/Admin/api/media/${selected.id}?version=${selected.version}`, "DELETE"); }}>Delete image</button></div>
+            <div className="d-flex flex-wrap gap-2">{canUpdate ? <button type="submit" className="btn btn-success">Save image</button> : null}{canDelete ? <button type="button" className="btn btn-danger" disabled={selected.usageCount > 0} onClick={() => { if (window.confirm("Move this image to Deleted? You can restore it from history.")) void mutate(`/Admin/api/media/${selected.id}?version=${selected.version}`, "DELETE"); }}>Delete image</button> : null}</div>
           </fieldset></form>
           {selected.usageCount > 0 ? <p className="mt-2">This image is used by {selected.usageCount} records. Remove its references before deleting it, or archive it.</p> : null}
           <h3 className="mt-4">Change history</h3>
           {history.map(revision => { const snapshot = JSON.parse(revision.snapshot) as Snapshot; return <details className="border rounded p-2 mb-2" key={revision.id}>
             <summary>v{revision.version} · {revision.action} · {new Date(revision.createdAtUtc).toLocaleString()}</summary>
             <p className="mt-2" style={{ overflowWrap: "anywhere" }}>{snapshot.Name} · {revision.actor}</p><p>{snapshot.AltText}</p><p style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{snapshot.Description}</p>
-            {!snapshot.IsDeleted ? <button className="btn btn-outline-primary" disabled={busy || revision.version === selected.version} onClick={() => { if (window.confirm(`Restore revision ${revision.version}?`)) void mutate(`/Admin/api/media/${selected.id}/restore`, "POST", { revisionId: revision.id, version: selected.version }); }}>Restore this revision</button> : null}
+            {!snapshot.IsDeleted && canRestore ? <button className="btn btn-outline-primary" disabled={busy || revision.version === selected.version} onClick={() => { if (window.confirm(`Restore revision ${revision.version}?`)) void mutate(`/Admin/api/media/${selected.id}/restore`, "POST", { revisionId: revision.id, version: selected.version }); }}>Restore this revision</button> : null}
           </details>; })}
         </> : <p>Select an image to edit its details or view history.</p>}
       </div>
