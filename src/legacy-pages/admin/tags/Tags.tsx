@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useAuth } from "@/auth/AuthContext";
+import { adminPermissions } from "@/auth/adminPermissions";
 import { adminRequest, type Category } from "@/lib/admin-categories";
 
 const endpoint = "/Admin/api/tags";
@@ -8,6 +10,11 @@ const empty = { name: "", description: "", parentId: "", sortOrder: "0", isArchi
 type Revision = { id: string; version: number; action: string; actor: string; snapshot: string; createdAtUtc: string };
 
 export default function Tags() {
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission(adminPermissions.tags.create);
+  const canUpdate = hasPermission(adminPermissions.tags.update);
+  const canDelete = hasPermission(adminPermissions.tags.delete);
+  const canRestore = hasPermission(adminPermissions.tags.restore);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selected, setSelected] = useState<Category | null>(null);
   const [draft, setDraft] = useState(empty);
@@ -63,6 +70,7 @@ export default function Tags() {
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
+    if (selected ? !canUpdate : !canCreate) return;
     const sortOrder = Number(draft.sortOrder);
     if (!Number.isInteger(sortOrder) || sortOrder < -2147483648 || sortOrder > 2147483647) { setError("Order must be a whole number within the supported range."); return; }
     void mutate(selected ? `${endpoint}/${selected.id}` : endpoint, selected ? "PUT" : "POST", {
@@ -73,14 +81,15 @@ export default function Tags() {
     const matchesStatus = status === "all" || (status === "deleted" ? category.isDeleted : !category.isDeleted && (status === "archived" ? category.isArchived : !category.isArchived));
     return matchesStatus && category.name.toLowerCase().includes(search.trim().toLowerCase());
   });
+  const canEditDraft = selected ? canUpdate : canCreate;
 
   return <section>
     <h2>Tags</h2>
     {error ? <p role="alert" className="alert alert-danger">{error}</p> : null}
     {notice ? <p role="status" className="alert alert-success">{notice}</p> : null}
     <div className="d-flex flex-wrap gap-2 mb-3">
-      <button type="button" className="btn btn-primary" disabled={busy} onClick={() => choose(null)}>New tag</button>
-      <button type="button" className="btn btn-secondary" disabled={busy || loading} onClick={() => { choose(null); setRefresh(value => value + 1); }}>Refresh</button>
+      {canCreate ? <button type="button" className="btn btn-primary" disabled={busy} onClick={() => choose(null)}>New tag</button> : null}
+      <button type="button" className="btn btn-secondary" disabled={busy || loading} onClick={() => { if (canCreate) choose(null); setRefresh(value => value + 1); }}>Refresh</button>
     </div>
     <div className="row g-3">
       <div className="col-12 col-xl-7">
@@ -98,16 +107,16 @@ export default function Tags() {
               <td data-label="Tag" style={{ overflowWrap: "anywhere" }}>{category.name}</td>
               <td data-label="Status">{category.isDeleted ? "Deleted" : category.isArchived ? "Archived" : "Active"}</td>
               <td data-label="Records">{category.usageCount}</td>
-              <td data-label="Actions"><button type="button" className="btn btn-sm btn-primary" disabled={busy} onClick={() => choose(category)}>{category.isDeleted ? "History / restore" : "Edit / history"}</button></td>
+              <td data-label="Actions"><button type="button" className="btn btn-sm btn-primary" disabled={busy} onClick={() => choose(category)}>{category.isDeleted ? "History / restore" : canUpdate ? "Edit / history" : "View / history"}</button></td>
             </tr>)}</tbody>
           </table>
           {!visible.length ? <p>No tags match this filter.</p> : null}
         </>}
       </div>
       <div className="col-12 col-xl-5" style={{ minWidth: 0 }}>
-        <h3>{selected ? `${selected.isDeleted ? "Deleted" : "Edit"} tag #${selected.id}` : "New tag"}</h3>
+        <h3>{selected ? `${selected.isDeleted ? "Deleted" : canUpdate ? "Edit" : "View"} tag #${selected.id}` : canCreate ? "New tag" : "Tag details"}</h3>
         <form onSubmit={submit}>
-          <fieldset disabled={busy || selected?.isDeleted}>
+          <fieldset disabled={busy || selected?.isDeleted || !canEditDraft}>
             <label className="form-label" htmlFor="category-name">Name</label>
             <input id="category-name" className="form-control mb-3" required maxLength={100} value={draft.name} onChange={event => setDraft({ ...draft, name: event.target.value })} />
             <label className="form-label" htmlFor="category-description">Description</label>
@@ -116,8 +125,8 @@ export default function Tags() {
             <input id="category-order" className="form-control mb-3" type="number" step={1} min={-2147483648} max={2147483647} required value={draft.sortOrder} onChange={event => setDraft({ ...draft, sortOrder: event.target.value })} />
             <label className="d-flex gap-2 align-items-center mb-3"><input type="checkbox" checked={draft.isArchived} onChange={event => setDraft({ ...draft, isArchived: event.target.checked })} />Archived</label>
             <div className="d-flex flex-wrap gap-2">
-              <button type="submit" className="btn btn-success">{busy ? "Saving…" : selected ? "Save tag" : "Create tag"}</button>
-              {selected ? <button type="button" className="btn btn-danger" disabled={selected.usageCount > 0} onClick={() => {
+              {canEditDraft ? <button type="submit" className="btn btn-success">{busy ? "Saving…" : selected ? "Save tag" : "Create tag"}</button> : null}
+              {selected && canDelete ? <button type="button" className="btn btn-danger" disabled={selected.usageCount > 0} onClick={() => {
                 if (window.confirm(`Delete “${selected.name}”? You can restore it from history.`)) void mutate(`${endpoint}/${selected.id}?version=${selected.version}`, "DELETE");
               }}>Delete tag</button> : null}
             </div>
@@ -134,7 +143,7 @@ export default function Tags() {
               <p className="mt-2" style={{ overflowWrap: "anywhere" }}>By: {revision.actor}</p>
               <p>{snapshot.Name} · Order: {snapshot.SortOrder} · {snapshot.IsArchived ? "Archived" : "Active"}</p>
               <p style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{snapshot.Description}</p>
-              {!snapshot.IsDeleted ? <button type="button" className="btn btn-outline-primary" disabled={busy || revision.version === selected.version} onClick={() => {
+              {!snapshot.IsDeleted && canRestore ? <button type="button" className="btn btn-outline-primary" disabled={busy || revision.version === selected.version} onClick={() => {
                 if (window.confirm(`Restore tag to revision ${revision.version}?`)) void mutate(`${endpoint}/${selected.id}/restore`, "POST", { revisionId: revision.id, version: selected.version });
               }}>Restore this revision</button> : null}
             </details>;
