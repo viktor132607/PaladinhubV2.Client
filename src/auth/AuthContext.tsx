@@ -19,6 +19,7 @@ import {
   hasAnyEffectivePermission,
   hasEffectivePermission,
 } from "@/auth/adminPermissions";
+import { ADMIN_PERMISSION_REFRESH_EVENT } from "@/lib/admin-categories";
 
 export type AuthUser = {
   id: string;
@@ -144,6 +145,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     void refresh();
+  }, [refresh]);
+
+  useEffect(() => {
+    const handlePermissionRefresh = () => {
+      void refresh();
+    };
+
+    window.addEventListener(
+      ADMIN_PERMISSION_REFRESH_EVENT,
+      handlePermissionRefresh,
+    );
+
+    return () => {
+      window.removeEventListener(
+        ADMIN_PERMISSION_REFRESH_EVENT,
+        handlePermissionRefresh,
+      );
+    };
   }, [refresh]);
 
   const login = useCallback(
