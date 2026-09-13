@@ -40,6 +40,18 @@ assertIncludes(home, 'property="og:title"', "Home HTML");
 assertIncludes(home, 'name="twitter:card"', "Home HTML");
 assertNotIncludes(home.toLowerCase(), "hreflang=", "Home HTML");
 
+const pageBuilder = await readRoute(
+  "Guides/fixture-page.html",
+  "Guides/fixture-page/index.html",
+);
+assertIncludes(pageBuilder, "Fixture Guide SEO", "Page Builder HTML");
+assertIncludes(pageBuilder, "Fixture Guide Social", "Page Builder HTML");
+assertIncludes(pageBuilder, "https://paladinhubv2-client.onrender.com/Guides/fixture-page", "Page Builder HTML");
+
+const products = await readRoute("products.html", "products/index.html");
+assertIncludes(products, "Fixture Products", "Products HTML");
+assertIncludes(products, "noindex", "Products HTML");
+
 const adminSeo = await readRoute("Admin/Seo.html", "Admin/Seo/index.html");
 assertIncludes(adminSeo, "noindex", "Admin SEO HTML");
 assertIncludes(adminSeo, "nofollow", "Admin SEO HTML");
@@ -47,7 +59,8 @@ assertIncludes(adminSeo, "nofollow", "Admin SEO HTML");
 const sitemap = await read("sitemap.xml");
 assertIncludes(sitemap, "<urlset", "sitemap.xml");
 assertIncludes(sitemap, "<loc>", "sitemap.xml");
-for (const forbidden of ["/admin", "/account", "/cart", "/checkout", "/home/home", "/merchandise/list"]) {
+assertIncludes(sitemap, "/Guides/fixture-page", "sitemap.xml");
+for (const forbidden of ["/admin", "/account", "/cart", "/checkout", "/home/home", "/merchandise/list", "/products"]) {
   assertNotIncludes(sitemap.toLowerCase(), forbidden, "sitemap.xml");
 }
 
@@ -69,7 +82,7 @@ if (manifest.status !== "included-in-this-build") {
 if (manifest.source !== "fixture") {
   throw new Error(`SEO build manifest has unexpected source: ${manifest.source}`);
 }
-if (manifest.snapshotVersion !== "fixture-2026-09-13.1") {
+if (manifest.snapshotVersion !== "fixture-2026-09-13.2") {
   throw new Error(`SEO build manifest has unexpected snapshot: ${manifest.snapshotVersion}`);
 }
 if (manifest.registryVersion !== "fixture-client-routes-2026-09-13.1") {
