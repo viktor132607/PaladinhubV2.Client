@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/auth/AuthContext";
+import { adminPermissions } from "@/auth/adminPermissions";
 import { adminRequest } from "@/lib/admin-categories";
 type Entry={id:string;parentId:string|null;name:string;kind:string;text:string;url:string;icon:string;sortOrder:number;openNewTab:boolean;isArchived:boolean;isDeleted:boolean;version:number};
 type Revision={id:string;version:number;action:string;actor:string;createdAtUtc:string;snapshot:string};
@@ -8,23 +10,26 @@ const draftOf=(x:Entry)=>({parentId:x.parentId,name:x.name,kind:x.kind,text:x.te
 const field="min-w-0 w-full rounded border border-slate-600 bg-slate-950 px-3 py-2 text-base";
 const button="min-h-11 max-w-full rounded border border-slate-600 bg-slate-800 px-3 py-2 disabled:opacity-40";
 export default function FooterAdmin(){
+ const {hasPermission}=useAuth();
+ const canCreate=hasPermission(adminPermissions.footer.create),canUpdate=hasPermission(adminPermissions.footer.update),canArchive=hasPermission(adminPermissions.footer.archive),canDelete=hasPermission(adminPermissions.footer.delete),canRestore=hasPermission(adminPermissions.footer.restore);
  const [rows,setRows]=useState<Entry[]>([]),[selected,setSelected]=useState<Entry|null>(null),[draft,setDraft]=useState(empty),[history,setHistory]=useState<Revision[]>([]);
  const [busy,setBusy]=useState(true),[error,setError]=useState(""),[notice,setNotice]=useState(""),[search,setSearch]=useState(""),[status,setStatus]=useState("active");
  const reload=()=>adminRequest<Entry[]>("/Admin/api/footer").then(setRows);
  useEffect(()=>{const c=new AbortController();adminRequest<Entry[]>("/Admin/api/footer","GET",undefined,c.signal).then(setRows).catch(e=>{if(!c.signal.aborted)setError(e.message);}).finally(()=>{if(!c.signal.aborted)setBusy(false);});return()=>c.abort();},[]);
  const dirty=JSON.stringify(draft)!==JSON.stringify(selected?draftOf(selected):empty);
  const discard=()=>!dirty||window.confirm("Discard unsaved footer changes?");
- const editable=!selected||!selected.isArchived&&!selected.isDeleted;
+ const canEditDraft=selected?canUpdate:canCreate;
+ const editable=canEditDraft&&(!selected||!selected.isArchived&&!selected.isDeleted);
  async function run(action:()=>Promise<void>){setBusy(true);setError("");setNotice("");try{await action();}catch(e){setError(e instanceof Error?e.message:"Operation failed.");}finally{setBusy(false);}}
  async function choose(x:Entry|null){if(!discard())return;setSelected(x);setDraft(x?draftOf(x):empty);setHistory([]);if(x)await run(async()=>setHistory(await adminRequest<Revision[]>(`/Admin/api/footer/${x.id}/history`)));}
  async function saved(x:Entry){await reload();setSelected(x);setDraft(draftOf(x));setHistory(await adminRequest<Revision[]>(`/Admin/api/footer/${x.id}/history`));window.dispatchEvent(new Event("footer-updated"));setNotice("Footer saved.");}
- async function save(){await run(async()=>saved(await adminRequest<Entry>(`/Admin/api/footer${selected?`/${selected.id}`:""}`,selected?"PUT":"POST",{...draft,version:selected?.version??0})));}
+ async function save(){if(!canEditDraft)return;await run(async()=>saved(await adminRequest<Entry>(`/Admin/api/footer${selected?`/${selected.id}`:""}`,selected?"PUT":"POST",{...draft,version:selected?.version??0})));}
  async function change(action:string,revisionId?:string){if(!selected||!discard()||!window.confirm(`${action} this footer entry?`))return;await run(async()=>saved(await adminRequest<Entry>(`/Admin/api/footer/${selected.id}/actions`,"POST",{action,revisionId,version:selected.version})));}
  return <main className="min-w-0 space-y-4 p-3 text-slate-100 sm:p-6">
   <h1 className="text-2xl text-amber-400">Footer & contacts</h1>
   {error&&<p role="alert" className="break-words text-red-300">{error}</p>}{notice&&<p role="status" className="text-green-300">{notice}</p>}
   <fieldset disabled={busy} className="min-w-0 space-y-4">
-   <div className="flex flex-wrap gap-2"><button className={button} onClick={()=>void choose(null)}>New entry</button><button className={button} onClick={()=>{if(discard())void run(async()=>{await reload();setSelected(null);setDraft(empty);setHistory([]);});}}>Reload footer</button></div>
+   <div className="flex flex-wrap gap-2">{canCreate?<button className={button} onClick={()=>void choose(null)}>New entry</button>:null}<button className={button} onClick={()=>{if(discard())void run(async()=>{await reload();setSelected(null);setDraft(empty);setHistory([]);});}}>Reload footer</button></div>
    <div className="grid gap-3 sm:grid-cols-2"><div className="min-w-0"><label className="block" htmlFor="footer-field-1">Search footer</label><input id="footer-field-1" className={field} value={search} onChange={e=>setSearch(e.target.value)}/></div><div className="min-w-0"><label className="block" htmlFor="footer-field-2">Entry status</label><select id="footer-field-2" className={field} value={status} onChange={e=>setStatus(e.target.value)}><option value="active">Active</option><option value="archived">Archived</option><option value="deleted">Deleted</option><option value="all">All</option></select></div></div>
    <div className="max-h-72 space-y-2 overflow-y-auto">{rows.filter(x=>(status==="all"||(status==="deleted"?x.isDeleted:status==="archived"?x.isArchived&&!x.isDeleted:!x.isDeleted&&!x.isArchived))&&`${x.name} ${x.text}`.toLowerCase().includes(search.toLowerCase())).map(x=><button className={`${button} block w-full break-words text-left ${selected?.id===x.id?"border-amber-400":""}`} key={x.id} aria-pressed={selected?.id===x.id} onClick={()=>void choose(x)}>{x.name} · {x.kind} · {x.parentId?rows.find(p=>p.id===x.parentId)?.name:"Root"} · v{x.version}{x.isDeleted?" · Deleted":x.isArchived?" · Archived":""}</button>)}</div>
    <fieldset disabled={!editable} className="min-w-0 space-y-3">
@@ -36,9 +41,9 @@ export default function FooterAdmin(){
     {draft.kind==="social"&&<div className="min-w-0"><label className="block" htmlFor="footer-field-8">Social icon</label><select id="footer-field-8" className={field} value={draft.icon} onChange={e=>setDraft({...draft,icon:e.target.value})}><option value="">No icon</option>{["facebook","instagram","youtube","discord","twitch","twitter","github"].map(k=><option key={k}>{k}</option>)}</select></div>}
     <div className="min-w-0"><label className="block" htmlFor="footer-field-9">Sort order</label><input id="footer-field-9" className={field} type="number" value={draft.sortOrder} onChange={e=>setDraft({...draft,sortOrder:Number(e.target.value)})}/></div>
     <label className="flex items-center gap-2"><input type="checkbox" checked={draft.openNewTab} onChange={e=>setDraft({...draft,openNewTab:e.target.checked})}/>Open link in new tab</label>
-    <button className={button} disabled={!draft.name.trim()} onClick={()=>void save()}>Save footer entry</button>
+    {canEditDraft?<button className={button} disabled={!draft.name.trim()} onClick={()=>void save()}>Save footer entry</button>:null}
    </fieldset>
-   {selected&&<><p className="break-all text-sm text-slate-400">Translation key: footer.{selected.id}.text</p><div className="flex flex-wrap gap-2">{!selected.isDeleted&&<><button className={button} onClick={()=>void change(selected.isArchived?"unarchive":"archive")}>{selected.isArchived?"Unarchive":"Archive"}</button><button className={button} onClick={()=>void change("delete")}>Delete entry</button></>}</div><h2 className="text-xl">Footer history</h2>{history.map(h=><div className="flex flex-wrap items-center justify-between gap-2 rounded border border-slate-700 p-3" key={h.id}><span className="break-words">v{h.version} · {h.action} · {h.actor} · {new Date(h.createdAtUtc).toLocaleString()}</span><button className={button} disabled={JSON.parse(h.snapshot).IsDeleted} onClick={()=>void change("restore",h.id)}>Restore v{h.version}</button></div>)}</>}
+   {selected&&<><p className="break-all text-sm text-slate-400">Translation key: footer.{selected.id}.text</p><div className="flex flex-wrap gap-2">{!selected.isDeleted&&<>{canArchive?<button className={button} onClick={()=>void change(selected.isArchived?"unarchive":"archive")}>{selected.isArchived?"Unarchive":"Archive"}</button>:null}{canDelete?<button className={button} onClick={()=>void change("delete")}>Delete entry</button>:null}</>}</div><h2 className="text-xl">Footer history</h2>{history.map(h=><div className="flex flex-wrap items-center justify-between gap-2 rounded border border-slate-700 p-3" key={h.id}><span className="break-words">v{h.version} · {h.action} · {h.actor} · {new Date(h.createdAtUtc).toLocaleString()}</span>{canRestore?<button className={button} disabled={JSON.parse(h.snapshot).IsDeleted} onClick={()=>void change("restore",h.id)}>Restore v{h.version}</button>:null}</div>)}</>}
   </fieldset>
  </main>;
 }
