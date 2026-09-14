@@ -5,7 +5,7 @@ import { useAuth } from "@/auth/AuthContext";
 import { Link, useLocation } from "@/router/nextCompat";
 import { fetchBackend, readApiJson } from "@/config/api";
 import ManagedNavigation, { type NavigationEntry } from "./ManagedNavigation";
-import { useLocalization, LanguagePicker } from "@/localization/LocalizationContext";
+import { useLocalization } from "@/localization/LocalizationContext";
 import AuthMenu from "./AuthMenu";
 
 const guidePages = [
@@ -15,6 +15,13 @@ const guidePages = [
   ["Rotation", "rotation"],
   ["Stats", "stats"],
 ] as const;
+
+function languageFlag(code: string, fallback: string) {
+  const normalized = code.toLowerCase().split("-")[0];
+  if (normalized === "en") return "🇬🇧";
+  if (normalized === "bg") return "🇧🇬";
+  return fallback;
+}
 
 function GuideMenu({
   label,
@@ -93,7 +100,7 @@ function GuideMenu({
 }
 
 export default function Navbar({ forceVisible = false }: { forceVisible?: boolean } = {}) {
-  const { t } = useLocalization();
+  const { t, language, languages, changeLanguage } = useLocalization();
   const { canAccessAdmin, loading: authLoading, user } = useAuth();
   const [navigation, setNavigation] = useState<NavigationEntry[] | null>(null);
   useEffect(() => {
@@ -204,7 +211,42 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
                 </Link>
               </li>
 
-              <LanguagePicker />
+              <li className="nav-item d-flex align-items-center px-2">
+                <div
+                  className="d-flex align-items-center gap-1"
+                  role="group"
+                  aria-label={t("language.label", "Language")}
+                  style={{ border: 0, outline: "none", boxShadow: "none", background: "transparent" }}
+                >
+                  {languages.map(option => {
+                    const selected = option.code.toLowerCase().split("-")[0] === language.toLowerCase().split("-")[0];
+                    return (
+                      <button
+                        key={option.code}
+                        type="button"
+                        aria-label={option.name}
+                        aria-pressed={selected}
+                        title={option.name}
+                        onClick={() => changeLanguage(option.code)}
+                        style={{
+                          border: 0,
+                          outline: "none",
+                          boxShadow: "none",
+                          background: "transparent",
+                          padding: "2px 4px",
+                          margin: 0,
+                          fontSize: 24,
+                          lineHeight: 1,
+                          cursor: "pointer",
+                          opacity: selected ? 1 : 0.55,
+                        }}
+                      >
+                        {languageFlag(option.code, option.name)}
+                      </button>
+                    );
+                  })}
+                </div>
+              </li>
               {authLoading || !user ? (
                 <>
                   <li className="nav-item">
