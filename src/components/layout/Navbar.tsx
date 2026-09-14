@@ -94,7 +94,7 @@ function GuideMenu({
 
 export default function Navbar({ forceVisible = false }: { forceVisible?: boolean } = {}) {
   const { t } = useLocalization();
-  const { canAccessAdmin } = useAuth();
+  const { canAccessAdmin, loading: authLoading, user } = useAuth();
   const [navigation, setNavigation] = useState<NavigationEntry[] | null>(null);
   useEffect(() => {
     let controller: AbortController | undefined;
@@ -205,7 +205,18 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
               </li>
 
               <LanguagePicker />
-              <AuthMenu />
+              {authLoading || !user ? (
+                <>
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/Account/Login">{t("auth.login", "Login")}</Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/Account/Register">{t("auth.register", "Register")}</Link>
+                  </li>
+                </>
+              ) : (
+                <AuthMenu />
+              )}
             </ul>
           </div>
         </div>
