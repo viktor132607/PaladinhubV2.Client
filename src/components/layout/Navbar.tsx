@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import { Link, useLocation } from "@/router/nextCompat";
 import { fetchBackend, readApiJson } from "@/config/api";
@@ -16,11 +16,110 @@ const guidePages = [
   ["Stats", "stats"],
 ] as const;
 
-function languageFlag(code: string, fallback: string) {
-  const normalized = code.toLowerCase().split("-")[0];
-  if (normalized === "en") return "🇬🇧";
-  if (normalized === "bg") return "🇧🇬";
-  return fallback;
+function normalizedLanguageCode(code: string) {
+  return code.toLowerCase().split("-")[0];
+}
+
+function LanguageMenu() {
+  const { t, language, languages, changeLanguage } = useLocalization();
+  const [expanded, setExpanded] = useState(false);
+  const rootRef = useRef<HTMLLIElement>(null);
+  const currentCode = normalizedLanguageCode(language);
+  const orderedLanguages = [...languages].sort((left, right) => {
+    const leftCode = normalizedLanguageCode(left.code);
+    const rightCode = normalizedLanguageCode(right.code);
+    if (leftCode === "en" && rightCode !== "en") return -1;
+    if (rightCode === "en" && leftCode !== "en") return 1;
+    return left.name.localeCompare(right.name);
+  });
+
+  useEffect(() => {
+    if (!expanded) return;
+
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setExpanded(false);
+      }
+    };
+
+    document.addEventListener("mousedown", closeOnOutsideClick);
+    return () => document.removeEventListener("mousedown", closeOnOutsideClick);
+  }, [expanded]);
+
+  return (
+    <li ref={rootRef} className="nav-item dropdown d-flex align-items-center px-2">
+      <button
+        type="button"
+        className="dropdown-toggle"
+        aria-label={t("language.label", "Language")}
+        aria-expanded={expanded}
+        onClick={() => setExpanded(value => !value)}
+        style={{
+          minWidth: 72,
+          height: 42,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 10,
+          padding: "0 12px",
+          border: "1px solid #cfd4da",
+          borderRadius: 8,
+          background: "#fff",
+          color: "#1f2937",
+          fontSize: 17,
+          fontWeight: 700,
+          lineHeight: 1,
+          boxShadow: "none",
+          cursor: "pointer",
+        }}
+      >
+        <span>{currentCode.toUpperCase()}</span>
+      </button>
+
+      <div
+        className={`dropdown-menu dropdown-menu-end${expanded ? " show" : ""}`}
+        style={{
+          minWidth: 72,
+          padding: 0,
+          marginTop: 2,
+          overflow: "hidden",
+          borderRadius: 8,
+        }}
+      >
+        {orderedLanguages.map(option => {
+          const optionCode = normalizedLanguageCode(option.code);
+          const selected = optionCode === currentCode;
+          return (
+            <button
+              key={option.code}
+              type="button"
+              className="dropdown-item text-center"
+              aria-label={option.name}
+              aria-current={selected ? "true" : undefined}
+              title={option.name}
+              onClick={() => {
+                changeLanguage(option.code);
+                setExpanded(false);
+              }}
+              style={{
+                minWidth: 72,
+                padding: "10px 12px",
+                border: 0,
+                textAlign: "center",
+                background: selected ? "#dc0000" : "#fff",
+                color: selected ? "#fff" : "#1f2937",
+                fontSize: 17,
+                fontWeight: 700,
+                lineHeight: 1.15,
+              }}
+            >
+              {optionCode.toUpperCase()}
+            </button>
+          );
+        })}
+      </div>
+    </li>
+  );
 }
 
 function GuideMenu({
@@ -100,7 +199,7 @@ function GuideMenu({
 }
 
 export default function Navbar({ forceVisible = false }: { forceVisible?: boolean } = {}) {
-  const { t, language, languages, changeLanguage } = useLocalization();
+  const { t } = useLocalization();
   const { canAccessAdmin, loading: authLoading, user } = useAuth();
   const [navigation, setNavigation] = useState<NavigationEntry[] | null>(null);
   useEffect(() => {
@@ -211,42 +310,8 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
                 </Link>
               </li>
 
-              <li className="nav-item d-flex align-items-center px-2">
-                <div
-                  className="d-flex align-items-center gap-1"
-                  role="group"
-                  aria-label={t("language.label", "Language")}
-                  style={{ border: 0, outline: "none", boxShadow: "none", background: "transparent" }}
-                >
-                  {languages.map(option => {
-                    const selected = option.code.toLowerCase().split("-")[0] === language.toLowerCase().split("-")[0];
-                    return (
-                      <button
-                        key={option.code}
-                        type="button"
-                        aria-label={option.name}
-                        aria-pressed={selected}
-                        title={option.name}
-                        onClick={() => changeLanguage(option.code)}
-                        style={{
-                          border: 0,
-                          outline: "none",
-                          boxShadow: "none",
-                          background: "transparent",
-                          padding: "2px 4px",
-                          margin: 0,
-                          fontSize: 24,
-                          lineHeight: 1,
-                          cursor: "pointer",
-                          opacity: selected ? 1 : 0.55,
-                        }}
-                      >
-                        {languageFlag(option.code, option.name)}
-                      </button>
-                    );
-                  })}
-                </div>
-              </li>
+              <LanguageMenu />
+
               {authLoading || !user ? (
                 <>
                   <li className="nav-item">
