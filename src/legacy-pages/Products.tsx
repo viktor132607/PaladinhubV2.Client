@@ -716,7 +716,7 @@ export default function Products() {
   const navigate =
     useNavigate();
 
-  const { hasRole } =
+  const { hasPermission } =
     useAuth();
 
   const [
@@ -1417,9 +1417,7 @@ export default function Products() {
                 🛒 My Cart
               </Link>
 
-              {hasRole(
-                "Admin",
-              ) && (
+              {hasPermission("products.create") && (
                 <Link
                   to="/Admin/Products/Create"
                   className="rounded bg-[#198754] px-3 py-1.5 text-sm font-semibold text-white no-underline hover:bg-[#157347]"
@@ -1739,20 +1737,18 @@ export default function Products() {
                             : "Add to Cart"}
                         </button>
 
-                        {hasRole(
-                          "Admin",
-                        ) && (
+                        {(hasPermission("products.update") || hasPermission("products.delete")) && (
                           <>
-                            <Link
+                            {hasPermission("products.update") && <Link
                               to={
                                 editPath
                               }
                               className="rounded bg-[#ffc107] px-3 py-1.5 text-center text-sm font-semibold text-black no-underline hover:bg-[#ffca2c]"
                             >
                               Edit
-                            </Link>
+                            </Link>}
 
-                            <button
+                            {hasPermission("products.delete") && <button
                               type="button"
                               onClick={() =>
                                 void deleteProduct(
@@ -1769,7 +1765,7 @@ export default function Products() {
                               product.id
                                 ? "Deleting..."
                                 : "Delete"}
-                            </button>
+                            </button>}
                           </>
                         )}
                       </div>

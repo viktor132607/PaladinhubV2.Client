@@ -8,7 +8,10 @@ type IconEntry = { name: string; icon: string; kind: string };
 type Catalog = { icons: IconEntry[]; page: number; pages: number; total: number };
 const acceptedTypes = new Set(["image/png", "image/jpeg", "image/gif", "image/webp"]);
 
-export default function SpellIconPicker({ value, onChange, disabled = false, onBusyChange, label = "Icon", kind = "spell" }: {
+export default function SpellIconPicker({ value, onChange, disabled = false, onBusyChange, label = "Icon", kind = "spell", allowBrowse = true, allowUpload = true, allowManage = true }: {
+  allowBrowse?: boolean;
+  allowUpload?: boolean;
+  allowManage?: boolean;
   label?: string;
   kind?: "spell" | "item";
   value: string;
@@ -37,7 +40,7 @@ export default function SpellIconPicker({ value, onChange, disabled = false, onB
   }, []);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !allowBrowse) return;
     const controller = new AbortController();
     setLoading(true);
     const timer = setTimeout(async () => {
@@ -53,10 +56,10 @@ export default function SpellIconPicker({ value, onChange, disabled = false, onB
       }
     }, 200);
     return () => { clearTimeout(timer); controller.abort(); };
-  }, [open, search, page, revision]);
+  }, [open, search, page, revision, allowBrowse]);
 
   async function upload(file: File) {
-    if (disabled || busyRef.current) return;
+    if (disabled || !allowUpload || busyRef.current) return;
     if (!acceptedTypes.has(file.type) || !file.size || file.size > 5 * 1024 * 1024) {
       setError("Choose a PNG, JPEG, GIF or WebP image up to 5 MB.");
       return;
@@ -96,6 +99,7 @@ export default function SpellIconPicker({ value, onChange, disabled = false, onB
       for (const item of items) {
         const type = item.types.find((type) => acceptedTypes.has(type));
         if (type) {
+          if (!allowUpload) throw new Error("You do not have permission to upload images.");
           const blob = await item.getType(type);
           await upload(new File([blob], `pasted-icon.${type.split("/")[1]}`, { type }));
           return;
@@ -117,10 +121,10 @@ export default function SpellIconPicker({ value, onChange, disabled = false, onB
       <label htmlFor={`${id}-value`} className="block">{label}</label>
       <input id={`${id}-value`} className="form-control w-full min-w-0 rounded border border-slate-600 px-3 py-2" value={value} maxLength={2048} placeholder="Image URL or existing filename" onChange={(event) => onChange(event.target.value)} disabled={disabled || uploading} aria-describedby={`${id}-help`} />
       <div className="flex flex-wrap gap-2">
-        <button type="button" className="btn btn-secondary" aria-expanded={open} aria-controls={`${id}-browser`} disabled={disabled || uploading} onClick={() => setOpen((current) => !current)}>{open ? "Close database" : "Browse database"}</button>
+        <button type="button" className="btn btn-secondary" aria-expanded={open} aria-controls={`${id}-browser`} disabled={disabled || uploading || !allowBrowse} onClick={() => setOpen((current) => !current)}>{open ? "Close database" : "Browse database"}</button>
         <button type="button" className="btn btn-secondary" disabled={disabled || uploading} onClick={() => void pasteClipboard()}>Paste image / URL</button>
-        <button type="button" className="btn btn-secondary" disabled={disabled || uploading} onClick={() => fileInput.current?.click()}>Upload image</button>
-        <a className="btn btn-outline-secondary" href="/Admin/Media" target="_blank" rel="noopener noreferrer">Manage media</a>
+        <button type="button" className="btn btn-secondary" disabled={disabled || uploading || !allowUpload} onClick={() => fileInput.current?.click()}>Upload image</button>
+        {allowManage ? <a className="btn btn-outline-secondary" href="/Admin/Media" target="_blank" rel="noopener noreferrer">Manage media</a> : null}
         {value ? <button type="button" className="btn btn-outline-warning" disabled={disabled || uploading} onClick={() => onChange("")}>Clear icon</button> : null}
       </div>
       <input ref={fileInput} type="file" accept="image/png,image/jpeg,image/gif,image/webp" className="hidden" aria-label={`Upload ${label.toLowerCase()}`} disabled={disabled || uploading} onChange={(event) => { const file = event.target.files?.[0]; event.target.value = ""; if (file) void upload(file); }} />

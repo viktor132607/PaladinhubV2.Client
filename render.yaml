@@ -7,7 +7,7 @@ services:
 
     envVars:
       - key: NEXT_PUBLIC_API_URL
-        value: https://paladinhubv2-api.onrender.com/api
+        value: https://paladinhubv2-server.onrender.com
 
     routes:
       - type: rewrite

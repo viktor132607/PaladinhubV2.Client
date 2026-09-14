@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  isSnapshot,
   canonicalPublicPath,
   getSeoSnapshot,
   metadataForPath,
@@ -148,4 +149,30 @@ describe("public SEO resolution", () => {
       path: "/Guides/fixture-page",
     });
   });
+});
+
+describe("public snapshot validation", () => {
+  it("accepts the API contract", () => expect(isSnapshot(snapshot)).toBe(true));
+  it("rejects malformed nested values and duplicate targets", () => {
+    expect(isSnapshot({...snapshot, pages:[{id:1, title:"Page", path:42}]})).toBe(false);
+    expect(isSnapshot({...snapshot, entries:[{...snapshot.entries[0], index:"false"}]})).toBe(false);
+    expect(isSnapshot({...snapshot, entries:[snapshot.entries[0],snapshot.entries[0]]})).toBe(false);
+    expect(isSnapshot({...snapshot, staticRoutes:["/Admin/../products"]})).toBe(false);
+  });
+});
+
+it("uses the immutable prebuild snapshot without another API fetch", async () => {
+  const fetchMock = vi.fn();
+  vi.stubGlobal("fetch", fetchMock);
+  vi.stubEnv("SEO_BUILD_SNAPSHOT_JSON", JSON.stringify(snapshot));
+  resetSeoSnapshotCacheForTests();
+  try {
+    expect(await getSeoSnapshot()).toEqual(snapshot);
+    expect(await getSeoSnapshot()).toEqual(snapshot);
+    expect(fetchMock).not.toHaveBeenCalled();
+  } finally {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+    resetSeoSnapshotCacheForTests();
+  }
 });

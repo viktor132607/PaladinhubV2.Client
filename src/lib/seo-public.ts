@@ -132,16 +132,28 @@ function normalizePath(value: string): string {
   return collapsed.length > 1 ? collapsed.replace(/\/+$/, "") : "/";
 }
 
-function isSnapshot(value: unknown): value is SeoPublicSnapshot {
+export function isSnapshot(value: unknown): value is SeoPublicSnapshot {
   if (!value || typeof value !== "object") return false;
   const candidate = value as Partial<SeoPublicSnapshot>;
-  return typeof candidate.siteUrl === "string" &&
-    typeof candidate.registryVersion === "string" &&
-    typeof candidate.snapshotVersion === "string" &&
-    typeof candidate.generatedAtUtc === "string" &&
-    Array.isArray(candidate.staticRoutes) &&
-    Array.isArray(candidate.pages) &&
-    Array.isArray(candidate.entries);
+  if (!(typeof candidate.siteUrl === "string" && normalizeOrigin(candidate.siteUrl) &&
+    typeof candidate.registryVersion === "string" && candidate.registryVersion &&
+    typeof candidate.snapshotVersion === "string" && candidate.snapshotVersion &&
+    typeof candidate.generatedAtUtc === "string" && Number.isFinite(Date.parse(candidate.generatedAtUtc)) &&
+    Array.isArray(candidate.staticRoutes) && Array.isArray(candidate.pages) && Array.isArray(candidate.entries))) return false;
+  const validPath = (path: unknown, global = false): path is string => typeof path === "string" &&
+    ((global && path === "*") || (path.startsWith("/") && !/[?#%\\]/.test(path) && !path.includes("//") && !path.split("/").some(segment => segment === "." || segment === "..")));
+  if (!candidate.staticRoutes.every(path => validPath(path))) return false;
+  if (!candidate.pages.every(page => page && Number.isInteger(page.id) && typeof page.title === "string" && validPath(page.path))) return false;
+  if (!candidate.entries.every(entry => entry && typeof entry.id === "string" && Number.isInteger(entry.version) &&
+    (entry.pageId === null || Number.isInteger(entry.pageId)) && validPath(entry.path, true) &&
+    [entry.title, entry.description, entry.canonicalUrl, entry.socialTitle, entry.socialDescription, entry.imageUrl].every(value => typeof value === "string") &&
+    [entry.index, entry.follow].every(value => value === null || typeof value === "boolean"))) return false;
+  const unique = (values: string[]) => new Set(values).size === values.length;
+  return unique(candidate.staticRoutes.map(path => path.toLowerCase())) &&
+    unique(candidate.pages.map(page => String(page.id))) &&
+    unique(candidate.pages.map(page => page.path.toLowerCase())) &&
+    unique(candidate.entries.map(entry => entry.id)) &&
+    unique(candidate.entries.map(entry => entry.path.toLowerCase()));
 }
 
 function normalizeSnapshot(payload: SeoPublicSnapshot): SeoPublicSnapshot {
@@ -183,6 +195,7 @@ async function fetchSeoSnapshotFromApi(): Promise<SeoPublicSnapshot> {
     try {
       const response = await fetch(snapshotUrl, {
         headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(15_000),
         cache: "no-store",
       });
       if (!response.ok) {
@@ -217,6 +230,13 @@ export function resetSeoSnapshotCacheForTests(): void {
 
 export async function getSeoSnapshot(): Promise<SeoPublicSnapshot> {
   if (snapshotPromise) return snapshotPromise;
+  const materialized = process.env.SEO_BUILD_SNAPSHOT_JSON;
+  if (materialized) {
+    const snapshot: unknown = JSON.parse(materialized);
+    if (!isSnapshot(snapshot)) throw new Error("SEO build failed: materialized snapshot is invalid.");
+    snapshotPromise = Promise.resolve(normalizeSnapshot(snapshot));
+    return snapshotPromise;
+  }
 
   if (!process.env.SEO_BUILD_SOURCE && process.env.NODE_ENV === "test") {
     snapshotPromise = Promise.resolve(normalizeSnapshot(unitTestFallbackSnapshot()));
@@ -265,7 +285,8 @@ export function canonicalPublicPath(
   requestedPath: string,
 ): string | null {
   const normalized = normalizePath(requestedPath);
-  const aliased = STATIC_ALIASES[normalized.toLowerCase()] ?? normalized;
+  const productAlias = /^\/Products\/Details\/([0-9a-f-]{36})$/i.exec(normalized);
+  const aliased = productAlias ? `/products/${productAlias[1]}` : STATIC_ALIASES[normalized.toLowerCase()] ?? normalized;
   const target = aliased.toLowerCase();
 
   const staticRoute = snapshot.staticRoutes.find(route =>

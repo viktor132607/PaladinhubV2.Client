@@ -32,7 +32,14 @@ export function groupPermissions(
 
 export function parseRoleSnapshot(snapshot: string): RoleSnapshot | null {
   try {
-    const parsed = JSON.parse(snapshot) as Partial<RoleSnapshot>;
+    const raw = JSON.parse(snapshot);
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+    // Revision JSON is stored independently of the API's camelCase serializer.
+    const parsed = {
+      name: raw.name ?? raw.Name,
+      isDisabled: raw.isDisabled ?? raw.IsDisabled,
+      permissions: raw.permissions ?? raw.Permissions,
+    };
     if (
       typeof parsed.name !== "string" ||
       typeof parsed.isDisabled !== "boolean" ||
@@ -43,7 +50,7 @@ export function parseRoleSnapshot(snapshot: string): RoleSnapshot | null {
       name: parsed.name,
       isDisabled: parsed.isDisabled,
       permissions: parsed.permissions.filter(
-        (value): value is string => typeof value === "string",
+        (value: unknown): value is string => typeof value === "string",
       ),
     };
   } catch {

@@ -553,7 +553,7 @@ export default function ProductDetails() {
 
   const {
     isAuthenticated,
-    hasRole,
+    hasPermission,
   } = useAuth();
 
   const [
@@ -1040,7 +1040,7 @@ export default function ProductDetails() {
                 {product.name}
               </h1>
 
-              {hasRole("Admin") ? (
+              {hasPermission("products.update") ? (
                 <Link
                   to={`/Admin/Products/Edit/${encodeURIComponent(
                     product.id,

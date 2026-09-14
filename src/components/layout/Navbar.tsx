@@ -19,13 +19,12 @@ const guidePages = [
 function GuideMenu({
   label,
   section,
-  isAdmin,
 }: {
   label: string;
   section: "Holy" | "Protection" | "Retribution";
-  isAdmin: boolean;
 }) {
   const { t } = useLocalization();
+  const { hasPermission } = useAuth();
   const [expanded, setExpanded] = useState(false);
   const { pathname } = useLocation();
   useEffect(() => setExpanded(false), [pathname]);
@@ -61,7 +60,7 @@ function GuideMenu({
               {t(title)}
             </Link>
 
-            {isAdmin ? (
+            {hasPermission("pages.delete") ? (
               <Link
                 className="text-danger position-absolute top-50 translate-middle-y"
                 style={{ right: 12, textDecoration: "none" }}
@@ -75,7 +74,7 @@ function GuideMenu({
           </li>
         ))}
 
-        {isAdmin ? (
+        {hasPermission("pages.create") ? (
           <>
             <li><hr className="dropdown-divider" /></li>
             <li>
@@ -95,7 +94,7 @@ function GuideMenu({
 
 export default function Navbar({ forceVisible = false }: { forceVisible?: boolean } = {}) {
   const { t } = useLocalization();
-  const { hasRole } = useAuth();
+  const { canAccessAdmin } = useAuth();
   const [navigation, setNavigation] = useState<NavigationEntry[] | null>(null);
   useEffect(() => {
     let controller: AbortController | undefined;
@@ -110,7 +109,6 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
     return () => { controller?.abort(); window.removeEventListener("navigation-updated", refreshNavigation); };
   }, []);
   const [open, setOpen] = useState(false);
-  const isAdmin = hasRole("Admin");
   const { pathname } = useLocation();
   useEffect(() => setOpen(false), [pathname]);
 
@@ -161,14 +159,14 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
 
           <div id="primary-navigation" className={`navbar-collapse collapse d-sm-inline-flex justify-content-between${open ? " show" : ""}`}>
             <ul className="navbar-nav">
-              {navigation !== null ? <ManagedNavigation isAdmin={isAdmin} entries={navigation} location="primary" /> : <>
+              {navigation !== null ? <ManagedNavigation entries={navigation} location="primary" /> : <>
               <li className="nav-item">
                 <Link to="/Home/Home" className="nav-link">{t("Home")}</Link>
               </li>
 
-              <GuideMenu label="Holy Paladin" section="Holy" isAdmin={isAdmin} />
-              <GuideMenu label="Protection Paladin" section="Protection" isAdmin={isAdmin} />
-              <GuideMenu label="Retribution Paladin" section="Retribution" isAdmin={isAdmin} />
+              <GuideMenu label="Holy Paladin" section="Holy" />
+              <GuideMenu label="Protection Paladin" section="Protection" />
+              <GuideMenu label="Retribution Paladin" section="Retribution" />
 
               <li className="nav-item">
                 <Link to="/Discussions/Index" className="nav-link">{t("Discussion")}</Link>
@@ -179,15 +177,15 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
               </li>
 
               </>}
-              {isAdmin ? (
+              {canAccessAdmin ? (
                 <li className="nav-item">
-                  <Link to="/Admin/Database" className="nav-link">{t("Admin")}</Link>
+                  <Link to="/Admin" className="nav-link">{t("Admin")}</Link>
                 </li>
               ) : null}
             </ul>
 
             <ul className="navbar-nav ms-auto">
-              {navigation !== null ? <ManagedNavigation isAdmin={isAdmin} entries={navigation} location="utility" /> : <>
+              {navigation !== null ? <ManagedNavigation entries={navigation} location="utility" /> : <>
               <li className="nav-item">
                 <Link to="/Merchandise/Merchandise" className="nav-link">
                   <i className="fa-solid fa-store" aria-hidden="true" /> {t("Merchandise")}

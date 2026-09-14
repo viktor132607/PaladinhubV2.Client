@@ -17,6 +17,7 @@ export type AccessRole = {
   name: string;
   isSystem: boolean;
   isDisabled: boolean;
+  isDeleted?: boolean;
   version: number;
   userCount: number;
   permissions: string[];

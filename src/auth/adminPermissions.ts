@@ -27,6 +27,7 @@ export const adminPermissions = {
   items: { read: "items.read", create: "items.create", update: "items.update", delete: "items.delete", manage: "items.manage" },
   carts: { read: "carts.read", manage: "carts.manage" },
   products: { read: "products.read", create: "products.create", update: "products.update", delete: "products.delete", manage: "products.manage" },
+  discussionPosts: { delete: "discussion_posts.delete", manage: "discussion_posts.manage" },
   productReviews: { delete: "product_reviews.delete", manage: "product_reviews.manage" },
   promoCodes: { read: "promo_codes.read", create: "promo_codes.create", update: "promo_codes.update", manage: "promo_codes.manage" },
 } as const;

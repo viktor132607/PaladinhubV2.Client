@@ -109,8 +109,8 @@ export async function generateStaticParams(): Promise<Array<{ slug: string[] }>>
   const result = applicationStaticParams.map(item => ({ slug: [...item.slug] }));
   const seen = new Set(result.map(item => item.slug.join("/").toLowerCase()));
 
-  for (const page of snapshot.pages) {
-    const slug = pathToStaticSlug(page.path);
+  for (const path of [...snapshot.staticRoutes, ...snapshot.pages.map(page => page.path)]) {
+    const slug = pathToStaticSlug(path);
     if (!slug?.length) continue;
     const key = slug.join("/").toLowerCase();
     if (seen.has(key)) continue;

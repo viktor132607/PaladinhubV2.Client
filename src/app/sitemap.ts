@@ -25,9 +25,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [...paths.values()]
     .map(path => resolveEffectiveSeo(snapshot, path))
-    .filter(seo => seo.isPublic && seo.index)
+    .filter(seo => seo.isPublic && seo.index && seo.canonicalUrl === pageUrl(siteUrl, seo.path))
     .map(seo => ({
-      url: pageUrl(siteUrl, seo.path),
+      url: seo.canonicalUrl,
       changeFrequency: seo.path === "/" ? "weekly" as const : "monthly" as const,
       priority: seo.path === "/" ? 1 : 0.7,
     }));

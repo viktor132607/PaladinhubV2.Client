@@ -2,7 +2,13 @@
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { adminRequest } from "@/lib/admin-categories";
+import SpellIconPicker from "@/components/admin/SpellIconPicker";
+import { fetchBackend, readApiJson } from "@/config/api";
+import { resolveEffectiveSeo, type SeoPublicSnapshot, type SeoBuildManifest } from "@/lib/seo-public";
 import { spellIconSource } from "@/lib/spell-icons";
+
+import { useAuth } from "@/auth/AuthContext";
+import { adminPermissions } from "@/auth/adminPermissions";
 
 type SeoTargetType = "global" | "static" | "database";
 type TriState = "inherit" | "yes" | "no";
@@ -167,6 +173,13 @@ function actionLabel(action: string): string {
 }
 
 export default function SeoAdmin() {
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission(adminPermissions.seo.create);
+  const canUpdate = hasPermission(adminPermissions.seo.update);
+  const canMediaRead = hasPermission(adminPermissions.media.read);
+  const [publicSnapshot, setPublicSnapshot] = useState<SeoPublicSnapshot | null>(null);
+  const [publication, setPublication] = useState("Checking published SEO…");
+  const [imageBusy, setImageBusy] = useState(false);
   const [entries, setEntries] = useState<SeoEntry[]>([]);
   const [targets, setTargets] = useState<SeoTargets>({ registryVersion: "", staticRoutes: [], pages: [] });
   const [selected, setSelected] = useState<SeoEntry | null>(null);
@@ -187,6 +200,25 @@ export default function SeoAdmin() {
   const [mediaPage, setMediaPage] = useState(1);
   const [mediaLoading, setMediaLoading] = useState(false);
   const [mediaCatalog, setMediaCatalog] = useState<MediaCatalog>({ media: [], page: 1, pages: 1, total: 0 });
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setPublication("Checking published SEO…");
+    void Promise.all([
+      fetchBackend("/api/seo/snapshot", { cache: "no-store", signal: controller.signal }).then(readApiJson<SeoPublicSnapshot>),
+      fetch("/seo-build-manifest", { cache: "no-store", signal: controller.signal }).then(readApiJson<SeoBuildManifest>),
+    ]).then(([snapshot, manifest]) => {
+      if (controller.signal.aborted) return;
+      setPublicSnapshot(snapshot);
+      setPublication(manifest.source === "api" && manifest.snapshotVersion === snapshot.snapshotVersion
+        && manifest.registryVersion === snapshot.registryVersion
+        ? "Published: the deployed build contains the current SEO settings."
+        : "Saved changes are pending publication. Rebuild and deploy the client to publish them.");
+    }).catch(() => {
+      if (!controller.signal.aborted) setPublication("Publication status could not be verified. Retry with Refresh; saving alone does not publish SEO.");
+    });
+    return () => controller.abort();
+  }, [entries, refresh]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -238,7 +270,7 @@ export default function SeoAdmin() {
   }, [selected]);
 
   useEffect(() => {
-    if (!mediaOpen) return;
+    if (!mediaOpen || !canMediaRead) return;
     const controller = new AbortController();
     const timer = window.setTimeout(() => {
       setMediaLoading(true);
@@ -262,7 +294,7 @@ export default function SeoAdmin() {
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [mediaOpen, mediaSearch, mediaPage]);
+  }, [mediaOpen, mediaSearch, mediaPage, canMediaRead]);
 
   const visibleEntries = useMemo(() => {
     const needle = search.trim().toLowerCase();
@@ -289,10 +321,26 @@ export default function SeoAdmin() {
     : `path:${(draft.targetType === "global" ? "*" : draft.path).toLowerCase()}`;
   const duplicateTarget = Boolean(targetKey && configuredTargets.has(targetKey));
   const isGlobal = draft.targetType === "global";
-  const editorDisabled = busy || Boolean(selected?.isDeleted || selected?.isArchived);
+  const editorDisabled = !(selected ? canUpdate : canCreate) || imageBusy || busy || Boolean(selected?.isDeleted || selected?.isArchived);
   const selectedMediaSource = draft.socialImageMediaId
     ? spellIconSource(`/api/spell-icons/${draft.socialImageMediaId}`)
     : "";
+
+  const preview = useMemo(() => {
+    if (!publicSnapshot) return null;
+    const path = draft.targetType === "global" ? "*" : draft.targetType === "database"
+      ? targets.pages.find(page => String(page.id) === draft.pageId)?.path ?? "" : draft.path;
+    const current = {
+      id: selected?.id ?? "draft", version: selected?.version ?? 0,
+      pageId: draft.targetType === "database" ? Number(draft.pageId) : null,
+      path, title: draft.title, description: draft.description, canonicalUrl: draft.canonicalUrl,
+      socialTitle: draft.socialTitle, socialDescription: draft.socialDescription,
+      imageUrl: selectedMediaSource || draft.imageUrl, index: nullableBoolean(draft.index), follow: nullableBoolean(draft.follow),
+    };
+    return resolveEffectiveSeo({ ...publicSnapshot,
+      entries: [...publicSnapshot.entries.filter(entry => entry.path.toLowerCase() !== path.toLowerCase()), current],
+    }, path === "*" ? "/" : path);
+  }, [publicSnapshot, draft, targets.pages, selected, selectedMediaSource]);
 
   function choose(entry: SeoEntry | null) {
     setSelected(entry);
@@ -371,7 +419,7 @@ export default function SeoAdmin() {
   }
 
   async function lifecycle(action: "archive" | "unarchive" | "delete" | "restore", revisionId?: string) {
-    if (!selected || busyRef.current) return;
+    if (!selected || busyRef.current || !hasPermission(adminPermissions.seo[action === "unarchive" ? "restore" : action])) return;
     busyRef.current = true;
     setBusy(true);
     setError("");
@@ -408,11 +456,12 @@ export default function SeoAdmin() {
         {targets.registryVersion ? <span className="badge text-bg-secondary">Route registry {targets.registryVersion}</span> : null}
       </div>
 
+      <p className="alert alert-info" role="status">{publication}</p>
       {error ? <p className="alert alert-danger" role="alert">{error}</p> : null}
       {notice ? <p className="alert alert-success" role="status">{notice}</p> : null}
 
       <div className="d-flex flex-wrap gap-2 mb-3">
-        <button type="button" className="btn btn-primary" disabled={busy} onClick={() => choose(null)}>New SEO entry</button>
+        <button type="button" className="btn btn-primary" disabled={busy || !canCreate} onClick={() => choose(null)}>New SEO entry</button>
         <button type="button" className="btn btn-secondary" disabled={busy || loading} onClick={() => setRefresh(value => value + 1)}>Refresh</button>
       </div>
 
@@ -558,7 +607,7 @@ export default function SeoAdmin() {
                 <div className="border rounded p-3 mb-3">
                   <div className="d-flex flex-wrap justify-content-between gap-2 align-items-center mb-2">
                     <strong>Social image</strong>
-                    <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => setMediaOpen(value => !value)}>{mediaOpen ? "Close media library" : "Choose from media"}</button>
+                    <button type="button" className="btn btn-sm btn-outline-primary" disabled={!canMediaRead} onClick={() => setMediaOpen(value => !value)}>{mediaOpen ? "Close media library" : "Choose from media"}</button>
                   </div>
 
                   {selectedMediaSource ? (
@@ -571,16 +620,14 @@ export default function SeoAdmin() {
                     </div>
                   ) : null}
 
-                  <label className="form-label" htmlFor="seo-image-url">Or external image URL</label>
-                  <input
-                    id="seo-image-url"
-                    type="url"
-                    className="form-control"
-                    maxLength={2048}
-                    placeholder="https://cdn.example.com/share-card.jpg"
-                    value={draft.imageUrl}
-                    onChange={event => setDraft(current => ({ ...current, imageUrl: event.target.value, socialImageMediaId: event.target.value ? "" : current.socialImageMediaId }))}
-                  />
+                  <SpellIconPicker label="Paste or upload social image"
+                    value={draft.socialImageMediaId ? `/api/spell-icons/${draft.socialImageMediaId}` : draft.imageUrl}
+                    disabled={editorDisabled} allowBrowse={false} allowManage={canMediaRead}
+                    allowUpload={hasPermission(adminPermissions.spellIcons.create)} onBusyChange={setImageBusy}
+                    onChange={value => {
+                      const match = /^\/api\/spell-icons\/([0-9a-f-]{36})$/i.exec(value);
+                      setDraft(current => ({ ...current, socialImageMediaId: match?.[1] ?? "", imageUrl: match ? "" : value }));
+                    }} />
                   <p className="small text-secondary mb-0 mt-1">Media-library image and external URL are mutually exclusive.</p>
                 </div>
 
@@ -638,11 +685,21 @@ export default function SeoAdmin() {
               </fieldset>
             </form>
 
+            {preview ? <section className="mt-4" aria-label="Effective SEO preview">
+              <h3>Effective metadata preview</h3>
+              <p className="small text-secondary">Includes inherited defaults{isGlobal ? " for the home page" : ""}.</p>
+              <strong>{preview.title}</strong><p>{preview.description}</p>
+              <p style={{ overflowWrap: "anywhere" }}>Canonical: {preview.canonicalUrl || "Not a published public page"}</p>
+              <p>Robots: {preview.index ? "index" : "noindex"}, {preview.follow ? "follow" : "nofollow"}</p>
+              <strong>{preview.socialTitle}</strong><p>{preview.socialDescription}</p>
+              {preview.imageUrl ? <img src={preview.imageUrl} alt="Social sharing preview" style={{ maxWidth: "100%", maxHeight: 200, objectFit: "contain" }} /> : null}
+            </section> : null}
+
             {selected ? (
               <div className="d-flex flex-wrap gap-2 mt-3">
-                {!selected.isDeleted && !selected.isArchived ? <button type="button" className="btn btn-warning" disabled={busy} onClick={() => { if (window.confirm("Archive this SEO entry?")) void lifecycle("archive"); }}>Archive</button> : null}
-                {!selected.isDeleted && selected.isArchived ? <button type="button" className="btn btn-success" disabled={busy} onClick={() => void lifecycle("unarchive")}>Unarchive</button> : null}
-                {!selected.isDeleted ? <button type="button" className="btn btn-danger" disabled={busy} onClick={() => { if (window.confirm("Move this SEO entry to Deleted? Its history will be preserved.")) void lifecycle("delete"); }}>Delete</button> : null}
+                {!selected.isDeleted && !selected.isArchived && hasPermission(adminPermissions.seo.archive) ? <button type="button" className="btn btn-warning" disabled={busy} onClick={() => { if (window.confirm("Archive this SEO entry?")) void lifecycle("archive"); }}>Archive</button> : null}
+                {!selected.isDeleted && selected.isArchived && hasPermission(adminPermissions.seo.restore) ? <button type="button" className="btn btn-success" disabled={busy} onClick={() => void lifecycle("unarchive")}>Unarchive</button> : null}
+                {!selected.isDeleted && hasPermission(adminPermissions.seo.delete) ? <button type="button" className="btn btn-danger" disabled={busy} onClick={() => { if (window.confirm("Move this SEO entry to Deleted? Its history will be preserved.")) void lifecycle("delete"); }}>Delete</button> : null}
               </div>
             ) : null}
 
@@ -657,7 +714,7 @@ export default function SeoAdmin() {
                       <span className="small text-secondary">{new Date(revision.createdAtUtc).toLocaleString()}</span>
                     </div>
                     <div className="small mt-1" style={{ overflowWrap: "anywhere" }}>By: {revision.actor}</div>
-                    {revision.action.toLowerCase() !== "delete" && revision.version !== selected.version ? (
+                    {hasPermission(adminPermissions.seo.restore) && revision.action.toLowerCase() !== "delete" && revision.version !== selected.version ? (
                       <button type="button" className="btn btn-sm btn-outline-primary mt-2" disabled={busy} onClick={() => { if (window.confirm(`Restore SEO entry to revision ${revision.version}?`)) void lifecycle("restore", revision.id); }}>Restore this revision</button>
                     ) : null}
                   </div>
