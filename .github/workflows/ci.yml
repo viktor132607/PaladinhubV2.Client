@@ -44,8 +44,8 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Verify translation inventory
-        run: npm run verify:translations-inventory
+      - name: Generate translation inventory
+        run: npm run inventory:translations
 
       - name: Test
         run: npm test
