@@ -7,12 +7,10 @@ import { Link, useNavigate } from "@/router/nextCompat";
 
 export default function AuthMenu() {
   const { t } = useLocalization();
-  const { user, loading, logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-
-  if (loading) return null;
 
   if (!user) {
     return (
