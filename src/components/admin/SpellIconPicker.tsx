@@ -3,6 +3,8 @@
 import { useEffect, useId, useRef, useState, type ClipboardEvent } from "react";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import { spellIconSource, itemIconSource } from "@/lib/spell-icons";
+import { useLocalization } from "@/localization/LocalizationContext";
+import { formatMessage } from "@/localization/catalog";
 
 type IconEntry = { name: string; icon: string; kind: string };
 type Catalog = { icons: IconEntry[]; page: number; pages: number; total: number };
@@ -19,6 +21,8 @@ export default function SpellIconPicker({ value, onChange, disabled = false, onB
   disabled?: boolean;
   onBusyChange?: (busy: boolean) => void;
 }) {
+  const { t } = useLocalization();
+  const visibleLabel = t(label);
   const id = useId();
   const fileInput = useRef<HTMLInputElement>(null);
   const busyRef = useRef(false);
@@ -118,40 +122,40 @@ export default function SpellIconPicker({ value, onChange, disabled = false, onB
 
   return (
     <div className="spell-icon-picker min-w-0 space-y-2" onPaste={paste}>
-      <label htmlFor={`${id}-value`} className="block">{label}</label>
-      <input id={`${id}-value`} className="form-control w-full min-w-0 rounded border border-slate-600 px-3 py-2" value={value} maxLength={2048} placeholder="Image URL or existing filename" onChange={(event) => onChange(event.target.value)} disabled={disabled || uploading} aria-describedby={`${id}-help`} />
+      <label htmlFor={`${id}-value`} className="block">{visibleLabel}</label>
+      <input id={`${id}-value`} className="form-control w-full min-w-0 rounded border border-slate-600 px-3 py-2" value={value} maxLength={2048} placeholder={t("icon.url")} onChange={(event) => onChange(event.target.value)} disabled={disabled || uploading} aria-describedby={`${id}-help`} />
       <div className="flex flex-wrap gap-2">
-        <button type="button" className="btn btn-secondary" aria-expanded={open} aria-controls={`${id}-browser`} disabled={disabled || uploading || !allowBrowse} onClick={() => setOpen((current) => !current)}>{open ? "Close database" : "Browse database"}</button>
-        <button type="button" className="btn btn-secondary" disabled={disabled || uploading} onClick={() => void pasteClipboard()}>Paste image / URL</button>
-        <button type="button" className="btn btn-secondary" disabled={disabled || uploading || !allowUpload} onClick={() => fileInput.current?.click()}>Upload image</button>
-        {allowManage ? <a className="btn btn-outline-secondary" href="/Admin/Media" target="_blank" rel="noopener noreferrer">Manage media</a> : null}
-        {value ? <button type="button" className="btn btn-outline-warning" disabled={disabled || uploading} onClick={() => onChange("")}>Clear icon</button> : null}
+        <button type="button" className="btn btn-secondary" aria-expanded={open} aria-controls={`${id}-browser`} disabled={disabled || uploading || !allowBrowse} onClick={() => setOpen((current) => !current)}>{t(open ? "icon.close" : "icon.browse")}</button>
+        <button type="button" className="btn btn-secondary" disabled={disabled || uploading} onClick={() => void pasteClipboard()}>{t("icon.paste")}</button>
+        <button type="button" className="btn btn-secondary" disabled={disabled || uploading || !allowUpload} onClick={() => fileInput.current?.click()}>{t("icon.upload")}</button>
+        {allowManage ? <a className="btn btn-outline-secondary" href="/Admin/Media" target="_blank" rel="noopener noreferrer">{t("icon.manage")}</a> : null}
+        {value ? <button type="button" className="btn btn-outline-warning" disabled={disabled || uploading} onClick={() => onChange("")}>{t("icon.clear")}</button> : null}
       </div>
-      <input ref={fileInput} type="file" accept="image/png,image/jpeg,image/gif,image/webp" className="hidden" aria-label={`Upload ${label.toLowerCase()}`} disabled={disabled || uploading} onChange={(event) => { const file = event.target.files?.[0]; event.target.value = ""; if (file) void upload(file); }} />
-      <p id={`${id}-help`} className="text-sm text-slate-400">Choose from the database, paste an image or URL, or upload a file (up to 5 MB). Save the record to apply it.</p>
-      {uploading ? <p role="status">Uploading image…</p> : null}
-      {error ? <p role="alert" className="text-danger">{error}</p> : null}
-      {source && source !== failedSource ? <img src={source} alt={`Selected ${label.toLowerCase()}`} className="h-16 w-16 rounded border border-slate-600 object-contain" onError={() => setFailedSource(source)} /> : source ? <p className="text-sm text-slate-400">Image unavailable. Choose another icon or upload the file.</p> : null}
+      <input ref={fileInput} type="file" accept="image/png,image/jpeg,image/gif,image/webp" className="hidden" aria-label={formatMessage(t("icon.uploadLabel"), { label: visibleLabel })} disabled={disabled || uploading} onChange={(event) => { const file = event.target.files?.[0]; event.target.value = ""; if (file) void upload(file); }} />
+      <p id={`${id}-help`} className="text-sm text-slate-400">{t("icon.help")}</p>
+      {uploading ? <p role="status">{t("icon.uploading")}</p> : null}
+      {error ? <p role="alert" className="text-danger">{t(error)}</p> : null}
+      {source && source !== failedSource ? <img src={source} alt={formatMessage(t("icon.selected"), { label: visibleLabel })} className="h-16 w-16 rounded border border-slate-600 object-contain" onError={() => setFailedSource(source)} /> : source ? <p className="text-sm text-slate-400">{t("icon.unavailable")}</p> : null}
       {open ? (
-        <section id={`${id}-browser`} aria-label="Spell icon database" className="rounded border border-slate-600 p-3">
-          <label htmlFor={`${id}-search`} className="block mb-2">Search spell, talent or filename</label>
+        <section id={`${id}-browser`} aria-label={t("icon.database")} className="rounded border border-slate-600 p-3">
+          <label htmlFor={`${id}-search`} className="block mb-2">{t("icon.search")}</label>
           <input id={`${id}-search`} className="form-control mb-3 w-full" type="search" value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} disabled={disabled || uploading} />
-          {loading ? <p role="status">Loading icons…</p> : (
+          {loading ? <p role="status">{t("icon.loading")}</p> : (
             <div className="max-h-[45dvh] overflow-y-auto">
               <div className="grid grid-cols-[repeat(auto-fill,minmax(90px,1fr))] gap-2">
-                {catalog.icons.map((entry) => <button type="button" key={entry.icon} title={entry.name} aria-label={`Select icon: ${entry.name}`} aria-pressed={value === entry.icon} disabled={disabled || uploading} className={`flex min-w-0 flex-col items-center gap-2 rounded border p-2 text-center ${value === entry.icon ? "border-amber-400 bg-amber-400/10" : "border-slate-600 bg-slate-900"}`} onClick={() => { onChange(entry.icon); setOpen(false); setFailedSource(""); }}>
+                {catalog.icons.map((entry) => <button type="button" key={entry.icon} title={entry.name} aria-label={formatMessage(t("icon.select"), { name: entry.name })} aria-pressed={value === entry.icon} disabled={disabled || uploading} className={`flex min-w-0 flex-col items-center gap-2 rounded border p-2 text-center ${value === entry.icon ? "border-amber-400 bg-amber-400/10" : "border-slate-600 bg-slate-900"}`} onClick={() => { onChange(entry.icon); setOpen(false); setFailedSource(""); }}>
                   <img src={spellIconSource(entry.icon)} alt="" loading="lazy" className="h-12 w-12 object-contain" />
                   <span className="w-full break-words text-xs">{entry.name}</span>
                 </button>)}
               </div>
-              {!catalog.icons.length ? <p>No matching icons.</p> : null}
+              {!catalog.icons.length ? <p>{t("icon.empty")}</p> : null}
             </div>
           )}
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <button type="button" className="btn btn-secondary" disabled={disabled || uploading || loading || catalog.page <= 1} onClick={() => setPage(catalog.page - 1)}>Previous</button>
-            <span>{catalog.page} / {catalog.pages} · {catalog.total} icons</span>
-            <button type="button" className="btn btn-secondary" disabled={disabled || uploading || loading || catalog.page >= catalog.pages} onClick={() => setPage(catalog.page + 1)}>Next</button>
-            <button type="button" className="btn btn-secondary" disabled={loading || uploading || disabled} onClick={() => setRevision((current) => current + 1)}>Refresh</button>
+            <button type="button" className="btn btn-secondary" disabled={disabled || uploading || loading || catalog.page <= 1} onClick={() => setPage(catalog.page - 1)}>{t("common.previous")}</button>
+            <span>{catalog.page} / {catalog.pages} · {formatMessage(t("icon.count"), { count: catalog.total })}</span>
+            <button type="button" className="btn btn-secondary" disabled={disabled || uploading || loading || catalog.page >= catalog.pages} onClick={() => setPage(catalog.page + 1)}>{t("common.next")}</button>
+            <button type="button" className="btn btn-secondary" disabled={loading || uploading || disabled} onClick={() => setRevision((current) => current + 1)}>{t("common.refresh")}</button>
           </div>
         </section>
       ) : null}
