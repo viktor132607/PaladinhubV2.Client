@@ -43,7 +43,15 @@ export function LocalizationProvider({ children }: { children: ReactNode }) {
   const changeLanguage = (code: string) => { setLanguage(code); try { localStorage.setItem("paladinhub-language", code); } catch {} };
   return <Context.Provider value={{ language, languages, changeLanguage, t: (key, fallback) => resolveMessage(language, resources, key, fallback) }}>{children}</Context.Provider>;
 }
+
+function languageLabel(option: LanguageOption) {
+  const code = option.code.toLowerCase().split("-")[0];
+  if (code === "en") return "🇬🇧";
+  if (code === "bg") return "🇧🇬";
+  return option.name;
+}
+
 export function LanguagePicker() {
   const { language, languages, changeLanguage, t } = useLocalization();
-  return <li className="nav-item d-flex align-items-center px-2"><select aria-label={t("language.label", "Language")} value={languages.some(l => l.code === language) ? language : "en"} onChange={e => changeLanguage(e.target.value)} style={{ minHeight: 44, maxWidth: "100%", width: 135, fontSize: 16, color: "#FFD700", background: "#1e1e1e", border: "1px solid #6b5b20", borderRadius: 4, padding: "4px 8px" }}>{languages.map(l => <option key={l.code} value={l.code}>{l.name}</option>)}</select></li>;
+  return <li className="nav-item d-flex align-items-center px-2"><select aria-label={t("language.label", "Language")} title={t("language.label", "Language")} value={languages.some(l => l.code === language) ? language : "en"} onChange={e => changeLanguage(e.target.value)} style={{ minHeight: 44, width: 64, fontSize: 22, lineHeight: 1, color: "#FFD700", background: "transparent", border: 0, borderRadius: 0, outline: "none", boxShadow: "none", padding: "4px 20px 4px 6px", cursor: "pointer" }}>{languages.map(l => <option key={l.code} value={l.code}>{languageLabel(l)}</option>)}</select></li>;
 }
