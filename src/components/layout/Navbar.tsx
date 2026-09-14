@@ -47,26 +47,29 @@ function LanguageMenu() {
   }, [expanded]);
 
   return (
-    <li ref={rootRef} className="nav-item dropdown d-flex align-items-center px-2">
+    <li
+      ref={rootRef}
+      className="nav-item d-flex align-items-center ms-2"
+      style={{ position: "relative", paddingTop: 4 }}
+    >
       <button
         type="button"
-        className="dropdown-toggle"
         aria-label={t("language.label", "Language")}
         aria-expanded={expanded}
         onClick={() => setExpanded(value => !value)}
         style={{
-          minWidth: 72,
-          height: 42,
+          minWidth: 64,
+          height: 34,
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: 10,
-          padding: "0 12px",
-          border: "1px solid #cfd4da",
-          borderRadius: 8,
-          background: "#fff",
-          color: "#1f2937",
-          fontSize: 17,
+          gap: 8,
+          padding: "0 10px",
+          border: "1px solid rgba(255, 215, 0, 0.55)",
+          borderRadius: 5,
+          background: "#1f1f1f",
+          color: "#ffd700",
+          fontSize: 15,
           fontWeight: 700,
           lineHeight: 1,
           boxShadow: "none",
@@ -74,50 +77,62 @@ function LanguageMenu() {
         }}
       >
         <span>{currentCode.toUpperCase()}</span>
+        <span aria-hidden="true" style={{ fontSize: 10, transform: expanded ? "rotate(180deg)" : "none" }}>▼</span>
       </button>
 
-      <div
-        className={`dropdown-menu dropdown-menu-end${expanded ? " show" : ""}`}
-        style={{
-          minWidth: 72,
-          padding: 0,
-          marginTop: 2,
-          overflow: "hidden",
-          borderRadius: 8,
-        }}
-      >
-        {orderedLanguages.map(option => {
-          const optionCode = normalizedLanguageCode(option.code);
-          const selected = optionCode === currentCode;
-          return (
-            <button
-              key={option.code}
-              type="button"
-              className="dropdown-item text-center"
-              aria-label={option.name}
-              aria-current={selected ? "true" : undefined}
-              title={option.name}
-              onClick={() => {
-                changeLanguage(option.code);
-                setExpanded(false);
-              }}
-              style={{
-                minWidth: 72,
-                padding: "10px 12px",
-                border: 0,
-                textAlign: "center",
-                background: selected ? "#dc0000" : "#fff",
-                color: selected ? "#fff" : "#1f2937",
-                fontSize: 17,
-                fontWeight: 700,
-                lineHeight: 1.15,
-              }}
-            >
-              {optionCode.toUpperCase()}
-            </button>
-          );
-        })}
-      </div>
+      {expanded ? (
+        <div
+          role="menu"
+          style={{
+            position: "absolute",
+            top: "calc(100% + 4px)",
+            right: 0,
+            zIndex: 1100,
+            minWidth: 64,
+            padding: 0,
+            overflow: "hidden",
+            border: "1px solid rgba(255, 215, 0, 0.55)",
+            borderRadius: 5,
+            background: "#1f1f1f",
+            boxShadow: "0 6px 14px rgba(0, 0, 0, 0.35)",
+          }}
+        >
+          {orderedLanguages.map(option => {
+            const optionCode = normalizedLanguageCode(option.code);
+            const selected = optionCode === currentCode;
+            return (
+              <button
+                key={option.code}
+                type="button"
+                role="menuitem"
+                aria-label={option.name}
+                aria-current={selected ? "true" : undefined}
+                title={option.name}
+                onClick={() => {
+                  changeLanguage(option.code);
+                  setExpanded(false);
+                }}
+                style={{
+                  width: "100%",
+                  minWidth: 64,
+                  padding: "9px 10px",
+                  border: 0,
+                  borderBottom: "1px solid rgba(255, 215, 0, 0.18)",
+                  textAlign: "center",
+                  background: selected ? "#ffd700" : "#1f1f1f",
+                  color: selected ? "#151515" : "#ffd700",
+                  fontSize: 15,
+                  fontWeight: 700,
+                  lineHeight: 1.15,
+                  cursor: "pointer",
+                }}
+              >
+                {optionCode.toUpperCase()}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
     </li>
   );
 }
@@ -310,8 +325,6 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
                 </Link>
               </li>
 
-              <LanguageMenu />
-
               {authLoading || !user ? (
                 <>
                   <li className="nav-item">
@@ -324,6 +337,8 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
               ) : (
                 <AuthMenu />
               )}
+
+              <LanguageMenu />
             </ul>
           </div>
         </div>
