@@ -44,7 +44,7 @@ export function LocalizationProvider({ children }: { children: ReactNode }) {
   return <Context.Provider value={{ language, languages, changeLanguage, t: (key, fallback) => resolveMessage(language, resources, key, fallback) }}>{children}</Context.Provider>;
 }
 
-function languageLabel(option: LanguageOption) {
+function languageFlag(option: LanguageOption) {
   const code = option.code.toLowerCase().split("-")[0];
   if (code === "en") return "🇬🇧";
   if (code === "bg") return "🇧🇬";
@@ -53,5 +53,45 @@ function languageLabel(option: LanguageOption) {
 
 export function LanguagePicker() {
   const { language, languages, changeLanguage, t } = useLocalization();
-  return <li className="nav-item d-flex align-items-center px-2"><select aria-label={t("language.label", "Language")} title={t("language.label", "Language")} value={languages.some(l => l.code === language) ? language : "en"} onChange={e => changeLanguage(e.target.value)} style={{ minHeight: 44, width: 64, fontSize: 22, lineHeight: 1, color: "#FFD700", background: "transparent", border: 0, borderRadius: 0, outline: "none", boxShadow: "none", padding: "4px 20px 4px 6px", cursor: "pointer" }}>{languages.map(l => <option key={l.code} value={l.code}>{languageLabel(l)}</option>)}</select></li>;
+  const currentCode = language.toLowerCase().split("-")[0];
+
+  return (
+    <li className="nav-item d-flex align-items-center px-2">
+      <div
+        role="group"
+        aria-label={t("language.label", "Language")}
+        className="d-flex align-items-center gap-1"
+        style={{ border: 0, outline: "none", boxShadow: "none", background: "transparent" }}
+      >
+        {languages.map(option => {
+          const optionCode = option.code.toLowerCase().split("-")[0];
+          const selected = optionCode === currentCode;
+          return (
+            <button
+              key={option.code}
+              type="button"
+              aria-label={option.name}
+              aria-pressed={selected}
+              title={option.name}
+              onClick={() => changeLanguage(option.code)}
+              style={{
+                border: 0,
+                outline: "none",
+                boxShadow: "none",
+                background: "transparent",
+                padding: "2px 4px",
+                margin: 0,
+                fontSize: 24,
+                lineHeight: 1,
+                cursor: "pointer",
+                opacity: selected ? 1 : 0.55,
+              }}
+            >
+              {languageFlag(option)}
+            </button>
+          );
+        })}
+      </div>
+    </li>
+  );
 }
