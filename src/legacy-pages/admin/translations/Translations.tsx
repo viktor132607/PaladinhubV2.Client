@@ -77,7 +77,7 @@ export default function Translations() {
   const currentPage = Math.min(page, Math.max(0, Math.ceil(entries.length / 50) - 1));
   return <main className="min-w-0 space-y-5 p-3 text-slate-100 sm:p-6">
     <h1 className="text-2xl text-amber-400">Languages & translations</h1>
-    <p className="text-sm text-slate-400">Manage language names and text keys. English is the fallback. Use an existing English label as the key, or navigation.ID for a specific menu link. Page Builder titles, paragraphs, captions and other text fields use their original text as keys.</p>
+    <p className="text-sm text-slate-400">Manage language names and text keys. English is the fallback. Use an existing English label as the key, or navigation.ID for a specific menu link. Page Builder supports page-scoped keys such as page.42.id.blockA.title and page.42.id.blockA.props.text. Stable keys override legacy source-text keys. Blocks without IDs use their array position, which changes when reordered. WoW names are preserved.</p>
     {error && <p role="alert" className="break-words text-red-300">{error}</p>}
     {notice && <p role="status" className="text-green-300">{notice}</p>}
     <fieldset disabled={busy} className="min-w-0 space-y-5">

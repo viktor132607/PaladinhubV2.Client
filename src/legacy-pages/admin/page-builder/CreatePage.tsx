@@ -630,7 +630,7 @@ export default function CreatePage() {
             <section className="rounded-xl border border-slate-700 bg-slate-900 p-6">
               <h2 className="mb-5 text-xl font-semibold">Live preview</h2>
               <div className="admin-content-preview min-w-0 overflow-x-auto rounded-lg bg-slate-950 p-3 sm:p-6">
-                <DynamicPageContent json={layoutJson} />
+                <DynamicPageContent json={layoutJson} pageId={editingId || undefined} />
               </div>
             </section>
           ) : null}

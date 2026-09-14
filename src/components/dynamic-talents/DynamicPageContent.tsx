@@ -1,6 +1,6 @@
 "use client";
 import { useLocalization } from "@/localization/LocalizationContext";
-import { localizeContent } from "@/localization/content";
+import { contentScope, localizeContent } from "@/localization/content";
 import { Component, type ReactNode, type ComponentType } from "react";
 import {
   parseLayout,
@@ -127,12 +127,14 @@ export function canRenderLayout(json: string) {
   }
 }
 
-export default function DynamicPageContent({ json }: { json: string }) {
+export default function DynamicPageContent({ json, pageId }: { json: string; pageId?: string | number }) {
   const { t } = useLocalization();
+  const blocks = parseLayout(json);
+  const scope = pageId === undefined ? "content" : contentScope(pageId);
   return (
     <div className="min-w-0 space-y-6">
-      {localizeContent(parseLayout(json), t).map((block, i) => (
-        <Boundary key={`${i}:${JSON.stringify(block)}`}>
+      {localizeContent(blocks, t, scope).map((block, i) => (
+        <Boundary key={`${i}:${JSON.stringify(blocks[i])}`}>
           <RenderBlock block={block} />
         </Boundary>
       ))}

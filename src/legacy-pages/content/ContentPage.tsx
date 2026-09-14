@@ -210,7 +210,7 @@ export default function ContentPage() {
 
         {renderOnClient ? (
           <div className="mt-6">
-            <DynamicPageContent json={layout} />
+            <DynamicPageContent json={layout} pageId={content.page.id} />
           </div>
         ) : content.html.trim() ? (
           <HtmlContent html={content.html} className="mt-6" />
