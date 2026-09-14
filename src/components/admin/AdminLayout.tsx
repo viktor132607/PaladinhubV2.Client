@@ -5,6 +5,8 @@ import { useAuth } from "@/auth/AuthContext";
 import { adminPermissions } from "@/auth/adminPermissions";
 import { Link, Outlet, useLocation } from "@/router/nextCompat";
 import Navbar from "@/components/layout/Navbar";
+import { useLocalization } from "@/localization/LocalizationContext";
+import { formatMessage } from "@/localization/catalog";
 
 type AdminLink = {
   label: string;
@@ -66,6 +68,7 @@ const sidebarSections: ReadonlyArray<{ title: string; links: readonly AdminLink[
 ];
 
 export default function AdminLayout({ children }: { children?: ReactNode }) {
+  const { t } = useLocalization();
   const { hasAnyPermission } = useAuth();
   const [promoOpen, setPromoOpen] = useState(false);
   const [sectionsOpen, setSectionsOpen] = useState(false);
@@ -117,14 +120,14 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
       <Navbar forceVisible />
 
       <header className="admin-secondary-nav">
-        <nav className="admin-secondary-nav-inner" aria-label="Admin navigation">
+        <nav className="admin-secondary-nav-inner" aria-label={t("admin.navigationLabel")}>
           {visibleSecondary.map((link) => (
             <Link
               key={link.label}
               to={link.to}
               className={`admin-secondary-link${isActive(link.to) ? " active" : ""}`}
             >
-              {link.label}
+              {t(link.label)}
             </Link>
           ))}
 
@@ -138,12 +141,12 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
                 aria-expanded={promoOpen}
                 onClick={() => setPromoOpen((current) => !current)}
               >
-                Promo Codes <span aria-hidden="true">▾</span>
+                {t("admin.promoCodes")} <span aria-hidden="true">▾</span>
               </button>
               {promoOpen ? (
                 <div className="admin-secondary-dropdown-menu">
-                  {hasAnyPermission([adminPermissions.promoCodes.read]) ? <Link to="/Admin/PromoCodes">All</Link> : null}
-                  {hasAnyPermission([adminPermissions.promoCodes.create]) ? <Link to="/Admin/PromoCodes/Create">Create</Link> : null}
+                  {hasAnyPermission([adminPermissions.promoCodes.read]) ? <Link to="/Admin/PromoCodes">{t("common.all")}</Link> : null}
+                  {hasAnyPermission([adminPermissions.promoCodes.create]) ? <Link to="/Admin/PromoCodes/Create">{t("common.create")}</Link> : null}
                 </div>
               ) : null}
             </div>
@@ -152,22 +155,22 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
       </header>
 
       <button type="button" className="admin-sections-toggle" aria-controls="admin-sections" aria-expanded={sectionsOpen} onClick={() => setSectionsOpen((value) => !value)}>
-        Admin sections <span aria-hidden="true">{sectionsOpen ? "−" : "+"}</span>
+        {t("admin.sections")} <span aria-hidden="true">{sectionsOpen ? "−" : "+"}</span>
       </button>
       <div className="admin-shell">
-        <aside id="admin-sections" className={`admin-shell-sidebar${sectionsOpen ? " is-open" : ""}`} aria-label="Admin sections">
-          <div className="admin-shell-sidebar-title">Admin</div>
+        <aside id="admin-sections" className={`admin-shell-sidebar${sectionsOpen ? " is-open" : ""}`} aria-label={t("admin.sections")}>
+          <div className="admin-shell-sidebar-title">{t("nav.admin")}</div>
           {visibleSections.map((section) => (
             <section className="admin-sidebar-section" key={section.title}>
-              <h2>{section.title}</h2>
-              <nav aria-label={`${section.title} admin links`}>
+              <h2>{t(section.title)}</h2>
+              <nav aria-label={formatMessage(t("admin.sectionLinks"), { name: t(section.title) })}>
                 {section.links.map((link) => (
                   <Link
                     key={link.label}
                     to={link.to}
                     className={`admin-sidebar-link${isActive(link.to) ? " active" : ""}`}
                   >
-                    {link.label}
+                    {t(link.label)}
                   </Link>
                 ))}
               </nav>
@@ -186,7 +189,7 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
 
       {!fullWidthWorkspace ? (
         <footer className="footer bg-dark text-light text-center py-2">
-          Admin Panel © {new Date().getFullYear()}
+          {t("admin.panel")} © {new Date().getFullYear()}
         </footer>
       ) : null}
     </div>

@@ -24,6 +24,12 @@ describe("built-in bilingual catalog", () => {
     expect(resolveMessage("bg", {"nav.home":""}, "nav.home")).toBe("");
     expect(resolveMessage("bg", {}, "constructor", "Safe")).toBe("Safe");
   });
+  it("applies stable CMS keys when a code-owned label uses its English alias", () => {
+    expect(resolveMessage("bg", { "admin.pages": "Мои страници" }, "Pages")).toBe("Мои страници");
+    expect(resolveMessage("bg", { "admin.pages": "" }, "Pages")).toBe("");
+    expect(resolveMessage("bg", { "admin.pages": "Stable", Pages: "Legacy" }, "Pages")).toBe("Stable");
+    expect(resolveMessage("bg", { Pages: "Legacy" }, "admin.pages")).toBe("Legacy");
+  });
   it("substitutes named parameters without interpreting user text as another template", () => {
     expect(formatMessage("Изтриване на {name}", {name:"{other}"})).toBe("Изтриване на {other}");
     expect(formatMessage("Missing {name}", {})).toBe("Missing {name}");
