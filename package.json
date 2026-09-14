@@ -14,6 +14,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
+    "inventory:translations": "node scripts/inventory-translations.mjs",
+    "verify:translations-inventory": "node scripts/inventory-translations.mjs --check",
     "verify:seo-export": "node scripts/verify-seo-export.mjs"
   },
   "dependencies": {

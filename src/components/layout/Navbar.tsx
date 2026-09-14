@@ -50,7 +50,7 @@ function GuideMenu({
         className={`dropdown-menu${expanded ? " show" : ""}`}
         aria-labelledby={`${section.toLowerCase()}Dropdown`}
       >
-        <li className="guide-mobile-overview"><Link to={`/${section}/Overview`} className="dropdown-item">{t("Overview")}</Link></li>
+        <li className="guide-mobile-overview"><Link to={`/${section}/Overview`} className="dropdown-item">{t("nav.overview", "Overview")}</Link></li>
         {guidePages.map(([title, slug]) => (
           <li className="position-relative" key={slug}>
             <Link
@@ -64,8 +64,8 @@ function GuideMenu({
               <Link
                 className="text-danger position-absolute top-50 translate-middle-y"
                 style={{ right: 12, textDecoration: "none" }}
-                title="Delete page"
-                aria-label={`Delete ${title}`}
+                title={t("page.delete", "Delete page")}
+                aria-label={t("page.deleteNamed", "Delete {name}").replace("{name}", t(title))}
                 to={`/Admin/PageBuilder/DeleteConfirm?section=${encodeURIComponent(section)}&slug=${encodeURIComponent(slug)}`}
               >
                 ✕
@@ -82,7 +82,7 @@ function GuideMenu({
                 className="dropdown-item"
                 to={`/Admin/PageBuilder/Create?section=${encodeURIComponent(section)}`}
               >
-                <i className="fa-solid fa-plus" aria-hidden="true" /> Add page
+                <i className="fa-solid fa-plus" aria-hidden="true" /> {t("page.add", "Add page")}
               </Link>
             </li>
           </>
@@ -149,7 +149,7 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
           <button
             className="navbar-toggler"
             type="button"
-            aria-label={t("Toggle navigation")}
+            aria-label={t("nav.toggle", "Toggle navigation")}
             aria-controls="primary-navigation"
             aria-expanded={open}
             onClick={() => setOpen((value) => !value)}
@@ -161,7 +161,7 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
             <ul className="navbar-nav">
               {navigation !== null ? <ManagedNavigation entries={navigation} location="primary" /> : <>
               <li className="nav-item">
-                <Link to="/Home/Home" className="nav-link">{t("Home")}</Link>
+                <Link to="/Home/Home" className="nav-link">{t("nav.home", "Home")}</Link>
               </li>
 
               <GuideMenu label="Holy Paladin" section="Holy" />
@@ -169,17 +169,17 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
               <GuideMenu label="Retribution Paladin" section="Retribution" />
 
               <li className="nav-item">
-                <Link to="/Discussions/Index" className="nav-link">{t("Discussion")}</Link>
+                <Link to="/Discussions/Index" className="nav-link">{t("nav.discussion", "Discussion")}</Link>
               </li>
 
               <li className="nav-item">
-                <Link to="/Home/Privacy" className="nav-link">{t("Privacy")}</Link>
+                <Link to="/Home/Privacy" className="nav-link">{t("nav.privacy", "Privacy")}</Link>
               </li>
 
               </>}
               {canAccessAdmin ? (
                 <li className="nav-item">
-                  <Link to="/Admin" className="nav-link">{t("Admin")}</Link>
+                  <Link to="/Admin" className="nav-link">{t("nav.admin", "Admin")}</Link>
                 </li>
               ) : null}
             </ul>
@@ -188,7 +188,7 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
               {navigation !== null ? <ManagedNavigation entries={navigation} location="utility" /> : <>
               <li className="nav-item">
                 <Link to="/Merchandise/Merchandise" className="nav-link">
-                  <i className="fa-solid fa-store" aria-hidden="true" /> {t("Merchandise")}
+                  <i className="fa-solid fa-store" aria-hidden="true" /> {t("nav.merchandise", "Merchandise")}
                 </Link>
               </li>
 
@@ -196,8 +196,8 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
               <li id="nav-cart" className="nav-item position-relative">
                 <Link
                   to="/Cart/MyCart"
-                  title={t("My Cart")}
-                  aria-label={t("My Cart")}
+                  title={t("cart.mine", "My Cart")}
+                  aria-label={t("cart.mine", "My Cart")}
                   className="nav-link position-relative"
                 >
                   <i className="fa-solid fa-cart-shopping" aria-hidden="true" />

@@ -18,16 +18,16 @@ export default function AuthMenu() {
     return (
       <>
         <li className="nav-item">
-          <Link className="nav-link" to="/Account/Login">{t("Login")}</Link>
+          <Link className="nav-link" to="/Account/Login">{t("auth.login", "Login")}</Link>
         </li>
         <li className="nav-item">
-          <Link className="nav-link" to="/Account/Register">{t("Register")}</Link>
+          <Link className="nav-link" to="/Account/Register">{t("auth.register", "Register")}</Link>
         </li>
       </>
     );
   }
 
-  const displayName = user.fullName || user.email || user.username || "Account";
+  const displayName = user.fullName || user.email || user.username || t("auth.accountFallback", "Account");
   const avatarSrc = user.avatarPath?.trim() || "/images/avatars/default01.png";
 
   const handleLogout = async () => {
@@ -56,7 +56,7 @@ export default function AuthMenu() {
       >
         <img
           src={avatarSrc}
-          alt="Avatar"
+          alt={t("auth.avatar", "Avatar")}
           className="rounded-circle border"
           style={{ width: 28, height: 28, objectFit: "cover" }}
         />
@@ -68,15 +68,15 @@ export default function AuthMenu() {
         aria-labelledby="userMenu"
       >
         <li>
-          <Link className="dropdown-item" to="/Account/MyAccount">{t("My Account")}</Link>
+          <Link className="dropdown-item" to="/Account/MyAccount">{t("auth.account", "My Account")}</Link>
         </li>
         <li><hr className="dropdown-divider" /></li>
         <li>
-          <Link className="dropdown-item" to="/Account/Settings">{t("Settings")}</Link>
+          <Link className="dropdown-item" to="/Account/Settings">{t("auth.settings", "Settings")}</Link>
         </li>
         <li><hr className="dropdown-divider" /></li>
         <li>
-          <Link className="dropdown-item" to="/Account/ChangePassword">{t("Change Password")}</Link>
+          <Link className="dropdown-item" to="/Account/ChangePassword">{t("auth.password", "Change Password")}</Link>
         </li>
         <li><hr className="dropdown-divider" /></li>
         <li className="px-3">

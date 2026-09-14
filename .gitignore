@@ -412,3 +412,6 @@ out/
 
 # Dependencies
 node_modules/
+
+# Full translation reports are stored losslessly compressed.
+translation-workspace/inventory.json

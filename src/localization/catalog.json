@@ -1,0 +1,133 @@
+{
+  "nav.home": {
+    "en": "Home",
+    "bg": "Начало"
+  },
+  "nav.holy": {
+    "en": "Holy Paladin",
+    "bg": "Holy Paladin",
+    "reason": "Official World of Warcraft specialization name; preserve proper name."
+  },
+  "nav.protection": {
+    "en": "Protection Paladin",
+    "bg": "Protection Paladin",
+    "reason": "Official World of Warcraft specialization name; preserve proper name."
+  },
+  "nav.retribution": {
+    "en": "Retribution Paladin",
+    "bg": "Retribution Paladin",
+    "reason": "Official World of Warcraft specialization name; preserve proper name."
+  },
+  "nav.overview": {
+    "en": "Overview",
+    "bg": "Общ преглед"
+  },
+  "nav.gear": {
+    "en": "Gear",
+    "bg": "Екипировка"
+  },
+  "nav.talents": {
+    "en": "Talents",
+    "bg": "Таланти"
+  },
+  "nav.consumables": {
+    "en": "Consumables",
+    "bg": "Консумативи"
+  },
+  "nav.rotation": {
+    "en": "Rotation",
+    "bg": "Ротация"
+  },
+  "nav.stats": {
+    "en": "Stats",
+    "bg": "Показатели"
+  },
+  "nav.discussion": {
+    "en": "Discussion",
+    "bg": "Дискусии"
+  },
+  "nav.privacy": {
+    "en": "Privacy",
+    "bg": "Поверителност"
+  },
+  "nav.merchandise": {
+    "en": "Merchandise",
+    "bg": "Магазин"
+  },
+  "auth.login": {
+    "en": "Login",
+    "bg": "Вход"
+  },
+  "auth.register": {
+    "en": "Register",
+    "bg": "Регистрация"
+  },
+  "auth.account": {
+    "en": "My Account",
+    "bg": "Моят профил"
+  },
+  "auth.settings": {
+    "en": "Settings",
+    "bg": "Настройки"
+  },
+  "auth.password": {
+    "en": "Change Password",
+    "bg": "Промяна на паролата"
+  },
+  "auth.logout": {
+    "en": "Logout",
+    "bg": "Изход"
+  },
+  "auth.loggingOut": {
+    "en": "Logging out...",
+    "bg": "Излизане..."
+  },
+  "cart.mine": {
+    "en": "My Cart",
+    "bg": "Моята количка"
+  },
+  "language.label": {
+    "en": "Language",
+    "bg": "Език"
+  },
+  "nav.toggle": {
+    "en": "Toggle navigation",
+    "bg": "Отваряне/затваряне на навигацията"
+  },
+  "footer.credit": {
+    "en": "Made with 💛 for WoW Paladins",
+    "bg": "Създадено с 💛 за паладините в WoW"
+  },
+  "nav.admin": {
+    "en": "Admin",
+    "bg": "Администрация"
+  },
+  "page.add": {
+    "en": "Add page",
+    "bg": "Добавяне на страница"
+  },
+  "page.delete": {
+    "en": "Delete page",
+    "bg": "Изтриване на страница"
+  },
+  "auth.avatar": {
+    "en": "Avatar",
+    "bg": "Аватар"
+  },
+  "auth.accountFallback": {
+    "en": "Account",
+    "bg": "Профил"
+  },
+  "nav.submenu": {
+    "en": "Toggle {name} submenu",
+    "bg": "Отваряне/затваряне на подменюто {name}"
+  },
+  "nav.submenuLabel": {
+    "en": "{name} submenu",
+    "bg": "Подменю {name}"
+  },
+  "page.deleteNamed": {
+    "en": "Delete {name}",
+    "bg": "Изтриване на {name}"
+  }
+}
