@@ -49,49 +49,41 @@ function LanguageMenu() {
   return (
     <li
       ref={rootRef}
-      className="nav-item d-flex align-items-center ms-2"
-      style={{ position: "relative", paddingTop: 4 }}
+      className="nav-item dropdown ms-2"
+      style={{ position: "relative" }}
     >
       <button
         type="button"
+        className="nav-link dropdown-toggle"
         aria-label={t("language.label", "Language")}
         aria-expanded={expanded}
         onClick={() => setExpanded(value => !value)}
         style={{
-          minWidth: 64,
-          height: 34,
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-          padding: "0 10px",
-          border: "1px solid rgba(255, 215, 0, 0.55)",
-          borderRadius: 5,
-          background: "#1f1f1f",
-          color: "#ffd700",
-          fontSize: 15,
-          fontWeight: 700,
-          lineHeight: 1,
+          border: 0,
+          outline: 0,
           boxShadow: "none",
+          background: "transparent",
           cursor: "pointer",
+          font: "inherit",
         }}
       >
-        <span>{currentCode.toUpperCase()}</span>
-        <span aria-hidden="true" style={{ fontSize: 10, transform: expanded ? "rotate(180deg)" : "none" }}>▼</span>
+        {currentCode.toUpperCase()}
       </button>
 
       {expanded ? (
         <div
           role="menu"
+          className="dropdown-menu dropdown-menu-end show"
           style={{
             position: "absolute",
-            top: "calc(100% + 4px)",
+            top: "100%",
             right: 0,
+            left: "auto",
             zIndex: 1100,
             minWidth: 64,
             padding: 0,
             overflow: "hidden",
-            border: "1px solid rgba(255, 215, 0, 0.55)",
+            border: "1px solid rgba(255, 215, 0, 0.35)",
             borderRadius: 5,
             background: "#1f1f1f",
             boxShadow: "0 6px 14px rgba(0, 0, 0, 0.35)",
@@ -112,13 +104,12 @@ function LanguageMenu() {
                   changeLanguage(option.code);
                   setExpanded(false);
                 }}
+                className="dropdown-item text-center"
                 style={{
-                  width: "100%",
                   minWidth: 64,
                   padding: "9px 10px",
                   border: 0,
-                  borderBottom: "1px solid rgba(255, 215, 0, 0.18)",
-                  textAlign: "center",
+                  borderBottom: "1px solid rgba(255, 215, 0, 0.15)",
                   background: selected ? "#ffd700" : "#1f1f1f",
                   color: selected ? "#151515" : "#ffd700",
                   fontSize: 15,
