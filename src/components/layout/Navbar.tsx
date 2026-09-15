@@ -51,6 +51,8 @@ function LanguageMenu() {
       ref={rootRef}
       className="nav-item dropdown ms-2"
       style={{ position: "relative" }}
+      onMouseEnter={() => setExpanded(true)}
+      onMouseLeave={() => setExpanded(false)}
     >
       <button
         type="button"
