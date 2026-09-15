@@ -74,6 +74,7 @@ function LanguageMenu() {
         <ul
           className="dropdown-menu dropdown-menu-end show"
           role="menu"
+          style={{ minWidth: "100%", width: "100%" }}
         >
           {orderedLanguages.map(option => {
             const optionCode = normalizedLanguageCode(option.code);
