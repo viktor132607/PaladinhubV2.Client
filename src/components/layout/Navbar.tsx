@@ -20,6 +20,28 @@ function normalizedLanguageCode(code: string) {
   return code.toLowerCase().split("-")[0];
 }
 
+function LanguageFlag({ code }: { code: string }) {
+  const normalizedCode = normalizedLanguageCode(code);
+  return (
+    <span
+      aria-hidden="true"
+      style={{
+        display: "inline-block",
+        width: 28,
+        height: 18,
+        flex: "0 0 28px",
+        borderRadius: 2,
+        verticalAlign: "middle",
+        backgroundColor: "#2c2c2c",
+        backgroundImage: `url(/images/flags/${normalizedCode}.png)`,
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+      }}
+    />
+  );
+}
+
 function LanguageMenu() {
   const { t, language, languages, changeLanguage } = useLocalization();
   const [expanded, setExpanded] = useState(false);
@@ -67,9 +89,12 @@ function LanguageMenu() {
           background: "transparent",
           cursor: "pointer",
           font: "inherit",
+          display: "flex",
+          alignItems: "center",
+          gap: 2,
         }}
       >
-        {currentCode.toUpperCase()}
+        <LanguageFlag code={currentCode} />
       </button>
 
       {expanded ? (
@@ -94,8 +119,9 @@ function LanguageMenu() {
                     setExpanded(false);
                   }}
                   className="dropdown-item"
+                  style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
                 >
-                  {optionCode.toUpperCase()}
+                  <LanguageFlag code={optionCode} />
                 </button>
               </li>
             );
