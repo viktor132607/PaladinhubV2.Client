@@ -71,58 +71,33 @@ function LanguageMenu() {
       </button>
 
       {expanded ? (
-        <div
-          role="menu"
+        <ul
           className="dropdown-menu dropdown-menu-end show"
-          style={{
-            position: "absolute",
-            top: "100%",
-            right: 0,
-            left: "auto",
-            zIndex: 1100,
-            minWidth: 64,
-            padding: 0,
-            overflow: "hidden",
-            border: "1px solid rgba(255, 215, 0, 0.35)",
-            borderRadius: 5,
-            background: "#1f1f1f",
-            boxShadow: "0 6px 14px rgba(0, 0, 0, 0.35)",
-          }}
+          role="menu"
         >
           {orderedLanguages.map(option => {
             const optionCode = normalizedLanguageCode(option.code);
             const selected = optionCode === currentCode;
             return (
-              <button
-                key={option.code}
-                type="button"
-                role="menuitem"
-                aria-label={option.name}
-                aria-current={selected ? "true" : undefined}
-                title={option.name}
-                onClick={() => {
-                  changeLanguage(option.code);
-                  setExpanded(false);
-                }}
-                className="dropdown-item text-center"
-                style={{
-                  minWidth: 64,
-                  padding: "9px 10px",
-                  border: 0,
-                  borderBottom: "1px solid rgba(255, 215, 0, 0.15)",
-                  background: selected ? "#ffd700" : "#1f1f1f",
-                  color: selected ? "#151515" : "#ffd700",
-                  fontSize: 15,
-                  fontWeight: 700,
-                  lineHeight: 1.15,
-                  cursor: "pointer",
-                }}
-              >
-                {optionCode.toUpperCase()}
-              </button>
+              <li key={option.code}>
+                <button
+                  type="button"
+                  role="menuitem"
+                  aria-label={option.name}
+                  aria-current={selected ? "true" : undefined}
+                  title={option.name}
+                  onClick={() => {
+                    changeLanguage(option.code);
+                    setExpanded(false);
+                  }}
+                  className="dropdown-item"
+                >
+                  {optionCode.toUpperCase()}
+                </button>
+              </li>
             );
           })}
-        </div>
+        </ul>
       ) : null}
     </li>
   );
