@@ -275,7 +275,7 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
 
           <div id="primary-navigation" className={`navbar-collapse collapse d-sm-inline-flex justify-content-between${open ? " show" : ""}`}>
             <ul className="navbar-nav">
-              {navigation !== null ? <ManagedNavigation entries={navigation} location="primary" /> : <>
+              {navigation !== null ? <ManagedNavigation entries={navigation.filter(item => !["/home/privacy", "/privacy"].includes(item.href.toLowerCase().replace(/\/+$/, "")))} location="primary" /> : <>
               <li className="nav-item">
                 <Link to="/Home/Home" className="nav-link">{t("nav.home", "Home")}</Link>
               </li>
@@ -286,10 +286,6 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
 
               <li className="nav-item">
                 <Link to="/Discussions/Index" className="nav-link">{t("nav.discussion", "Discussion")}</Link>
-              </li>
-
-              <li className="nav-item">
-                <Link to="/Home/Privacy" className="nav-link">{t("nav.privacy", "Privacy")}</Link>
               </li>
 
               </>}
