@@ -46,6 +46,8 @@ const applicationStaticParams = [
   { slug: ["Checkout", "Failure"] },
   { slug: ["Account", "Login"] },
   { slug: ["Account", "Register"] },
+  { slug: ["Account", "ForgotPassword"] },
+  { slug: ["Account", "ResetPassword"] },
   { slug: ["Account", "MyAccount"] },
   { slug: ["Account", "AccountDetails"] },
   { slug: ["Account", "ChangePassword"] },

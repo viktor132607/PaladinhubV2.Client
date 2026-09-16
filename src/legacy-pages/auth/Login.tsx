@@ -61,6 +61,7 @@ export default function Login() {
             <label className="form-check-label" htmlFor="RememberMe">Remember me</label>
           </div>
           <button type="submit" className="btn btn-primary w-100 p-2" disabled={submitting}>Login</button>
+          <p className="text-center mt-2"><Link to="/Account/ForgotPassword">Forgot password?</Link></p>
           <p className="text-center mt-2">
             Don&apos;t have an account? <Link to="/Account/Register" className="text-decoration-none">Register</Link>
           </p>

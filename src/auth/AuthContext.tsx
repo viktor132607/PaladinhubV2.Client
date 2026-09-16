@@ -11,6 +11,7 @@ import {
 } from "react";
 import {
   backendEndpoints,
+  clearCachedCsrfToken,
   fetchBackend,
   readApiJson,
 } from "@/config/api";
@@ -54,6 +55,7 @@ type TwoFactorInput = {
   code: string;
   rememberMe: boolean;
   rememberMachine: boolean;
+  provider?: "Authenticator" | "Email";
 };
 
 type LoginResult = {
@@ -122,6 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const applySession = useCallback((session: AuthSession | null | undefined) => {
+    clearCachedCsrfToken();
     setUser(
       session?.isAuthenticated
         ? normalizeSessionUser(session.user)

@@ -1,40 +1,71 @@
-
-import { NavLink } from "@/router/nextCompat";
-
-export type AccountSideNavProps = {
-  active?: string;
-};
-
+import { Link } from "@/router/nextCompat";
+import s from "./account.module.css";
 const links = [
-  ["Overview", "/account", "Account Overview"],
-  ["Security", "/account/security", "Security"],
-  ["Privacy", "/account/privacy", "Privacy & Communication"],
-  ["Connections", "/account/connections", "Connections"],
-  ["PaymentMethods", "/account/payment-methods", "Payment Methods"],
-  ["TransactionHistory", "/account/transactions", "Transaction History"],
+  [
+    "Overview",
+    "MyAccount",
+    "Account Overview",
+    "M3 10 12 3l9 7v11h-6v-7H9v7H3z",
+  ],
+  [
+    "Details",
+    "AccountDetails",
+    "Account Details",
+    "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M4 21v-2a8 8 0 0 1 16 0v2",
+  ],
+  ["Security", "Security", "Security", "M12 3 3 7v5c0 5 9 10 9 10s9-5 9-10V7z"],
+  [
+    "Privacy",
+    "Privacy",
+    "Privacy & Communication",
+    "M6 10h12v11H6zM8 10V7a4 4 0 0 1 8 0v3",
+  ],
+  [
+    "Connections",
+    "Connections",
+    "Connections",
+    "m9 15 6-6M8 17l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m0 10a4 4 0 0 0 6 0l5-5a4 4 0 0 0-6-6l-1 1",
+  ],
+  [
+    "PaymentMethods",
+    "PaymentMethods",
+    "Payment Methods",
+    "M3 5h18v14H3zM3 10h18M6 15h4",
+  ],
+  [
+    "TransactionHistory",
+    "TransactionHistory",
+    "Transaction History",
+    "M6 3h12v18l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h6",
+  ],
+  [
+    "Settings",
+    "Settings",
+    "Settings",
+    "M4 6h16M4 12h16M4 18h16M8 3v6M16 9v6M9 15v6",
+  ],
 ] as const;
-
-export default function AccountSideNav({ active }: AccountSideNavProps) {
+export default function AccountSideNav({ active }: { active?: string }) {
   return (
-    <aside className="w-full shrink-0 lg:w-[260px]">
-      <div className="rounded-xl border border-[#313a45] bg-[#1a1f24] p-3 shadow-xl">
-        <nav className="flex flex-col gap-1" aria-label="Account navigation">
-          {links.map(([key, to, label]) => (
-            <NavLink
-              key={key}
-              to={to}
-              className={({ isActive }) =>
-                [
-                  "rounded-lg px-3 py-2.5 text-sm font-medium text-[#e9ecef] transition hover:bg-[#20262d]",
-                  isActive || active === key ? "bg-[#20262d]" : "",
-                ].join(" ")
-              }
-            >
-              {label}
-            </NavLink>
-          ))}
-        </nav>
-      </div>
-    </aside>
+    <nav className={s.nav} aria-label="Account navigation">
+      {links.map(([key, path, label, d]) => (
+        <Link
+          key={key}
+          to={`/Account/${path}`}
+          aria-current={active === key ? "page" : undefined}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            aria-hidden="true"
+          >
+            <path d={d} />
+          </svg>
+          {label}
+        </Link>
+      ))}
+    </nav>
   );
 }

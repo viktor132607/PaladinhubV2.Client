@@ -1,18 +1,31 @@
-
+"use client";
 import type { ReactNode } from "react";
+import { useAuth } from "@/auth/AuthContext";
+import { Link } from "@/router/nextCompat";
 import AccountSideNav from "./AccountSideNav";
-
-export type AccountLayoutProps = {
-  children?: ReactNode;
-  active?: string;
-};
-
-export default function AccountLayout({ children, active }: AccountLayoutProps) {
+import s from "./account.module.css";
+export type AccountLayoutProps = { children?: ReactNode; active?: string };
+export default function AccountLayout({
+  children,
+  active,
+}: AccountLayoutProps) {
+  const { loading, isAuthenticated } = useAuth();
   return (
-    <main id="acc" className="min-h-[calc(100vh-4rem)] bg-[#0f1216] px-4 py-8 text-[#e9ecef]">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 lg:flex-row">
+    <main className={s.page}>
+      <div className={s.frame}>
         <AccountSideNav active={active} />
-        <section className="min-w-0 flex-1">{children}</section>
+        <section className={s.content}>
+          {loading ? (
+            <p role="status">Loading account...</p>
+          ) : !isAuthenticated ? (
+            <div className={s.card}>
+              <h1>Sign in to your account</h1>
+              <Link to="/Account/Login">Sign in</Link>
+            </div>
+          ) : (
+            children
+          )}
+        </section>
       </div>
     </main>
   );

@@ -68,6 +68,8 @@ import Login from "@/pages/auth/Login";
 import LoginWith2FA from "@/pages/auth/LoginWith2FA";
 import RecoveryCodeLogin from "@/pages/auth/RecoveryCodeLogin";
 import Register from "@/pages/auth/Register";
+import ForgotPassword from "@/pages/auth/ForgotPassword";
+import ResetPassword from "@/pages/auth/ResetPassword";
 import ShowRecoveryCodes from "@/pages/auth/ShowRecoveryCodes";
 import VerifyEmail from "@/pages/auth/VerifyEmail";
 
@@ -189,6 +191,8 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/Account/Register" element={<Register />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/Account/ForgotPassword" element={<ForgotPassword />} />
+          <Route path="/Account/ResetPassword" element={<ResetPassword />} />
           <Route path="/Account/LoginWith2fa" element={<LoginWith2FA />} />
           <Route path="/Account/RecoveryCodeLogin" element={<RecoveryCodeLogin />} />
           <Route path="/Account/VerifyEmail" element={<VerifyEmail />} />
