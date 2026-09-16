@@ -27,7 +27,7 @@ type Overview = {
   }[];
 };
 export default function MyAccount() {
-  const { user, refresh, logout } = useAuth();
+  const { user, refresh } = useAuth();
   const [data, setData] = useState<Overview | null>(null),
     [profile, setProfile] = useState<Profile | null>(null);
   const [error, setError] = useState(""),
@@ -35,6 +35,7 @@ export default function MyAccount() {
     [busy, setBusy] = useState(false),
     [code, setCode] = useState(""),
     [amount, setAmount] = useState("10");
+  const [addingBalance, setAddingBalance] = useState(false);
   const load = useCallback(async () => {
     const [a, b] = await Promise.all([
       accountGet<Overview>("/api/account/MyAccount"),
@@ -169,7 +170,7 @@ export default function MyAccount() {
               }}
             >
               <label>
-                <span className={s.muted}>Gift or promotional code</span>
+                <span className={s.srOnly}>Gift or promotional code</span>
                 <input
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
@@ -179,56 +180,68 @@ export default function MyAccount() {
                 />
               </label>
               <button className={s.primary} disabled={busy}>
-                Redeem
+                Redeem Code
               </button>
             </form>
           </article>
           <article className={s.card}>
             <div className={s.row}>
-              <h2>Balance</h2>
-              <Link to="/Account/PaymentMethods">Payment methods</Link>
+              <h2>PaladinHub Balance</h2>
+              <Link to="/Account/PaymentMethods">Payment Methods ›</Link>
             </div>
             <div className={s.balance}>
               {money(data.balance, data.currency)}
             </div>
-            <form
-              className={s.inline}
-              onSubmit={(e) => {
-                e.preventDefault();
-                void run(async () => {
-                  const r = await accountPost<{ url: string }>(
-                    "/api/account/wallet/checkout",
-                    { amount: Number(amount) },
-                  );
-                  const url = new URL(r.url);
-                  if (
-                    url.protocol !== "https:" ||
-                    url.hostname !== "checkout.stripe.com"
-                  )
-                    throw new Error("Invalid payment destination.");
-                  window.location.assign(url.href);
-                });
-              }}
+            <button
+              className={s.textButton}
+              onClick={() => setAddingBalance(!addingBalance)}
+              aria-expanded={addingBalance}
             >
-              <label>
-                <span>Amount (USD)</span>
-                <input
-                  type="number"
-                  min="1"
-                  max="1000"
-                  step="0.01"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  required
-                />
-              </label>
-              <button className={s.primary} disabled={busy}>
-                Add balance
-              </button>
-            </form>
+              + Add balance
+            </button>
+            {addingBalance && (
+              <form
+                className={s.inline}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void run(async () => {
+                    const r = await accountPost<{ url: string }>(
+                      "/api/account/wallet/checkout",
+                      { amount: Number(amount) },
+                    );
+                    const url = new URL(r.url);
+                    if (
+                      url.protocol !== "https:" ||
+                      url.hostname !== "checkout.stripe.com"
+                    )
+                      throw new Error("Invalid payment destination.");
+                    window.location.assign(url.href);
+                  });
+                }}
+              >
+                <label>
+                  <span>Amount (USD)</span>
+                  <input
+                    type="number"
+                    min="1"
+                    max="1000"
+                    step="0.01"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    required
+                  />
+                </label>
+                <button className={s.primary} disabled={busy}>
+                  Add balance
+                </button>
+              </form>
+            )}
           </article>
           <article className={s.card}>
-            <h2>Your Information</h2>
+            <div className={s.row}>
+              <h2>Your Information</h2>
+              <Link to="/Account/AccountDetails">Account Details ›</Link>
+            </div>
             <dl className={s.info}>
               <dt>Name</dt>
               <dd>{profile.fullName}</dd>
@@ -239,11 +252,13 @@ export default function MyAccount() {
               <dt>Phone</dt>
               <dd>{profile.phoneNumber || "Not set"}</dd>
             </dl>
-            <Link to="/Account/AccountDetails">Edit account details</Link>
           </article>
           <article className={s.card}>
-            <h2>Security Checkup</h2>
             <div className={s.row}>
+              <h2>Security Checkup</h2>
+              <Link to="/Account/Security">Security ›</Link>
+            </div>
+            <div className={s.securityCheck}>
               <div className={s.badges}>
                 <span
                   className={`${s.badge} ${profile.emailConfirmed ? s.good : ""}`}
@@ -269,128 +284,13 @@ export default function MyAccount() {
               </div>
               <SecurityRing score={data.securityScore} />
             </div>
-            <Link to="/Account/Security">Manage security</Link>
-            <ul>
-              {data.securityTips.map((t) => (
-                <li key={t}>{t}</li>
-              ))}
-            </ul>
           </article>
-          <article className={s.card}>
-            <h2>Your avatar</h2>
-            <div
-              className={s.upload}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                if (!busy && e.dataTransfer.files[0])
-                  void upload(e.dataTransfer.files[0]);
-              }}
-            >
-              <p>Drag & drop an image here</p>
-              <label>
-                Choose an image (PNG, JPG, WEBP; up to 5 MB)
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  disabled={busy}
-                  onChange={(e) => {
-                    if (e.target.files?.[0]) void upload(e.target.files[0]);
-                    e.target.value = "";
-                  }}
-                />
-              </label>
-            </div>
-            {data.uploads.length > 0 && (
-              <>
-                <h2>Your uploads</h2>
-                <div className={s.avatars}>
-                  {data.uploads.map((path) => (
-                    <div key={path}>
-                      <button
-                        aria-label="Use uploaded avatar"
-                        aria-pressed={profile.avatarPath === path}
-                        disabled={busy}
-                        onClick={() =>
-                          void run(async () => {
-                            await accountForm(
-                              "/api/account/SetUploadedAvatar",
-                              { path },
-                            );
-                            await Promise.all([load(), refresh()]);
-                          })
-                        }
-                      >
-                        <img src={backendUrl(path)} alt="Uploaded avatar" />
-                      </button>
-                      <button
-                        aria-label="Delete uploaded avatar"
-                        disabled={busy}
-                        onClick={() =>
-                          void run(async () => {
-                            await accountForm("/api/account/DeleteUpload", {
-                              path,
-                            });
-                            await Promise.all([load(), refresh()]);
-                          })
-                        }
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-            <h2>Choose a default avatar</h2>
-            <div className={s.avatars}>
-              {Array.from(
-                { length: 39 },
-                (_, i) => `default${String(i + 1).padStart(2, "0")}.png`,
-              ).map((file) => (
-                <button
-                  key={file}
-                  aria-label={`Choose avatar ${file}`}
-                  aria-pressed={
-                    profile.avatarPath === `/images/avatars/${file}`
-                  }
-                  disabled={busy}
-                  onClick={() =>
-                    void run(async () => {
-                      await accountForm("/api/account/SetDefaultAvatar", {
-                        file,
-                      });
-                      await Promise.all([load(), refresh()]);
-                    })
-                  }
-                >
-                  <img src={`/images/avatars/${file}`} alt="" loading="lazy" />
-                </button>
-              ))}
-            </div>
-          </article>
-          <article className={s.card}>
-            <h2>Actions</h2>
-            <div className={s.stack}>
-              <Link className={s.button} to="/Account/ChangePassword">
-                Change password
-              </Link>
-              <Link className={s.button} to="/Account/TransactionHistory">
-                Transaction history
-              </Link>
-              <Link className={s.button} to="/Account/Settings">
-                Settings
-              </Link>
-              <button disabled={busy} onClick={() => void run(logout)}>
-                Logout
-              </button>
-            </div>
-          </article>
+
           <article className={`${s.card} ${s.wide}`}>
             <div className={s.row}>
-              <h2>Recent activity</h2>
+              <h2>Recent Purchases</h2>
               <Link to="/Account/TransactionHistory">
-                View all transactions
+                Transaction History ›
               </Link>
             </div>
             {data.recentPurchases.length === 0 ? (
@@ -418,6 +318,107 @@ export default function MyAccount() {
               </div>
             )}
           </article>
+          <details className={`${s.card} ${s.wide} ${s.avatarEditor}`}>
+            <summary>
+              Profile picture <span>Change avatar</span>
+            </summary>
+            <div className={s.avatarBody}>
+              <div
+                className={s.upload}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  if (!busy && e.dataTransfer.files[0])
+                    void upload(e.dataTransfer.files[0]);
+                }}
+              >
+                <p>Drag & drop an image here</p>
+                <label>
+                  Choose an image (PNG, JPG, WEBP; up to 5 MB)
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    disabled={busy}
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) void upload(e.target.files[0]);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+              </div>
+              {data.uploads.length > 0 && (
+                <>
+                  <h2>Your uploads</h2>
+                  <div className={s.avatars}>
+                    {data.uploads.map((path) => (
+                      <div key={path}>
+                        <button
+                          aria-label="Use uploaded avatar"
+                          aria-pressed={profile.avatarPath === path}
+                          disabled={busy}
+                          onClick={() =>
+                            void run(async () => {
+                              await accountForm(
+                                "/api/account/SetUploadedAvatar",
+                                { path },
+                              );
+                              await Promise.all([load(), refresh()]);
+                            })
+                          }
+                        >
+                          <img src={backendUrl(path)} alt="Uploaded avatar" />
+                        </button>
+                        <button
+                          aria-label="Delete uploaded avatar"
+                          disabled={busy}
+                          onClick={() =>
+                            void run(async () => {
+                              await accountForm("/api/account/DeleteUpload", {
+                                path,
+                              });
+                              await Promise.all([load(), refresh()]);
+                            })
+                          }
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+              <h2>Choose a default avatar</h2>
+              <div className={s.avatars}>
+                {Array.from(
+                  { length: 39 },
+                  (_, i) => `default${String(i + 1).padStart(2, "0")}.png`,
+                ).map((file) => (
+                  <button
+                    key={file}
+                    aria-label={`Choose avatar ${file}`}
+                    aria-pressed={
+                      profile.avatarPath === `/images/avatars/${file}`
+                    }
+                    disabled={busy}
+                    onClick={() =>
+                      void run(async () => {
+                        await accountForm("/api/account/SetDefaultAvatar", {
+                          file,
+                        });
+                        await Promise.all([load(), refresh()]);
+                      })
+                    }
+                  >
+                    <img
+                      src={`/images/avatars/${file}`}
+                      alt=""
+                      loading="lazy"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </details>
         </div>
       )}
     </AccountLayout>

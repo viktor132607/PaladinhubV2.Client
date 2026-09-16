@@ -13,18 +13,33 @@ function normalizePath(pathname: string) {
 
 function usesAccountLayout(pathname: string) {
   const path = normalizePath(pathname);
-  return path === "/account/login" || path === "/login" || path === "/account/register" || path === "/register" || path === "/account/verifyemail" || path === "/verify-email";
+  return (
+    path === "/account/login" ||
+    path === "/login" ||
+    path === "/account/register" ||
+    path === "/register" ||
+    path === "/account/verifyemail" ||
+    path === "/verify-email"
+  );
 }
 
 function usesAdminLayout(pathname: string) {
   const path = normalizePath(pathname);
-  return path === "/admin" || path.startsWith("/admin/") || path === "/products/create" || path.startsWith("/products/edit/");
+  return (
+    path === "/admin" ||
+    path.startsWith("/admin/") ||
+    path === "/products/create" ||
+    path.startsWith("/products/edit/")
+  );
 }
 
 export default function Layout() {
   const { pathname } = useLocation();
   const accountLayout = usesAccountLayout(pathname);
   const adminLayout = usesAdminLayout(pathname);
+  const profileLayout =
+    normalizePath(pathname) === "/account" ||
+    normalizePath(pathname).startsWith("/account/");
 
   useEffect(() => {
     if (accountLayout || adminLayout) return;
@@ -32,17 +47,21 @@ export default function Layout() {
     const applyCurrentSection = () => {
       const currentHash = window.location.hash;
 
-      document.querySelectorAll<HTMLElement>(".section-cell.active").forEach((el) => {
-        el.classList.remove("active");
-      });
+      document
+        .querySelectorAll<HTMLElement>(".section-cell.active")
+        .forEach((el) => {
+          el.classList.remove("active");
+        });
 
       if (!currentHash) return;
 
-      document.querySelectorAll<HTMLAnchorElement>(".section-cell").forEach((el) => {
-        if (el.getAttribute("href") === currentHash) {
-          el.classList.add("active");
-        }
-      });
+      document
+        .querySelectorAll<HTMLAnchorElement>(".section-cell")
+        .forEach((el) => {
+          if (el.getAttribute("href") === currentHash) {
+            el.classList.add("active");
+          }
+        });
     };
 
     applyCurrentSection();
@@ -53,6 +72,15 @@ export default function Layout() {
   if (accountLayout || adminLayout) {
     return <Outlet />;
   }
+
+  if (profileLayout)
+    return (
+      <div className="ph-v1-layout">
+        <Navbar />
+        <Outlet />
+        <Footer />
+      </div>
+    );
 
   return (
     <div className="ph-v1-layout">

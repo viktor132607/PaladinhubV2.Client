@@ -21,6 +21,7 @@ export default function Security() {
   const [profile, setProfile] = useState<Profile | null>(null),
     [security, setSecurity] = useState<SecurityState | null>(null),
     [password, setPassword] = useState("");
+  const [editingEmail, setEditingEmail] = useState(false);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [notice, setNotice] = useState(""),
@@ -64,7 +65,7 @@ export default function Security() {
       {!profile || !security ? (
         <p>Loading security settings...</p>
       ) : (
-        <div className={s.grid}>
+        <div className={s.stack}>
           <article className={`${s.card} ${s.wide}`}>
             <div className={s.row}>
               <div>
@@ -83,7 +84,7 @@ export default function Security() {
             <p className={s.muted}>
               Use a unique password to protect your account.
             </p>
-            <Link className={s.button} to="/Account/ChangePassword">
+            <Link className={s.textButton} to="/Account/ChangePassword">
               Change password
             </Link>
           </article>
@@ -126,63 +127,82 @@ export default function Security() {
                 {profile.authenticatorEnabled ? "Attached" : "Not attached"}
               </span>
             </p>
-            <Link className={s.button} to="/Account/Enable2FA">
+            <Link className={s.textButton} to="/Account/Enable2FA">
               {profile.authenticatorEnabled
                 ? "Manage authenticator"
                 : "Set up authenticator"}
             </Link>
           </article>
           <article className={s.card}>
-            <h2>Email two-step verification</h2>
+            <div className={s.row}>
+              <h2>Email two-step verification</h2>
+              <button
+                className={s.textButton}
+                onClick={() => setEditingEmail(!editingEmail)}
+                aria-expanded={editingEmail}
+              >
+                ✎ Update
+              </button>
+            </div>
             <p className={s.muted}>
               Receive a login code at your verified email address after entering
               your password.
             </p>
-            <form
-              className={s.form}
-              onSubmit={(e) => {
-                e.preventDefault();
-                void run(async () => {
-                  const r = await accountPost("/api/account/manage/email-2fa", {
-                    enabled: !profile.emailTwoFactorEnabled,
-                    password,
-                  });
-                  setPassword("");
-                  setCodes(r.recoveryCodes || []);
-                  await load();
-                  setNotice(r.message);
-                });
-              }}
+            <p
+              className={`${s.badge} ${profile.emailTwoFactorEnabled ? s.good : ""}`}
             >
-              <p>
-                <span
-                  className={`${s.badge} ${profile.emailTwoFactorEnabled ? s.good : ""}`}
-                >
-                  {profile.emailTwoFactorEnabled ? "Enabled" : "Disabled"}
-                </span>
-              </p>
-              <label>
-                Current password
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="current-password"
-                />
-              </label>
-              <button
-                disabled={
-                  busy ||
-                  (!profile.emailConfirmed && !profile.emailTwoFactorEnabled)
-                }
+              {profile.emailTwoFactorEnabled ? "Enabled" : "Disabled"}
+            </p>
+            {editingEmail && (
+              <form
+                className={s.editForm}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void run(async () => {
+                    const r = await accountPost(
+                      "/api/account/manage/email-2fa",
+                      {
+                        enabled: !profile.emailTwoFactorEnabled,
+                        password,
+                      },
+                    );
+                    setPassword("");
+                    setCodes(r.recoveryCodes || []);
+                    await load();
+                    setNotice(r.message);
+                  });
+                }}
               >
-                {profile.emailTwoFactorEnabled
-                  ? "Disable email 2FA"
-                  : "Enable email 2FA"}
-              </button>
-              {!profile.emailConfirmed && <p>Verify your email first.</p>}
-            </form>
+                <p>
+                  <span
+                    className={`${s.badge} ${profile.emailTwoFactorEnabled ? s.good : ""}`}
+                  >
+                    {profile.emailTwoFactorEnabled ? "Enabled" : "Disabled"}
+                  </span>
+                </p>
+                <label>
+                  Current password
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="current-password"
+                  />
+                </label>
+                <button
+                  disabled={
+                    busy ||
+                    (!profile.emailConfirmed && !profile.emailTwoFactorEnabled)
+                  }
+                >
+                  {profile.emailTwoFactorEnabled
+                    ? "Disable email 2FA"
+                    : "Enable email 2FA"}
+                </button>
+                {!profile.emailConfirmed && <p>Verify your email first.</p>}
+              </form>
+            )}
           </article>
           <article className={s.card}>
             <h2>Recovery codes</h2>
@@ -228,7 +248,7 @@ export default function Security() {
             )}
           </article>
           <article className={s.card}>
-            <h2>Sessions</h2>
+            <h2>Login sessions</h2>
             <p className={s.muted}>
               Sign out from all devices, including this one.
             </p>

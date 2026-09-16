@@ -21,12 +21,6 @@ const links = [
     "M6 10h12v11H6zM8 10V7a4 4 0 0 1 8 0v3",
   ],
   [
-    "Connections",
-    "Connections",
-    "Connections",
-    "m9 15 6-6M8 17l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m0 10a4 4 0 0 0 6 0l5-5a4 4 0 0 0-6-6l-1 1",
-  ],
-  [
     "PaymentMethods",
     "PaymentMethods",
     "Payment Methods",
@@ -37,12 +31,6 @@ const links = [
     "TransactionHistory",
     "Transaction History",
     "M6 3h12v18l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h6",
-  ],
-  [
-    "Settings",
-    "Settings",
-    "Settings",
-    "M4 6h16M4 12h16M4 18h16M8 3v6M16 9v6M9 15v6",
   ],
 ] as const;
 export default function AccountSideNav({ active }: { active?: string }) {
