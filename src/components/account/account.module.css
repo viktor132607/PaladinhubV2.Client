@@ -1,13 +1,8 @@
 .page {
   min-height: calc(100vh - 56px);
-  background: radial-gradient(
-    ellipse at 32% 0%,
-    #272044 0,
-    #141d30 35%,
-    #15171f 70%
-  );
+  background: #111;
   color: #e9ecef;
-  padding: 56px 32px 80px;
+  padding: 112px 32px 64px;
   font-size: 14px;
   line-height: 1.55;
 }
@@ -23,6 +18,7 @@
   min-width: 0;
 }
 .page h1 {
+  padding-bottom: 0;
   font-size: 34px;
   margin: 0 0 36px;
   color: #f2f5f8;
@@ -30,9 +26,10 @@
   font-weight: 700;
 }
 .page h2 {
+  padding-bottom: 0;
   font-size: 18px;
   margin: 0 0 16px;
-  color: #f2f5f8;
+  color: #ff69b4;
   font-weight: 650;
   text-align: left;
 }
@@ -40,13 +37,13 @@
   margin: 0 0 12px;
 }
 .page a {
-  color: #149fff;
+  color: #ffd700;
 }
 .page a:hover {
   text-decoration: underline;
 }
 .card {
-  background: #191c23;
+  background: #1a1a1a;
   border: 0;
   border-radius: 3px;
   padding: 30px 32px;
@@ -72,8 +69,8 @@
 }
 .nav a[aria-current="page"],
 .nav a:hover {
-  background: #272a33;
-  border-left-color: #149fff;
+  background: #2c2c2c;
+  border-left-color: #ffd700;
   text-decoration: none;
 }
 .nav svg {
@@ -101,7 +98,7 @@
   flex-wrap: wrap;
 }
 .muted {
-  color: #a8b0bd;
+  color: #b9b9b9;
 }
 .balance {
   font-size: 22px;
@@ -120,13 +117,13 @@
   overflow-wrap: anywhere;
 }
 .info dt {
-  color: #a8b0bd;
+  color: #b9b9b9;
 }
 .page input:not([type="checkbox"]),
 .page select {
   width: 100%;
   min-width: 0;
-  background: #111218;
+  background: #111;
   border: 1px solid #60636a;
   border-radius: 5px;
   color: #e9ecef;
@@ -140,9 +137,9 @@
 .page button,
 .button {
   padding: 10px 16px;
-  border: 1px solid #3a4550;
+  border: 1px solid #3b3b3b;
   border-radius: 5px;
-  background: #2d333b;
+  background: #292929;
   color: #e9ecef;
   font: inherit;
   font-weight: 600;
@@ -150,19 +147,19 @@
   text-align: center;
 }
 .page button:hover {
-  background: #3a424d;
+  background: #383838;
 }
 .page button:disabled {
   opacity: 0.5;
   cursor: wait;
 }
 .page button.primary {
-  background: #0074d9;
-  border-color: #0074d9;
-  color: white;
+  background: #ffd700;
+  border-color: #ffd700;
+  color: #111;
 }
 .page :is(button, a, input, select):focus-visible {
-  outline: 2px solid #149fff;
+  outline: 2px solid #ffd700;
   outline-offset: 3px;
 }
 .form {
@@ -206,7 +203,7 @@
   align-items: center;
   gap: 10px;
   font-size: 13px;
-  color: #c9ced8;
+  color: #ccc;
 }
 .badge::before {
   content: "!";
@@ -217,7 +214,7 @@
   flex-shrink: 0;
   border-radius: 50%;
   background: #a77922;
-  color: #191c23;
+  color: #1a1a1a;
   font-weight: 900;
 }
 .good::before {
@@ -250,8 +247,8 @@
   border-radius: 4px;
 }
 .avatars button[aria-pressed="true"] {
-  border-color: #149fff;
-  box-shadow: 0 0 0 1px #149fff;
+  border-color: #ffd700;
+  box-shadow: 0 0 0 1px #ffd700;
 }
 .upload {
   border: 1px dashed #697581;
@@ -270,7 +267,7 @@
 .table th {
   padding: 12px 8px;
   text-align: left;
-  border-bottom: 1px solid #313a45;
+  border-bottom: 1px solid #333;
 }
 .codes {
   display: grid;
@@ -279,7 +276,7 @@
   user-select: all;
 }
 .codes code {
-  background: #10151b;
+  background: #141414;
   padding: 10px;
   overflow-wrap: anywhere;
 }
@@ -287,7 +284,7 @@
   overflow-wrap: anywhere;
   font-family: monospace;
   letter-spacing: 2px;
-  background: #10151b;
+  background: #141414;
   padding: 16px;
 }
 .check {
@@ -310,7 +307,7 @@
 }
 @media (max-width: 640px) {
   .page {
-    padding: 20px 12px;
+    padding: 96px 12px 48px;
   }
   .grid {
     grid-template-columns: 1fr;
@@ -345,7 +342,7 @@
 
 /* Account panels share the same header/body geometry across every section. */
 .panel {
-  background: #191c23;
+  background: #1a1a1a;
   border-radius: 3px;
   min-width: 0;
   overflow: hidden;
@@ -353,7 +350,7 @@
 .panelHeader,
 .card > h2:first-child,
 .card > .row:first-child {
-  background: #23262e;
+  background: #242424;
   min-height: 70px;
   display: flex;
   align-items: center;
@@ -371,7 +368,7 @@
 }
 .panelHeader p {
   font-size: 12px;
-  color: #bdc4d1;
+  color: #bdbdbd;
   margin: 6px 0 0;
 }
 .panelHeader a,
@@ -391,7 +388,7 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: #149fff;
+  color: #ffd700;
   font-weight: 600;
   text-align: left;
   text-decoration: underline;
@@ -399,7 +396,7 @@
 }
 .page .textButton:hover,
 .panelHeader button:hover {
-  color: #69c1ff;
+  color: #ffe96b;
   background: transparent;
 }
 .nav a:nth-child(2),
@@ -441,7 +438,7 @@
   justify-content: space-between;
   gap: 30px;
   padding: 22px 0;
-  border-bottom: 1px solid #242832;
+  border-bottom: 1px solid #292929;
 }
 .preferenceRow:first-child {
   padding-top: 0;
@@ -463,7 +460,7 @@
   font-size: 12px;
   line-height: 1.5;
   margin: 0;
-  color: #aeb6c6;
+  color: #b9b9b9;
 }
 .positive {
   color: #76d900;
@@ -475,7 +472,7 @@
   grid-template-columns: 125px 1fr auto;
   gap: 20px;
   padding: 30px 0;
-  border-bottom: 1px solid #30343d;
+  border-bottom: 1px solid #333;
 }
 .paymentRow:first-child {
   padding-top: 0;
@@ -489,12 +486,12 @@
   margin: 4px 0 0;
 }
 .historyTable {
-  background: #191c23;
+  background: #1a1a1a;
   overflow: hidden;
   border-radius: 0;
 }
 .tableHead {
-  background: #23262e;
+  background: #242424;
   color: #fff;
 }
 .history table {
@@ -502,7 +499,7 @@
 }
 .history th,
 .history td {
-  border-bottom: 1px solid #33363e;
+  border-bottom: 1px solid #333;
   padding: 15px 20px;
 }
 .history td > span {
@@ -511,12 +508,12 @@
   border: none;
   font-size: 13px;
   font-weight: 400;
-  color: #d8dce5;
+  color: #ddd;
 }
 .history nav button {
   background: transparent;
   border: 0;
-  color: #149fff;
+  color: #ffd700;
   padding: 5px;
 }
 .history nav button[aria-current="page"] {
@@ -525,7 +522,7 @@
 }
 .empty {
   padding: 15px 0;
-  color: #aeb6c6;
+  color: #b9b9b9;
 }
 .avatarEditor {
   padding: 0;
@@ -534,11 +531,11 @@
   padding: 24px 32px;
   cursor: pointer;
   font-weight: 600;
-  background: #23262e;
+  background: #242424;
 }
 .avatarEditor summary span {
   float: right;
-  color: #149fff;
+  color: #ffd700;
   font-size: 13px;
 }
 .avatarBody {
@@ -587,14 +584,16 @@
     margin-bottom: 0;
   }
   .page h1 {
+    padding-bottom: 0;
     margin-bottom: 26px;
   }
 }
 @media (max-width: 640px) {
   .page {
-    padding: 24px 16px 48px;
+    padding: 96px 16px 48px;
   }
   .page h1 {
+    padding-bottom: 0;
     font-size: 28px;
   }
   .panelHeader,
@@ -611,6 +610,7 @@
     padding: 20px 16px;
   }
   .page h2 {
+    padding-bottom: 0;
     font-size: 17px;
   }
   .securityCheck {

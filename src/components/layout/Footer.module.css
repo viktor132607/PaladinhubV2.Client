@@ -1,0 +1,127 @@
+.footer {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 48px 32px 24px;
+  background: #090909;
+  border-top: 1px solid #292929;
+  color: #c5c5c5;
+  font:
+    13px/1.65 Arial,
+    sans-serif;
+  text-align: left;
+}
+.inner {
+  max-width: 1216px;
+  margin: 0 auto;
+}
+.columns {
+  display: grid;
+  gap: 32px 48px;
+}
+/* Auto placement accommodates every administrator-defined section. */
+.columns {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.brand {
+  min-width: 0;
+}
+.footer .wordmark {
+  display: inline-block;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  color: #fff;
+  margin-bottom: 14px;
+  text-decoration: none;
+}
+.footer .wordmark span {
+  color: #ffd700;
+}
+.footer p {
+  color: #b9b9b9;
+  margin: 0 0 12px;
+  overflow-wrap: anywhere;
+}
+.brand p {
+  max-width: 310px;
+}
+.footer h2 {
+  color: #f3f3f3;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0 0 14px;
+  padding: 0;
+  text-align: left;
+}
+.footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.footer li {
+  margin: 0 0 7px;
+  color: inherit;
+}
+.footer a {
+  color: #c9c9c9;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.footer a:hover {
+  color: #ffd700;
+  text-decoration: underline;
+}
+.footer a:focus-visible {
+  outline: 2px solid #ffd700;
+  outline-offset: 4px;
+}
+.group {
+  min-width: 0;
+}
+.group .group {
+  margin-top: 20px;
+}
+.link {
+  display: inline-block;
+  padding: 2px 0;
+}
+.bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+  border-top: 1px solid #252525;
+  margin-top: 32px;
+  padding-top: 20px;
+  font-size: 12px;
+}
+.bottom p {
+  margin: 0;
+}
+@media (min-width: 1000px) {
+  .brand {
+    grid-column: span 2;
+  }
+  .columns {
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .footer {
+    padding: 32px 20px 24px;
+  }
+  .columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 20px;
+  }
+  .brand {
+    grid-column: 1/-1;
+  }
+  .bottom {
+    margin-top: 28px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
