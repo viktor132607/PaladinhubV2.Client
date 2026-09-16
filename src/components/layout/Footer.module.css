@@ -1,7 +1,10 @@
 .footer {
   position: relative;
-  width: 100%;
-  margin: 0;
+  width: 100vw;
+  max-width: none;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  box-sizing: border-box;
   padding: 48px 32px 24px;
   background: #090909;
   border-top: 1px solid #292929;
