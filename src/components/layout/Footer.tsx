@@ -48,13 +48,9 @@ export default function Footer() {
   }, []);
 
   const text = (x: Entry) =>
-    t(
-      `footer.${x.id}.text`,
-      x.text.replace(
-        "Made with 💛 for WoW Paladins",
-        t("footer.credit", "Made with 💛 for WoW Paladins"),
-      ),
-    ).replaceAll("{year}", String(new Date().getFullYear()));
+    t(`footer.${x.id}.text`, x.text)
+      .replace(/\s*\|?\s*Made with 💛 for WoW Paladins/g, "")
+      .replaceAll("{year}", String(new Date().getFullYear()));
 
   const render = (x: Entry) => {
     const label = (
