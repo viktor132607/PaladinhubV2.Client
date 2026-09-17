@@ -4,6 +4,8 @@ import { useState, type FormEvent } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import { Link, useLocation, useNavigate } from "@/router/nextCompat";
 
+const AUTH_RETURN_URL_KEY = "paladinhub.auth.returnUrl";
+
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "Login failed.";
 
@@ -32,9 +34,14 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const returnUrl = safeReturnUrl(
-    new URLSearchParams(location.search).get("returnUrl"),
-  );
+
+  const explicitReturnUrl =
+    new URLSearchParams(location.search).get("returnUrl");
+  const rememberedReturnUrl =
+    typeof window !== "undefined"
+      ? window.sessionStorage.getItem(AUTH_RETURN_URL_KEY)
+      : null;
+  const returnUrl = safeReturnUrl(explicitReturnUrl || rememberedReturnUrl);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -49,10 +56,7 @@ export default function Login() {
           "paladinhub.auth.rememberMe",
           String(rememberMe),
         );
-        window.sessionStorage.setItem(
-          "paladinhub.auth.returnUrl",
-          returnUrl,
-        );
+        window.sessionStorage.setItem(AUTH_RETURN_URL_KEY, returnUrl);
         navigate("/Account/LoginWith2fa");
         return;
       }
