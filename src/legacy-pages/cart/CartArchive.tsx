@@ -4,16 +4,25 @@ import { useCallback, useEffect, useState } from "react";
 import { backendEndpoints, fetchBackend } from "@/config/api";
 import { Link } from "@/router/nextCompat";
 
+const ORDER_STATUSES = ["Pending", "Processing", "Shipped", "Completed", "Cancelled"] as const;
+type OrderStatus = (typeof ORDER_STATUSES)[number];
+
 type ArchivedCart = {
   id: string;
   username: string;
   orderDate: string;
+  status: OrderStatus;
 };
 
 type JsonRecord = Record<string, unknown>;
 
 function asRecord(value: unknown): JsonRecord {
   return value && typeof value === "object" ? (value as JsonRecord) : {};
+}
+
+function normalizeStatus(value: unknown): OrderStatus {
+  const text = String(value ?? "").trim().toLowerCase();
+  return ORDER_STATUSES.find((status) => status.toLowerCase() === text) ?? "Pending";
 }
 
 function normalizeArchive(payload: unknown): ArchivedCart[] {
@@ -35,13 +44,10 @@ function normalizeArchive(payload: unknown): ArchivedCart[] {
       return {
         id: String(cart.id ?? cart.Id ?? ""),
         username: String(
-          cart.username ??
-            cart.userName ??
-            user.userName ??
-            user.UserName ??
-            "Unknown",
+          cart.username ?? cart.userName ?? user.userName ?? user.UserName ?? "Unknown",
         ),
         orderDate: String(cart.orderDate ?? cart.OrderDate ?? ""),
+        status: normalizeStatus(cart.status ?? cart.Status),
       };
     })
     .filter((cart) => cart.id);
@@ -58,6 +64,7 @@ function parseArchiveHtml(html: string): ArchivedCart[] {
         id: cells[0]?.textContent?.trim() || hrefId,
         username: cells[1]?.textContent?.trim() || "Unknown",
         orderDate: cells[2]?.textContent?.trim() || "",
+        status: normalizeStatus(cells[3]?.textContent),
       };
     })
     .filter((cart) => cart.id);
@@ -81,9 +88,7 @@ async function loadArchive(): Promise<ArchivedCart[]> {
     }
 
     const contentType = response.headers.get("content-type") || "";
-    if (contentType.includes("application/json")) {
-      return normalizeArchive(await response.json());
-    }
+    if (contentType.includes("application/json")) return normalizeArchive(await response.json());
 
     const html = await response.text();
     const rows = parseArchiveHtml(html);
@@ -98,6 +103,8 @@ export default function CartArchive() {
   const [carts, setCarts] = useState<ArchivedCart[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [statusError, setStatusError] = useState("");
+  const [savingStatusId, setSavingStatusId] = useState("");
 
   const reload = useCallback(async () => {
     setLoading(true);
@@ -115,6 +122,32 @@ export default function CartArchive() {
     void reload();
   }, [reload]);
 
+  const updateStatus = async (cart: ArchivedCart, status: OrderStatus) => {
+    if (status === cart.status) return;
+
+    const previousStatus = cart.status;
+    setStatusError("");
+    setSavingStatusId(cart.id);
+    setCarts((current) => current.map((entry) => entry.id === cart.id ? { ...entry, status } : entry));
+
+    try {
+      const response = await fetchBackend(`/api/cart/archive/${encodeURIComponent(cart.id)}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ status }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Order status update failed with status ${response.status}.`);
+      }
+    } catch (caught) {
+      setCarts((current) => current.map((entry) => entry.id === cart.id ? { ...entry, status: previousStatus } : entry));
+      setStatusError(caught instanceof Error ? caught.message : "Order status could not be updated.");
+    } finally {
+      setSavingStatusId("");
+    }
+  };
+
   return (
     <main className="min-h-[calc(100vh-56px)] bg-[#0f1216] px-4 py-8 text-[#e9ecef]">
       <section className="mx-auto max-w-6xl">
@@ -129,15 +162,17 @@ export default function CartArchive() {
         </div>
 
         {error ? <div className="mb-5 rounded-lg border border-red-500/50 bg-red-950/40 px-4 py-3 text-red-200" role="alert">{error}</div> : null}
+        {statusError ? <div className="mb-5 rounded-lg border border-red-500/50 bg-red-950/40 px-4 py-3 text-red-200" role="alert">{statusError}</div> : null}
 
         <div className="overflow-hidden rounded-xl border border-[#313a45] bg-[#1a1f24] shadow-xl">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[760px] text-left">
+            <table className="w-full min-w-[900px] text-left">
               <thead className="border-b border-[#313a45] bg-[#151a1f] text-sm uppercase tracking-wide text-[#a8b0bd]">
                 <tr>
                   <th className="px-5 py-4">Cart Id</th>
                   <th className="px-5 py-4">Username</th>
                   <th className="px-5 py-4">Date Of Order</th>
+                  <th className="px-5 py-4">Status</th>
                   <th className="px-5 py-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -147,6 +182,17 @@ export default function CartArchive() {
                     <td className="px-5 py-4 font-mono text-sm text-[#cfd6df]">{cart.id}</td>
                     <td className="px-5 py-4 font-semibold text-[#ff5fb3]">{cart.username}</td>
                     <td className="px-5 py-4 text-[#cfd6df]">{formatDate(cart.orderDate)}</td>
+                    <td className="px-5 py-4">
+                      <select
+                        value={cart.status}
+                        disabled={savingStatusId === cart.id}
+                        onChange={(event) => void updateStatus(cart, event.target.value as OrderStatus)}
+                        className="min-w-36 rounded-md border border-[#46515e] bg-[#11161b] px-3 py-2 text-sm font-semibold text-[#e9ecef] outline-none focus:border-[#ff5fb3] disabled:opacity-60"
+                        aria-label={`Status for order ${cart.id}`}
+                      >
+                        {ORDER_STATUSES.map((status) => <option key={status} value={status}>{status}</option>)}
+                      </select>
+                    </td>
                     <td className="px-5 py-4 text-right">
                       <Link to={`/Cart/Details/${encodeURIComponent(cart.id)}`} className="inline-flex items-center gap-2 rounded-md border border-blue-400/60 px-3 py-2 text-sm font-semibold text-blue-200 hover:bg-blue-950/40">
                         <span aria-hidden="true">◉</span> View
