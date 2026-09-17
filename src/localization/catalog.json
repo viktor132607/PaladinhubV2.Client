@@ -194,5 +194,20 @@
   "page.deleteNamed": {
     "en": "Delete {name}",
     "bg": "Изтриване на {name}"
-  }
+  },
+  "Database backup": {"en": "Database backup", "bg": "Архивиране на базата"},
+  "backup.scope": {"en": "Full PostgreSQL database archive: users, roles, products, orders, balances, pages, spells, talents, translations, settings and every other database record, including stored images.", "bg": "Пълен архив на PostgreSQL: потребители, роли, продукти, поръчки, баланси, страници, магии, таланти, преводи, настройки и всички останали записи, включително изображенията в базата."},
+  "backup.external": {"en": "Files hosted outside the database and server environment settings are not included.", "bg": "Файловете извън базата и настройките на сървърната среда не са включени."},
+  "backup.export": {"en": "Export the entire database", "bg": "Експорт на цялата база"},
+  "backup.exportHelp": {"en": "Download a compressed .dump archive containing all application schemas, data, relationships and sequences. Keep the archive private: it contains account and security data.", "bg": "Изтеглете компресиран .dump архив с всички схеми, данни, връзки и броячи. Пазете архива: той съдържа данни за акаунти и сигурност."},
+  "backup.download": {"en": "Download full archive", "bg": "Изтегли пълния архив"},
+  "backup.restore": {"en": "Restore database", "bg": "Възстанови базата"},
+  "backup.warning": {"en": "Restoring replaces the entire current database with the selected archive, including accounts and permissions. Later changes will be removed. Download a current backup first.", "bg": "Възстановяването заменя цялата текуща база с избрания архив, включително акаунтите и правата. По-късните промени ще бъдат премахнати. Първо изтеглете актуален архив."},
+  "backup.file": {"en": "PostgreSQL archive (.dump)", "bg": "PostgreSQL архив (.dump)"},
+  "backup.confirm": {"en": "Type RESTORE to confirm", "bg": "Въведете RESTORE за потвърждение"},
+  "backup.downloaded": {"en": "The full archive is ready to download.", "bg": "Пълният архив е готов за изтегляне."},
+  "backup.restored": {"en": "Database restored successfully. Reload the site to load restored data; you may need to sign in again.", "bg": "Базата е възстановена успешно. Презаредете сайта за възстановените данни; може да е необходим нов вход."},
+  "backup.failed": {"en": "The database operation failed.", "bg": "Операцията с базата е неуспешна."},
+  "backup.exporting": {"en": "Creating the full archive. Keep this page open.", "bg": "Създава се пълният архив. Оставете страницата отворена."},
+  "backup.restoring": {"en": "Restoring the database. Keep this page open.", "bg": "Базата се възстановява. Оставете страницата отворена."}
 }

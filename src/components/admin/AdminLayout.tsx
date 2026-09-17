@@ -39,6 +39,7 @@ const sidebarSections: ReadonlyArray<{ title: string; links: readonly AdminLink[
   {
     title: "Data",
     links: [
+      { label: "Database backup", to: "/Admin/Backup", permissions: [adminPermissions.databaseBackups.read, adminPermissions.databaseBackups.restore] },
       { label: "Database", to: "/Admin/Database", permissions: [adminPermissions.database.read] },
       { label: "Categories", to: "/Admin/Categories", permissions: [adminPermissions.categories.read] },
       { label: "Classes & specializations", to: "/Admin/Classes", permissions: [adminPermissions.classes.read] },

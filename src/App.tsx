@@ -35,6 +35,7 @@ import AccountSecurity from "@/pages/account/Security";
 import AccountSettings from "@/pages/account/Settings";
 import TransactionHistory from "@/pages/account/TransactionHistory";
 
+import DatabaseBackup from "@/pages/admin/database/DatabaseBackup";
 import AdminDatabase from "@/pages/admin/database/Database";
 import AdminCategories from "@/pages/admin/categories/Categories";
 import AdminClasses from "@/pages/admin/classes/Classes";
@@ -220,6 +221,7 @@ export default function App() {
 
           <Route path="/Admin" element={adminShell(<AdminLayout />)}>
             <Route index element={<AdminHome />} />
+            <Route path="Backup" element={<PermissionRoute anyOf={[adminPermissions.databaseBackups.read, adminPermissions.databaseBackups.restore]}><DatabaseBackup /></PermissionRoute>} />
             <Route path="Database" element={permissionPage(<AdminDatabase />, adminPermissions.database.read)} />
             <Route path="Categories" element={permissionPage(<AdminCategories />, adminPermissions.categories.read)} />
             <Route path="Classes" element={permissionPage(<AdminClasses />, adminPermissions.classes.read)} />

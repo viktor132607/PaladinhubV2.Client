@@ -66,6 +66,7 @@ const applicationStaticParams = [
   { slug: ["Home", "Privacy"] },
   { slug: ["Home", "ThanksForPurchasing"] },
   { slug: ["Admin", "Database"] },
+  { slug: ["Admin", "Backup"] },
   { slug: ["Admin", "Categories"] },
   { slug: ["Admin", "Classes"] },
   { slug: ["Admin", "Tags"] },

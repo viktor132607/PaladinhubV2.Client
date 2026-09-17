@@ -14,6 +14,7 @@ export const adminPermissions = {
   footer: { read: "footer.read", create: "footer.create", update: "footer.update", archive: "footer.archive", delete: "footer.delete", restore: "footer.restore", manage: "footer.manage" },
   seo: { read: "seo.read", create: "seo.create", update: "seo.update", archive: "seo.archive", delete: "seo.delete", restore: "seo.restore", manage: "seo.manage" },
   localization: { read: "localization.read", create: "localization.create", update: "localization.update", archive: "localization.archive", delete: "localization.delete", restore: "localization.restore", manage: "localization.manage" },
+  databaseBackups: { read: "database_backups.read", restore: "database_backups.restore" },
   database: { read: "database.read" },
   media: { read: "media.read", update: "media.update", delete: "media.delete", restore: "media.restore", manage: "media.manage" },
   categories: { read: "categories.read", create: "categories.create", update: "categories.update", delete: "categories.delete", restore: "categories.restore", manage: "categories.manage" },
