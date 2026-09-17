@@ -7,6 +7,8 @@ import BannerZone from "@/components/banners/BannerZone";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
+const AUTH_RETURN_URL_KEY = "paladinhub.auth.returnUrl";
+
 function normalizePath(pathname: string) {
   return pathname.toLowerCase().replace(/\/+$/, "") || "/";
 }
@@ -44,13 +46,22 @@ function usesDiscussionLayout(pathname: string) {
 }
 
 export default function Layout() {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const accountLayout = usesAccountLayout(pathname);
   const adminLayout = usesAdminLayout(pathname);
   const discussionLayout = usesDiscussionLayout(pathname);
   const profileLayout =
     normalizePath(pathname) === "/account" ||
     normalizePath(pathname).startsWith("/account/");
+
+  useEffect(() => {
+    if (usesAccountLayout(pathname)) return;
+
+    window.sessionStorage.setItem(
+      AUTH_RETURN_URL_KEY,
+      `${pathname}${search || ""}`,
+    );
+  }, [pathname, search]);
 
   useEffect(() => {
     if (accountLayout || adminLayout) return;
