@@ -15,6 +15,9 @@ type CartItem = {
 type CartDetailsData = {
   items: CartItem[];
   totalPrice: number;
+  status: string;
+  username: string;
+  orderDate: string;
 };
 
 type JsonRecord = Record<string, unknown>;
@@ -25,7 +28,7 @@ function asRecord(value: unknown): JsonRecord {
 
 function normalizeCart(payload: unknown): CartDetailsData {
   const root = asRecord(payload);
-  const source = (root.items ?? root.myProducts ?? root.MyProducts ?? []) as unknown;
+  const source = (root.items ?? root.Items ?? root.myProducts ?? root.MyProducts ?? []) as unknown;
   const items = Array.isArray(source)
     ? source
         .map((entry) => {
@@ -47,6 +50,9 @@ function normalizeCart(payload: unknown): CartDetailsData {
     totalPrice: Number.isFinite(explicitTotal)
       ? explicitTotal
       : items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    status: String(root.status ?? root.Status ?? "Pending"),
+    username: String(root.username ?? root.Username ?? "Unknown"),
+    orderDate: String(root.orderDate ?? root.OrderDate ?? ""),
   };
 }
 
@@ -76,6 +82,9 @@ function parseDetailsHtml(html: string): CartDetailsData {
   return {
     items,
     totalPrice: parseMoney(totalText) || items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    status: "Pending",
+    username: "Unknown",
+    orderDate: "",
   };
 }
 
@@ -111,7 +120,13 @@ async function loadDetails(id: string): Promise<CartDetailsData> {
 
 export default function CartDetails() {
   const { id = "" } = useParams<{ id: string }>();
-  const [cart, setCart] = useState<CartDetailsData>({ items: [], totalPrice: 0 });
+  const [cart, setCart] = useState<CartDetailsData>({
+    items: [],
+    totalPrice: 0,
+    status: "Pending",
+    username: "Unknown",
+    orderDate: "",
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -144,6 +159,13 @@ export default function CartDetails() {
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#ff5fb3]">Archived order</p>
           <h1 className="mt-2 text-3xl font-semibold">Cart Details</h1>
           {id ? <p className="mt-2 break-all font-mono text-sm text-[#8f99a6]">{id}</p> : null}
+          {!loading && !error ? (
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-sm">
+              <span className="rounded-full border border-[#46515e] bg-[#1a1f24] px-3 py-1.5 text-[#cfd6df]">{cart.username}</span>
+              {cart.orderDate ? <span className="rounded-full border border-[#46515e] bg-[#1a1f24] px-3 py-1.5 text-[#cfd6df]">{cart.orderDate}</span> : null}
+              <span className="rounded-full border border-[#ff5fb3]/60 bg-[#ff5fb3]/10 px-3 py-1.5 font-semibold text-[#ff8bc9]">{cart.status}</span>
+            </div>
+          ) : null}
         </div>
 
         {error ? <div className="mb-5 rounded-lg border border-red-500/50 bg-red-950/40 px-4 py-3 text-red-200" role="alert">{error}</div> : null}
