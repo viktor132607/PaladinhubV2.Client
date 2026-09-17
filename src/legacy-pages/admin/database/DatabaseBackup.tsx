@@ -53,7 +53,7 @@ export default function DatabaseBackup() {
   }
 
   return <div className="container-fluid py-4">
-    <h1 className="h2 mb-3">{t("Database backup")}</h1>
+    <h1 className="h2 mb-3">{t("backup.title")}</h1>
     <p>{t("backup.scope")}</p>
     <p className="text-muted">{t("backup.external")}</p>
     {error && <div className="alert alert-danger" role="alert">{error}</div>}
