@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import { Link, useLocation } from "@/router/nextCompat";
 import { fetchBackend, readApiJson } from "@/config/api";
 import ManagedNavigation, { type NavigationEntry } from "./ManagedNavigation";
 import { useLocalization } from "@/localization/LocalizationContext";
 import AuthMenu from "./AuthMenu";
+import MiniCart, { type MiniCartData } from "@/components/cart/MiniCart";
 
 const guidePages = [
   ["Gear", "gear"],
@@ -15,6 +16,8 @@ const guidePages = [
   ["Rotation", "rotation"],
   ["Stats", "stats"],
 ] as const;
+
+const CART_UPDATED_EVENT = "paladinhub:cart-updated";
 
 function normalizedLanguageCode(code: string) {
   return code.toLowerCase().split("-")[0];
@@ -212,6 +215,55 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
   const { t } = useLocalization();
   const { canAccessAdmin, loading: authLoading, user } = useAuth();
   const [navigation, setNavigation] = useState<NavigationEntry[] | null>(null);
+  const [cartCount, setCartCount] = useState(0);
+  const [miniCartOpen, setMiniCartOpen] = useState(false);
+  const [miniCartActivated, setMiniCartActivated] = useState(false);
+  const miniCartHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const refreshCartCount = useCallback(async () => {
+    try {
+      const response = await fetchBackend("/api/cart/CountJson", {
+        method: "GET",
+        cache: "no-store",
+      });
+      const payload = await readApiJson<unknown>(response);
+      const count = Number(payload);
+      setCartCount(Number.isFinite(count) ? Math.max(0, Math.trunc(count)) : 0);
+    } catch {
+      setCartCount(0);
+    }
+  }, []);
+
+  const showMiniCart = useCallback(() => {
+    if (miniCartHideTimerRef.current !== null) {
+      clearTimeout(miniCartHideTimerRef.current);
+      miniCartHideTimerRef.current = null;
+    }
+
+    setMiniCartActivated(true);
+    setMiniCartOpen(true);
+  }, []);
+
+  const hideMiniCart = useCallback(() => {
+    if (miniCartHideTimerRef.current !== null) {
+      clearTimeout(miniCartHideTimerRef.current);
+    }
+
+    miniCartHideTimerRef.current = setTimeout(() => {
+      setMiniCartOpen(false);
+      miniCartHideTimerRef.current = null;
+    }, 200);
+  }, []);
+
+  const handleMiniCartChanged = useCallback((data: MiniCartData) => {
+    setCartCount(
+      data.items.reduce(
+        (sum, item) => sum + Math.max(0, Math.trunc(item.quantity)),
+        0,
+      ),
+    );
+  }, []);
+
   useEffect(() => {
     let controller: AbortController | undefined;
     const refreshNavigation = () => {
@@ -224,9 +276,43 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
     window.addEventListener("navigation-updated", refreshNavigation);
     return () => { controller?.abort(); window.removeEventListener("navigation-updated", refreshNavigation); };
   }, []);
+
+  useEffect(() => {
+    void refreshCartCount();
+
+    const onCartUpdated = () => {
+      void refreshCartCount();
+    };
+
+    const onVisibilityChange = () => {
+      if (!document.hidden) {
+        void refreshCartCount();
+      }
+    };
+
+    window.addEventListener(CART_UPDATED_EVENT, onCartUpdated);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      window.removeEventListener(CART_UPDATED_EVENT, onCartUpdated);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [refreshCartCount]);
+
+  useEffect(() => {
+    return () => {
+      if (miniCartHideTimerRef.current !== null) {
+        clearTimeout(miniCartHideTimerRef.current);
+      }
+    };
+  }, []);
+
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
-  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    setOpen(false);
+    setMiniCartOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (forceVisible) return;
@@ -305,7 +391,12 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
               </li>
 
               </>}
-              <li id="nav-cart" className="nav-item position-relative">
+              <li
+                id="nav-cart"
+                className="nav-item position-relative"
+                onMouseEnter={showMiniCart}
+                onMouseLeave={hideMiniCart}
+              >
                 <Link
                   to="/Cart/MyCart"
                   title={t("cart.mine", "My Cart")}
@@ -313,7 +404,25 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
                   className="nav-link position-relative"
                 >
                   <i className="fa-solid fa-cart-shopping" aria-hidden="true" />
+                  <span
+                    id="cart-badge"
+                    className={`cart-badge${cartCount > 0 ? "" : " d-none"}`}
+                  >
+                    {cartCount}
+                  </span>
                 </Link>
+
+                <div
+                  id="mini-cart-panel"
+                  className={`mini-cart-panel${miniCartOpen ? "" : " d-none"}`}
+                  aria-hidden={!miniCartOpen}
+                >
+                  {miniCartActivated ? (
+                    <MiniCart onChanged={handleMiniCartChanged} />
+                  ) : (
+                    <div className="p-3 text-center text-muted">Loading...</div>
+                  )}
+                </div>
               </li>
 
               {authLoading || !user ? (
