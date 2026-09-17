@@ -3,9 +3,11 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useState,
   type FormEvent,
 } from "react";
+import { useAuth } from "@/auth/AuthContext";
 import {
   backendEndpoints,
   fetchBackend,
@@ -41,10 +43,7 @@ type PaymentOption = {
   icon: string;
 };
 
-const paymentMethodValues: Record<
-  PaymentMethod,
-  number
-> = {
+const paymentMethodValues: Record<PaymentMethod, number> = {
   Card: 0,
   CashOnDelivery: 1,
   Balance: 2,
@@ -54,22 +53,19 @@ const paymentOptions: PaymentOption[] = [
   {
     value: "Card",
     title: "Card",
-    description:
-      "Pay securely with a debit or credit card through Stripe.",
+    description: "Pay securely with a debit or credit card through Stripe.",
     icon: "💳",
   },
   {
     value: "CashOnDelivery",
     title: "Cash on delivery",
-    description:
-      "Register the order now and pay when it is delivered.",
+    description: "Register the order now and pay when it is delivered.",
     icon: "📦",
   },
   {
     value: "Balance",
     title: "Wallet Balance",
-    description:
-      "Use the available balance in your PaladinHub wallet.",
+    description: "Use the available balance in your PaladinHub wallet.",
     icon: "👛",
   },
 ];
@@ -77,173 +73,95 @@ const paymentOptions: PaymentOption[] = [
 class CheckoutRequestError extends Error {
   readonly redirect: string | null;
 
-  constructor(
-    message: string,
-    redirect?: string | null,
-  ) {
+  constructor(message: string, redirect?: string | null) {
     super(message);
     this.name = "CheckoutRequestError";
-    this.redirect =
-      redirect?.trim() || null;
+    this.redirect = redirect?.trim() || null;
   }
 }
 
-function normalizePaymentMethod(
-  value: unknown,
-): PaymentMethod {
-  if (
-    value === 1 ||
-    value === "1" ||
-    value === "CashOnDelivery"
-  ) {
+function normalizePaymentMethod(value: unknown): PaymentMethod {
+  if (value === 1 || value === "1" || value === "CashOnDelivery") {
     return "CashOnDelivery";
   }
-
-  if (
-    value === 2 ||
-    value === "2" ||
-    value === "Balance"
-  ) {
+  if (value === 2 || value === "2" || value === "Balance") {
     return "Balance";
   }
-
   return "Card";
 }
 
-async function readPaymentResponse(
-  response: Response,
-): Promise<PaymentResponse> {
+async function readPaymentResponse(response: Response): Promise<PaymentResponse> {
   if (response.ok) {
-    return (
-      (await readApiJson<PaymentResponse>(
-        response,
-      )) ?? {}
-    );
+    return (await readApiJson<PaymentResponse>(response)) ?? {};
   }
 
-  const contentType =
-    response.headers.get(
-      "content-type",
-    ) ?? "";
-
-  if (
-    contentType.includes(
-      "application/json",
-    )
-  ) {
-    const payload =
-      (await response
-        .json()
-        .catch(
-          () => null,
-        )) as PaymentResponse | null;
-
+  const contentType = response.headers.get("content-type") ?? "";
+  if (contentType.includes("application/json")) {
+    const payload = (await response.json().catch(() => null)) as PaymentResponse | null;
     throw new CheckoutRequestError(
       payload?.message ||
         payload?.Message ||
         payload?.title ||
         `Payment request failed with status ${response.status}.`,
-      payload?.redirect ??
-        payload?.Redirect,
+      payload?.redirect ?? payload?.Redirect,
     );
   }
 
-  const message =
-    await response
-      .text()
-      .catch(() => "");
-
+  const message = await response.text().catch(() => "");
   throw new CheckoutRequestError(
-    message ||
-      `Payment request failed with status ${response.status}.`,
+    message || `Payment request failed with status ${response.status}.`,
   );
 }
 
-function isAbortError(
-  error: unknown,
-): boolean {
-  return (
-    error instanceof DOMException &&
-    error.name === "AbortError"
-  );
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === "AbortError";
 }
 
 export default function Payment() {
   const navigate = useNavigate();
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const [method, setMethod] = useState<PaymentMethod>("Card");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [method, setMethod] =
-    useState<PaymentMethod>("Card");
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [saving, setSaving] =
-    useState(false);
-
-  const [error, setError] =
-    useState<string | null>(null);
+  const availableOptions = useMemo(
+    () =>
+      isAuthenticated
+        ? paymentOptions
+        : paymentOptions.filter((option) => option.value !== "Balance"),
+    [isAuthenticated],
+  );
 
   const load = useCallback(
-    async (
-      signal?: AbortSignal,
-    ): Promise<void> => {
+    async (signal?: AbortSignal): Promise<void> => {
       setLoading(true);
       setError(null);
 
       try {
-        const response =
-          await fetchBackend(
-            backendEndpoints.checkout
-              .payment,
-            {
-              method: "GET",
-              cache: "no-store",
-              signal,
+        const response = await fetchBackend(backendEndpoints.checkout.payment, {
+          method: "GET",
+          cache: "no-store",
+          signal,
+          headers: { Accept: "application/json" },
+        });
+        const result = await readPaymentResponse(response);
+        if (signal?.aborted) return;
 
-              headers: {
-                Accept:
-                  "application/json",
-              },
-            },
-          );
-
-        const result =
-          await readPaymentResponse(
-            response,
-          );
-
-        if (signal?.aborted) {
-          return;
-        }
-
+        const loadedMethod = normalizePaymentMethod(
+          result.method ??
+            result.Method ??
+            result.paymentMethod ??
+            result.PaymentMethod,
+        );
         setMethod(
-          normalizePaymentMethod(
-            result.method ??
-              result.Method ??
-              result.paymentMethod ??
-              result.PaymentMethod,
-          ),
+          !isAuthenticated && loadedMethod === "Balance" ? "Card" : loadedMethod,
         );
       } catch (caught) {
-        if (
-          signal?.aborted ||
-          isAbortError(caught)
-        ) {
-          return;
-        }
+        if (signal?.aborted || isAbortError(caught)) return;
 
-        if (
-          caught instanceof
-            CheckoutRequestError &&
-          caught.redirect
-        ) {
-          navigate(
-            caught.redirect,
-            {
-              replace: true,
-            },
-          );
-
+        if (caught instanceof CheckoutRequestError && caught.redirect) {
+          navigate(caught.redirect, { replace: true });
           return;
         }
 
@@ -253,94 +171,54 @@ export default function Payment() {
             : "Payment details could not be loaded.",
         );
       } finally {
-        if (!signal?.aborted) {
-          setLoading(false);
-        }
+        if (!signal?.aborted) setLoading(false);
       }
     },
-    [navigate],
+    [isAuthenticated, navigate],
   );
 
   useEffect(() => {
-    const controller =
-      new AbortController();
-
+    if (authLoading) return;
+    const controller = new AbortController();
     void load(controller.signal);
+    return () => controller.abort();
+  }, [authLoading, load]);
 
-    return () => {
-      controller.abort();
-    };
-  }, [load]);
-
-  const submit = async (
-    event: FormEvent<HTMLFormElement>,
-  ): Promise<void> => {
-    event.preventDefault();
-
-    if (loading || saving) {
-      return;
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated && method === "Balance") {
+      setMethod("Card");
     }
+  }, [authLoading, isAuthenticated, method]);
+
+  const submit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
+    event.preventDefault();
+    if (authLoading || loading || saving) return;
 
     setSaving(true);
     setError(null);
 
     try {
-      const response =
-        await fetchBackend(
-          backendEndpoints.checkout
-            .payment,
-          {
-            method: "POST",
-            cache: "no-store",
-
-            headers: {
-              Accept:
-                "application/json",
-
-              "Content-Type":
-                "application/json",
-            },
-
-            body: JSON.stringify({
-              method:
-                paymentMethodValues[
-                  method
-                ],
-            }),
-          },
-        );
-
-      const result =
-        await readPaymentResponse(
-          response,
-        );
+      const response = await fetchBackend(backendEndpoints.checkout.payment, {
+        method: "POST",
+        cache: "no-store",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ method: paymentMethodValues[method] }),
+      });
+      const result = await readPaymentResponse(response);
 
       if (result.ok === false) {
         throw new Error(
-          result.message ||
-            result.Message ||
-            "Payment method could not be saved.",
+          result.message || result.Message || "Payment method could not be saved.",
         );
       }
 
-      navigate(
-        result.redirect ||
-          result.Redirect ||
-          "/Checkout/Review",
-      );
+      navigate(result.redirect || result.Redirect || "/Checkout/Review");
     } catch (caught) {
-      if (
-        caught instanceof
-          CheckoutRequestError &&
-        caught.redirect
-      ) {
-        navigate(
-          caught.redirect,
-          {
-            replace: true,
-          },
-        );
-
+      if (caught instanceof CheckoutRequestError && caught.redirect) {
+        navigate(caught.redirect, { replace: true });
         return;
       }
 
@@ -354,6 +232,8 @@ export default function Payment() {
     }
   };
 
+  const blocked = authLoading || loading || saving;
+
   return (
     <main className="min-h-[calc(100vh-56px)] bg-[#0f1216] px-4 py-8 text-[#e9ecef]">
       <section
@@ -363,10 +243,15 @@ export default function Payment() {
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#ff5fb3]">
           Checkout
         </p>
-
         <h1 className="mt-2 text-3xl font-semibold text-[#8ab4ff]">
           Choose payment method
         </h1>
+
+        {!authLoading && !isAuthenticated ? (
+          <p className="mt-3 text-sm text-[#b1bac4]">
+            Guest checkout is available with card or cash on delivery. Wallet balance requires a signed-in account.
+          </p>
+        ) : null}
 
         {error ? (
           <div
@@ -374,13 +259,10 @@ export default function Payment() {
             role="alert"
           >
             <p>{error}</p>
-
-            {loading === false ? (
+            {!loading ? (
               <button
                 type="button"
-                onClick={() => {
-                  void load();
-                }}
+                onClick={() => void load()}
                 disabled={saving}
                 className="mt-3 rounded border border-red-300/40 px-3 py-2 text-sm font-semibold hover:bg-red-900/40 disabled:opacity-50"
               >
@@ -390,68 +272,37 @@ export default function Payment() {
           </div>
         ) : null}
 
-        <form
-          onSubmit={submit}
-          className="mt-6 space-y-3"
-        >
-          {paymentOptions.map(
-            (option) => {
-              const selected =
-                method === option.value;
-
-              return (
-                <label
-                  key={option.value}
-                  className={`flex cursor-pointer items-start gap-4 rounded-xl border p-4 transition ${
-                    selected
-                      ? "border-[#8ab4ff] bg-[#8ab4ff]/10"
-                      : "border-[#39424d] bg-[#151a1f] hover:border-[#596675]"
-                  } ${
-                    loading || saving
-                      ? "cursor-not-allowed opacity-60"
-                      : ""
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="method"
-                    value={
-                      option.value
-                    }
-                    checked={selected}
-                    onChange={() => {
-                      setMethod(
-                        option.value,
-                      );
-                    }}
-                    disabled={
-                      loading || saving
-                    }
-                    className="mt-1 h-4 w-4 accent-[#8ab4ff]"
-                  />
-
-                  <span
-                    className="text-2xl"
-                    aria-hidden="true"
-                  >
-                    {option.icon}
+        <form onSubmit={submit} className="mt-6 space-y-3">
+          {availableOptions.map((option) => {
+            const selected = method === option.value;
+            return (
+              <label
+                key={option.value}
+                className={`flex cursor-pointer items-start gap-4 rounded-xl border p-4 transition ${
+                  selected
+                    ? "border-[#8ab4ff] bg-[#8ab4ff]/10"
+                    : "border-[#39424d] bg-[#151a1f] hover:border-[#596675]"
+                } ${blocked ? "cursor-not-allowed opacity-60" : ""}`}
+              >
+                <input
+                  type="radio"
+                  name="method"
+                  value={option.value}
+                  checked={selected}
+                  onChange={() => setMethod(option.value)}
+                  disabled={blocked}
+                  className="mt-1 h-4 w-4 accent-[#8ab4ff]"
+                />
+                <span className="text-2xl" aria-hidden="true">{option.icon}</span>
+                <span>
+                  <span className="block font-semibold text-white">{option.title}</span>
+                  <span className="mt-1 block text-sm text-[#b1bac4]">
+                    {option.description}
                   </span>
-
-                  <span>
-                    <span className="block font-semibold text-white">
-                      {option.title}
-                    </span>
-
-                    <span className="mt-1 block text-sm text-[#b1bac4]">
-                      {
-                        option.description
-                      }
-                    </span>
-                  </span>
-                </label>
-              );
-            },
-          )}
+                </span>
+              </label>
+            );
+          })}
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#2a3139] pt-5">
             <Link
@@ -460,19 +311,12 @@ export default function Payment() {
             >
               Back
             </Link>
-
             <button
               type="submit"
-              disabled={
-                loading || saving
-              }
+              disabled={blocked}
               className="rounded-md bg-blue-600 px-6 py-2.5 font-semibold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {saving
-                ? "Saving..."
-                : loading
-                  ? "Loading..."
-                  : "Continue"}
+              {saving ? "Saving..." : blocked ? "Loading..." : "Continue"}
             </button>
           </div>
         </form>
