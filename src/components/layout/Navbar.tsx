@@ -309,7 +309,7 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
 
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
-  const normalizedPathname = (pathname || "/").toLowerCase().replace(/\\/+$/, "") || "/";
+  const normalizedPathname = (pathname || "/").toLowerCase().replace(/\/+$/, "") || "/";
   useEffect(() => {
     setOpen(false);
     setMiniCartOpen(false);

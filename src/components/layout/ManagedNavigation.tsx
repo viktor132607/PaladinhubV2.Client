@@ -16,12 +16,12 @@ function Menu({ item, children }: { item: NavigationEntry; children: NavigationE
   const canCreate = hasPermission("pages.create");
   const section = /^\/(Holy|Protection|Retribution)\/Overview$/i.exec(item.href)?.[1];
   const [open, setOpen] = useState(false); const { pathname } = useLocation();
-  const currentPath = (pathname || "/").toLowerCase().replace(/\\/+$/, "") || "/";
-  const itemPath = item.href.toLowerCase().replace(/\\/+$/, "") || "/";
+  const currentPath = (pathname || "/").toLowerCase().replace(/\/+$/, "") || "/";
+  const itemPath = item.href.toLowerCase().replace(/\/+$/, "") || "/";
   const sectionPath = section ? `/${section.toLowerCase()}/` : null;
-  const isActive = !/^https?:\\/\\//i.test(item.href) && (
+  const isActive = !/^https?:\/\//i.test(item.href) && (
     currentPath === itemPath ||
-    children.some(child => currentPath === (child.href.toLowerCase().replace(/\\/+$/, "") || "/")) ||
+    children.some(child => currentPath === (child.href.toLowerCase().replace(/\/+$/, "") || "/")) ||
     (sectionPath ? currentPath.startsWith(sectionPath) : false)
   );
   useEffect(() => setOpen(false), [pathname]);
