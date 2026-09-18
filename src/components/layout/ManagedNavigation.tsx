@@ -19,8 +19,10 @@ function Menu({ item, children }: { item: NavigationEntry; children: NavigationE
   const currentPath = (pathname || "/").toLowerCase().replace(/\/+$/, "") || "/";
   const itemPath = item.href.toLowerCase().replace(/\/+$/, "") || "/";
   const sectionPath = section ? `/${section.toLowerCase()}/` : null;
+  const isHomeItem = itemPath === "/home/home" || itemPath === "/home";
   const isActive = !/^https?:\/\//i.test(item.href) && (
     currentPath === itemPath ||
+    (currentPath === "/" && isHomeItem) ||
     children.some(child => currentPath === (child.href.toLowerCase().replace(/\/+$/, "") || "/")) ||
     (sectionPath ? currentPath.startsWith(sectionPath) : false)
   );
