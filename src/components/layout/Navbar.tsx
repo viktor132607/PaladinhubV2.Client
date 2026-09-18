@@ -151,7 +151,7 @@ function GuideMenu({
     <li className="nav-item dropdown">
       <Link
         to={`/${section}/Overview`}
-        className="nav-link dropdown-toggle"
+        className={`nav-link dropdown-toggle${pathname.toLowerCase().startsWith(`/${section.toLowerCase()}/`) ? " active" : ""}`}
         id={`${section.toLowerCase()}Dropdown`}
         role="button"
         aria-expanded={expanded}
@@ -309,6 +309,7 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
 
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
+  const normalizedPathname = (pathname || "/").toLowerCase().replace(/\\/+$/, "") || "/";
   useEffect(() => {
     setOpen(false);
     setMiniCartOpen(false);
@@ -363,7 +364,7 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
             <ul className="navbar-nav">
               {navigation !== null ? <ManagedNavigation entries={navigation.filter(item => !["/home/privacy", "/privacy"].includes(item.href.toLowerCase().replace(/\/+$/, "")))} location="primary" /> : <>
               <li className="nav-item">
-                <Link to="/Home/Home" className="nav-link">{t("nav.home", "Home")}</Link>
+                <Link to="/Home/Home" className={`nav-link${normalizedPathname === "/" || normalizedPathname === "/home/home" ? " active" : ""}`}>{t("nav.home", "Home")}</Link>
               </li>
 
               <GuideMenu label="Holy Paladin" section="Holy" />
@@ -371,13 +372,13 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
               <GuideMenu label="Retribution Paladin" section="Retribution" />
 
               <li className="nav-item">
-                <Link to="/Discussions/Index" className="nav-link">{t("nav.discussion", "Discussion")}</Link>
+                <Link to="/Discussions/Index" className={`nav-link${normalizedPathname.startsWith("/discussions") ? " active" : ""}`}>{t("nav.discussion", "Discussion")}</Link>
               </li>
 
               </>}
               {canAccessAdmin ? (
                 <li className="nav-item">
-                  <Link to="/Admin" className="nav-link">{t("nav.admin", "Admin")}</Link>
+                  <Link to="/Admin" className={`nav-link${normalizedPathname.startsWith("/admin") ? " active" : ""}`}>{t("nav.admin", "Admin")}</Link>
                 </li>
               ) : null}
             </ul>
@@ -385,7 +386,7 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
             <ul className="navbar-nav ms-auto">
               {navigation !== null ? <ManagedNavigation entries={navigation} location="utility" /> : <>
               <li className="nav-item">
-                <Link to="/Merchandise/Merchandise" className="nav-link">
+                <Link to="/Merchandise/Merchandise" className={`nav-link${normalizedPathname.startsWith("/merchandise") ? " active" : ""}`}>
                   <i className="fa-solid fa-store" aria-hidden="true" /> {t("nav.merchandise", "Merchandise")}
                 </Link>
               </li>
@@ -401,7 +402,7 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
                   to="/Cart/MyCart"
                   title={t("cart.mine", "My Cart")}
                   aria-label={t("cart.mine", "My Cart")}
-                  className="nav-link position-relative"
+                  className={`nav-link position-relative${normalizedPathname.startsWith("/cart") ? " active" : ""}`}
                 >
                   <i className="fa-solid fa-cart-shopping" aria-hidden="true" />
                   <span

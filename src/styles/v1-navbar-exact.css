@@ -54,3 +54,53 @@
 }
 
 .guide-mobile-overview { display: none; }
+
+/* V1-style nav item state: subtle underline on hover, gold underline for the active section. */
+.ph-v1-navbar .navbar-nav .nav-link:hover,
+.ph-v1-navbar .navbar-nav .nav-link:focus-visible {
+    text-decoration-line: underline !important;
+    text-decoration-color: #b8b8b8 !important;
+    text-decoration-thickness: 2px !important;
+    text-underline-offset: .34rem !important;
+}
+
+.ph-v1-navbar .navbar-nav .nav-link.active,
+.ph-v1-navbar .navbar-nav .nav-link[aria-current="page"] {
+    color: #FFD700 !important;
+    text-decoration-line: underline !important;
+    text-decoration-color: #FFD700 !important;
+    text-decoration-thickness: 2px !important;
+    text-underline-offset: .34rem !important;
+}
+
+/* Managed navigation uses the same Bootstrap/V1 caret on desktop instead of a separate glyph button. */
+.ph-v1-navbar .ph-managed-submenu-toggle {
+    display: none !important;
+}
+
+.ph-v1-navbar .nav-item.dropdown > .d-flex > .nav-link.dropdown-toggle {
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+@media (max-width: 575.98px) {
+    .ph-v1-navbar .nav-item.dropdown > .d-flex > .nav-link.dropdown-toggle::after {
+        display: none !important;
+    }
+
+    .ph-v1-navbar .ph-managed-submenu-toggle {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        padding-left: .35rem !important;
+        padding-right: .35rem !important;
+    }
+
+    .ph-v1-navbar .ph-managed-submenu-caret {
+        width: 0;
+        height: 0;
+        border-top: .3em solid currentColor;
+        border-right: .3em solid transparent;
+        border-left: .3em solid transparent;
+    }
+}
