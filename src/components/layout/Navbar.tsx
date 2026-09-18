@@ -36,7 +36,7 @@ function LanguageFlag({ code }: { code: string }) {
         borderRadius: 2,
         verticalAlign: "middle",
         backgroundColor: "#2c2c2c",
-        backgroundImage: `url(/images/flags/${normalizedCode}.png)`,
+        backgroundImage: `url(/images/flags/${normalizedCode}.webp)`,
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
