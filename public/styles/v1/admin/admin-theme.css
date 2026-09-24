@@ -170,6 +170,13 @@
 .ph-admin .admin-products-filters .form-control { flex: 1 1 240px; width: auto; min-width: 0; }
 .ph-admin .admin-products-filters .form-select { flex: 0 1 200px; width: auto; min-width: 0; }
 .ph-admin .admin-product-thumb { width: 48px; height: 58px; flex: none; border-radius: 5px; object-fit: contain; background: var(--admin-control); }
+.ph-admin .admin-product-photo { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 12px; padding: 12px; border: 1px solid var(--admin-line); border-radius: 9px; background: var(--admin-surface-muted); }
+.ph-admin .admin-product-photo.is-main { border-color: var(--admin-accent); }
+.ph-admin .admin-product-photo-preview img { display: block; width: 84px; height: 96px; object-fit: contain; }
+.ph-admin .admin-product-photo-preview .badge { display: block; margin-top: 5px; }
+.ph-admin .admin-product-photo-content, .ph-admin .admin-product-photo .spell-icon-picker { min-width: 0; }
+.ph-admin .admin-product-photo .spell-icon-picker > img { display: none; }
+.ph-admin .admin-product-photo .spell-icon-picker .btn { min-height: 36px; }
 .ph-admin .admin-products-page .admin-record-table { min-width: 650px; }
 .ph-admin .admin-shell-main :where(.btn-primary, .list-group-item.active) {
   border-color: var(--admin-accent);
@@ -281,6 +288,9 @@
   .ph-admin .admin-shell-main > .admin-record-editor { padding: 18px; }
 }
 @media (max-width: 575.98px) {
+  .ph-admin .admin-product-photo { grid-template-columns: minmax(0, 1fr); }
+  .ph-admin .admin-product-photo-preview { display: flex; align-items: center; gap: 10px; }
+  .ph-admin .admin-product-photo-preview img { width: 72px; height: 72px; }
   .ph-admin .admin-products-page .admin-record-table { min-width: 0; }
   .ph-admin .admin-shell-main .d-flex.flex-wrap:has(> input[type="search"]) > :is(.form-control, .form-select) {
     flex: 1 1 100% !important;

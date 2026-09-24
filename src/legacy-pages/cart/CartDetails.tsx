@@ -1,5 +1,7 @@
 "use client";
 
+import { useCurrency } from "@/currency/CurrencyContext";
+
 import { useCallback, useEffect, useState } from "react";
 import { backendEndpoints, fetchBackend } from "@/config/api";
 import { Link, useParams } from "@/router/nextCompat";
@@ -119,6 +121,7 @@ async function loadDetails(id: string): Promise<CartDetailsData> {
 }
 
 export default function CartDetails() {
+  const { formatMoney } = useCurrency();
   const { id = "" } = useParams<{ id: string }>();
   const [cart, setCart] = useState<CartDetailsData>({
     items: [],
@@ -217,8 +220,4 @@ export default function CartDetails() {
       </section>
     </main>
   );
-}
-
-function formatMoney(value: number): string {
-  return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }

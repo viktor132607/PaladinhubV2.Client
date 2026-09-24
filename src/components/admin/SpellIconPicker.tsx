@@ -10,7 +10,8 @@ type IconEntry = { name: string; icon: string; kind: string };
 type Catalog = { icons: IconEntry[]; page: number; pages: number; total: number };
 const acceptedTypes = new Set(["image/png", "image/jpeg", "image/gif", "image/webp"]);
 
-export default function SpellIconPicker({ value, onChange, disabled = false, onBusyChange, label = "Icon", kind = "spell", allowBrowse = true, allowUpload = true, allowManage = true }: {
+export default function SpellIconPicker({ value, onChange, disabled = false, onBusyChange, label = "Icon", kind = "spell", allowBrowse = true, allowUpload = true, allowManage = true, compact = false }: {
+  compact?: boolean;
   allowBrowse?: boolean;
   allowUpload?: boolean;
   allowManage?: boolean;
@@ -36,6 +37,7 @@ export default function SpellIconPicker({ value, onChange, disabled = false, onB
   const [error, setError] = useState("");
   const [revision, setRevision] = useState(0);
   const [failedSource, setFailedSource] = useState("");
+  const [showUrl, setShowUrl] = useState(false);
   const source = kind === "item" ? itemIconSource(value) : spellIconSource(value);
 
   useEffect(() => {
@@ -123,11 +125,12 @@ export default function SpellIconPicker({ value, onChange, disabled = false, onB
   return (
     <div className="spell-icon-picker min-w-0 space-y-2" onPaste={paste}>
       <label htmlFor={`${id}-value`} className="block">{visibleLabel}</label>
-      <input id={`${id}-value`} className="form-control w-full min-w-0 rounded border border-slate-600 px-3 py-2" value={value} maxLength={2048} placeholder={t("icon.url")} onChange={(event) => onChange(event.target.value)} disabled={disabled || uploading} aria-describedby={`${id}-help`} />
+      {(!compact || showUrl) && <input id={`${id}-value`} className="form-control w-full min-w-0 rounded border border-slate-600 px-3 py-2" value={value} maxLength={2048} placeholder={t("icon.url")} onChange={(event) => onChange(event.target.value)} disabled={disabled || uploading} aria-describedby={`${id}-help`} />}
       <div className="flex flex-wrap gap-2">
-        <button type="button" className="btn btn-secondary" aria-expanded={open} aria-controls={`${id}-browser`} disabled={disabled || uploading || !allowBrowse} onClick={() => setOpen((current) => !current)}>{t(open ? "icon.close" : "icon.browse")}</button>
+        <button type="button" className={`btn btn-secondary${compact ? " d-none d-md-inline-flex" : ""}`} aria-expanded={open} aria-controls={`${id}-browser`} disabled={disabled || uploading || !allowBrowse} onClick={() => setOpen((current) => !current)}>{t(open ? "icon.close" : "icon.browse")}</button>
         <button type="button" className="btn btn-secondary" disabled={disabled || uploading} onClick={() => void pasteClipboard()}>{t("icon.paste")}</button>
-        <button type="button" className="btn btn-secondary" disabled={disabled || uploading || !allowUpload} onClick={() => fileInput.current?.click()}>{t("icon.upload")}</button>
+        <button type="button" className="btn btn-secondary" disabled={disabled || uploading || !allowUpload} onClick={() => fileInput.current?.click()}>{compact ? "Choose photo" : t("icon.upload")}</button>
+        {compact && <button type="button" className="btn btn-outline-secondary" disabled={disabled || uploading} aria-expanded={showUrl} onClick={() => setShowUrl((current) => !current)}>{showUrl ? "Hide URL" : "Use image URL"}</button>}
         {allowManage ? <a className="btn btn-outline-secondary" href="/Admin/Media" target="_blank" rel="noopener noreferrer">{t("icon.manage")}</a> : null}
         {value ? <button type="button" className="btn btn-outline-warning" disabled={disabled || uploading} onClick={() => onChange("")}>{t("icon.clear")}</button> : null}
       </div>

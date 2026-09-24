@@ -1,5 +1,7 @@
 "use client";
 
+import { useCurrency } from "@/currency/CurrencyContext";
+
 import {
   useEffect,
   useRef,
@@ -90,12 +92,7 @@ type FinalizeResponse = {
   message?: string;
 };
 
-type ApiErrorResponse = {
-  message?: string;
-  title?: string;
-  error?: string;
-  redirect?: string;
-};
+
 
 const STRIPE_SCRIPT_ID =
   "stripe-js-v3";
@@ -330,7 +327,7 @@ function normalizeCardSession(
       stringValue(
         source.currency ??
           source.Currency,
-      ) || "USD",
+      ) || "EUR",
   };
 
   if (
@@ -346,11 +343,12 @@ function normalizeCardSession(
 }
 
 async function loadCardSession(
+  currency: "EUR" | "USD",
   signal?: AbortSignal,
 ): Promise<CardSession> {
   const response =
     await fetchBackend(
-      backendEndpoints.checkout.card,
+      `${backendEndpoints.checkout.card}?currency=${currency}`,
       {
         method: "GET",
         cache: "no-store",
@@ -422,6 +420,7 @@ function isAbortError(
 }
 
 export default function CardPayment() {
+  const { currency } = useCurrency();
   const navigate = useNavigate();
 
   const mountRef =
@@ -478,6 +477,7 @@ export default function CardPayment() {
         try {
           const cardSession =
             await loadCardSession(
+              currency,
               controller.signal,
             );
 
@@ -638,7 +638,7 @@ export default function CardPayment() {
       stripeRef.current = null;
       clientSecretRef.current = "";
     };
-  }, [navigate]);
+  }, [navigate, currency]);
 
   const submit = async (
     event: FormEvent<HTMLFormElement>,

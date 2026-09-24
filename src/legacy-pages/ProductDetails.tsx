@@ -1,5 +1,7 @@
 "use client";
 
+import { useCurrency } from "@/currency/CurrencyContext";
+
 import {
   useCallback,
   useEffect,
@@ -501,20 +503,6 @@ function resolveImageUrl(
   return backendUrl(normalized);
 }
 
-function formatMoney(
-  value: number,
-): string {
-  return new Intl.NumberFormat(
-    undefined,
-    {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    },
-  ).format(value);
-}
-
 function formatDate(
   value: string,
 ): string {
@@ -545,6 +533,7 @@ function isAbortError(
 }
 
 export default function ProductDetails() {
+  const { formatMoney } = useCurrency();
   const params =
     useParams<{ id: string }>();
 

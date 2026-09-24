@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useLocation, useNavigate, useParams } from "@/router/nextCompat";
+import ProductGalleryEditor, { productImageUrl } from "@/components/admin/ProductGalleryEditor";
 
 type GalleryImage = {
   id: number | null;
@@ -130,6 +131,7 @@ export default function EditProduct() {
   const [mainPreview, setMainPreview] = useState(placeholder);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [imageBusy, setImageBusy] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -178,60 +180,9 @@ export default function EditProduct() {
 
   const firstNonEmptyUrl = (source: GalleryImage[]) => source.find((image) => image.url.trim())?.url.trim() || "";
 
-  const updateImageUrl = (index: number, value: string) => {
-    setForm((current) => {
-      if (!current) return current;
-      const images = current.images.map((image, imageIndex) => imageIndex === index ? { ...image, url: value } : image);
-      if (current.thumbnailImageId === null && current.thumbnailIndex === index) setMainPreview(value.trim() || placeholder);
-      if (current.thumbnailImageId === null && current.thumbnailIndex === null) setMainPreview(firstNonEmptyUrl(images) || placeholder);
-      return { ...current, images };
-    });
-  };
-
-  const setMainImage = (index: number) => {
-    setForm((current) => {
-      const image = current?.images[index];
-      if (!current || !image?.url.trim()) return current;
-      setMainPreview(image.url.trim());
-      return {
-        ...current,
-        thumbnailImageId: image.id,
-        thumbnailIndex: image.id === null ? index : null,
-      };
-    });
-  };
-
-  const moveImage = (index: number, direction: -1 | 1) => {
-    setForm((current) => {
-      if (!current) return current;
-      const target = index + direction;
-      if (target < 0 || target >= current.images.length) return current;
-      const images = [...current.images];
-      [images[index], images[target]] = [images[target], images[index]];
-      return { ...current, images };
-    });
-  };
-
-  const removeImage = (index: number) => {
-    setForm((current) => {
-      if (!current) return current;
-      const removed = current.images[index];
-      const wasMain = (current.thumbnailImageId !== null && removed.id === current.thumbnailImageId) || (current.thumbnailImageId === null && current.thumbnailIndex === index);
-      const images = current.images.filter((_, imageIndex) => imageIndex !== index);
-      const next = {
-        ...current,
-        images,
-        thumbnailImageId: wasMain ? null : current.thumbnailImageId,
-        thumbnailIndex: wasMain ? null : current.thumbnailIndex,
-      };
-      if (wasMain) setMainPreview(firstNonEmptyUrl(images) || placeholder);
-      return next;
-    });
-  };
-
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!form || submitting) return;
+    if (!form || submitting || imageBusy) return;
     setError("");
 
     const name = form.name.trim();
@@ -318,7 +269,7 @@ export default function EditProduct() {
                 <label htmlFor="product-price" className="form-label">Price</label>
                 <div className="input-group">
                   <input id="product-price" name="price" className="form-control" type="number" step="0.01" min="0" value={form.price} onChange={(event) => patch("price", event.target.value)} disabled={submitting} />
-                  <span className="input-group-text">$</span>
+                  <span className="input-group-text">€</span>
                 </div>
               </div>
 
@@ -346,7 +297,7 @@ export default function EditProduct() {
 
               <div className="d-grid gap-2 d-md-flex">
                 <Link to={returnPath} className="btn btn-outline-light">Cancel</Link>
-                <button type="submit" className="btn btn-warning fw-bold px-4" disabled={submitting}>{submitting ? "Saving…" : "Save"}</button>
+                <button type="submit" className="btn btn-warning fw-bold px-4" disabled={submitting || imageBusy}>{submitting ? "Saving…" : "Save"}</button>
               </div>
             </div>
 
@@ -355,64 +306,19 @@ export default function EditProduct() {
                 <div className="card-header border-secondary">Main image preview</div>
                 <div className="card-body">
                   <div className="ratio ratio-1x1 mb-2">
-                    <img id="main-preview" src={mainPreview} alt="preview" className="w-100 h-100 rounded" style={{ objectFit: "cover" }} />
+                    <img id="main-preview" src={productImageUrl(mainPreview)} alt="preview" className="w-100 h-100 rounded" style={{ objectFit: "cover" }} />
                   </div>
                   <div className="small text-muted">Click the ⭐ on a row to set it as main (thumbnail).</div>
                 </div>
               </div>
 
-              <div className="mb-2 d-flex align-items-center justify-content-between">
-                <label className="form-label m-0">Gallery images</label>
-                <button type="button" id="btn-add-img" className="btn btn-sm btn-outline-warning" onClick={() => patch("images", [...form.images, { id: null, url: "", altText: "" }])} disabled={submitting}>+ Add image</button>
-              </div>
-
-              <div id="img-list" className="d-flex flex-column gap-2">
-                {form.images.map((image, index) => {
-                  const active = form.thumbnailImageId !== null ? image.id === form.thumbnailImageId : form.thumbnailIndex === index;
-                  return (
-                    <div key={`${image.id ?? "new"}-${index}`} className={`img-row${active ? " active-main" : ""}`} data-id={image.id ?? ""}>
-                      <div className="d-flex align-items-center gap-2">
-                        <img className="thumb rounded" src={image.url.trim() || placeholder} alt="" />
-                        <span className={`badge bg-warning text-dark badge-main${active ? "" : " d-none"}`}>Main</span>
-                        <input className="form-control form-control-sm flex-grow-1 img-url" value={image.url} placeholder="https://..." onChange={(event) => updateImageUrl(index, event.target.value)} disabled={submitting} />
-                        <div className="btn-group btn-group-sm">
-                          <button type="button" className="btn btn-outline-secondary btn-up" title="Up" onClick={() => moveImage(index, -1)} disabled={submitting}>▲</button>
-                          <button type="button" className="btn btn-outline-secondary btn-down" title="Down" onClick={() => moveImage(index, 1)} disabled={submitting}>▼</button>
-                        </div>
-                        <button type="button" className="btn btn-outline-warning btn-sm btn-main" title="Set as main" onClick={() => setMainImage(index)} disabled={submitting}>⭐</button>
-                        <button type="button" className="btn btn-outline-danger btn-sm btn-remove" title="Remove" onClick={() => removeImage(index)} disabled={submitting}>🗑</button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <small className="text-muted">Order is top → bottom. If no main is picked, the first non-empty is used.</small>
+              <ProductGalleryEditor images={form.images} mainIndex={form.thumbnailImageId !== null ? form.images.findIndex((image) => image.id === form.thumbnailImageId) : form.thumbnailIndex} disabled={submitting || imageBusy} onBusyChange={setImageBusy}
+                onChange={(next) => { patch("images", next); setMainPreview(next.find((image) => image.id !== null && image.id === form.thumbnailImageId)?.url || next[form.thumbnailIndex ?? 0]?.url || firstNonEmptyUrl(next) || placeholder); }}
+                onMainChange={(index, next) => { const source = next ?? form.images; const image = index === null ? null : source[index]; setForm((current) => current ? { ...current, thumbnailImageId: image?.id ?? null, thumbnailIndex: image?.id ? null : index } : current); setMainPreview(image?.url || firstNonEmptyUrl(source) || placeholder); }} />
             </div>
           </div>
         </form>
       </div>
-
-      <style>{`
-        .img-row {
-          border: 1px solid var(--bs-secondary);
-          border-radius: .5rem;
-          padding: .5rem;
-          background: #111;
-        }
-        .img-row .thumb {
-          width: 56px;
-          height: 56px;
-          object-fit: cover;
-        }
-        .img-row.active-main {
-          border-color: #f59f00;
-          box-shadow: 0 0 0 2px rgba(245,159,0,.15) inset;
-        }
-        .img-row .badge-main {
-          font-size: .65rem;
-        }
-      `}</style>
     </div>
   );
 }

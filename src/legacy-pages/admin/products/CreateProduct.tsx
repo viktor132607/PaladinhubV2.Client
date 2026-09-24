@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useLocation, useNavigate } from "@/router/nextCompat";
+import ProductGalleryEditor, { productImageUrl } from "@/components/admin/ProductGalleryEditor";
 
 type GalleryImage = {
   url: string;
@@ -67,6 +68,7 @@ export default function CreateProduct() {
   const [thumbnailIndex, setThumbnailIndex] = useState<number | null>(null);
   const [mainPreview, setMainPreview] = useState(placeholder);
   const [submitting, setSubmitting] = useState(false);
+  const [imageBusy, setImageBusy] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -95,44 +97,9 @@ export default function CreateProduct() {
 
   const firstNonEmptyUrl = (source: GalleryImage[]) => source.find((image) => image.url.trim())?.url.trim() || "";
 
-  const updateImageUrl = (index: number, value: string) => {
-    setImages((current) => {
-      const next = current.map((image, imageIndex) => imageIndex === index ? { ...image, url: value } : image);
-      if (thumbnailIndex === null) setMainPreview(firstNonEmptyUrl(next) || placeholder);
-      return next;
-    });
-  };
-
-  const moveImage = (index: number, direction: -1 | 1) => {
-    const target = index + direction;
-    if (target < 0 || target >= images.length) return;
-    setImages((current) => {
-      const next = [...current];
-      [next[index], next[target]] = [next[target], next[index]];
-      return next;
-    });
-  };
-
-  const removeImage = (index: number) => {
-    setImages((current) => {
-      const wasMain = thumbnailIndex === index;
-      const next = current.filter((_, imageIndex) => imageIndex !== index);
-      if (wasMain) setThumbnailIndex(null);
-      setMainPreview(firstNonEmptyUrl(next) || placeholder);
-      return next;
-    });
-  };
-
-  const setMainImage = (index: number) => {
-    const url = images[index]?.url.trim();
-    if (!url) return;
-    setThumbnailIndex(index);
-    setMainPreview(url);
-  };
-
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (submitting) return;
+    if (submitting || imageBusy) return;
     setError("");
 
     const normalizedName = name.trim();
@@ -204,7 +171,7 @@ export default function CreateProduct() {
               <label htmlFor="product-price" className="form-label">Price</label>
               <div className="input-group">
                 <input id="product-price" name="price" className="form-control" type="number" step="0.01" min="0" value={price} onChange={(event) => setPrice(event.target.value)} disabled={submitting} />
-                <span className="input-group-text">$</span>
+                  <span className="input-group-text">€</span>
               </div>
             </div>
 
@@ -232,7 +199,7 @@ export default function CreateProduct() {
 
             <div className="d-grid gap-2 d-md-flex">
               <Link to={returnPath} className="btn btn-outline-light">Cancel</Link>
-              <button type="submit" className="btn btn-warning fw-bold px-4" disabled={submitting}>{submitting ? "Creating…" : "Create"}</button>
+              <button type="submit" className="btn btn-warning fw-bold px-4" disabled={submitting || imageBusy}>{submitting ? "Creating…" : "Create"}</button>
             </div>
           </div>
 
@@ -241,62 +208,18 @@ export default function CreateProduct() {
               <div className="card-header border-secondary">Main image preview</div>
               <div className="card-body">
                 <div className="ratio ratio-1x1 mb-2">
-                  <img id="main-preview" src={mainPreview} alt="preview" className="w-100 h-100 rounded" style={{ objectFit: "cover" }} />
+                  <img id="main-preview" src={productImageUrl(mainPreview)} alt="preview" className="w-100 h-100 rounded" style={{ objectFit: "cover" }} />
                 </div>
                 <div className="small text-muted">Click the ⭐ on a row to set it as main (thumbnail).</div>
               </div>
             </div>
 
-            <div className="mb-2 d-flex align-items-center justify-content-between">
-              <label className="form-label m-0">Gallery images</label>
-              <button type="button" id="btn-add-img" className="btn btn-sm btn-outline-warning" onClick={() => setImages((current) => [...current, { url: "", altText: "" }])} disabled={submitting}>+ Add image</button>
-            </div>
-
-            <div id="img-list" className="d-flex flex-column gap-2">
-              {images.map((image, index) => {
-                const active = thumbnailIndex === index;
-                return (
-                  <div key={index} className={`img-row${active ? " active-main" : ""}`}>
-                    <div className="d-flex align-items-center gap-2">
-                      <img className="thumb rounded" src={image.url.trim() || placeholder} alt="" />
-                      <span className={`badge bg-warning text-dark badge-main${active ? "" : " d-none"}`}>Main</span>
-                      <input className="form-control form-control-sm flex-grow-1 img-url" placeholder="https://..." value={image.url} onChange={(event) => updateImageUrl(index, event.target.value)} disabled={submitting} />
-                      <div className="btn-group btn-group-sm">
-                        <button type="button" className="btn btn-outline-secondary btn-up" title="Up" onClick={() => moveImage(index, -1)} disabled={submitting}>▲</button>
-                        <button type="button" className="btn btn-outline-secondary btn-down" title="Down" onClick={() => moveImage(index, 1)} disabled={submitting}>▼</button>
-                      </div>
-                      <button type="button" className="btn btn-outline-warning btn-sm btn-main" title="Set as main" onClick={() => setMainImage(index)} disabled={submitting}>⭐</button>
-                      <button type="button" className="btn btn-outline-danger btn-sm btn-remove" title="Remove" onClick={() => removeImage(index)} disabled={submitting}>🗑</button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <small className="text-muted">Order is top → bottom. The first non-empty image is used if no main is chosen.</small>
+            <ProductGalleryEditor images={images} mainIndex={thumbnailIndex} disabled={submitting || imageBusy} onBusyChange={setImageBusy}
+                onChange={(next) => { setImages(next); setMainPreview(next[thumbnailIndex ?? 0]?.url || next.find((image) => image.url.trim())?.url || placeholder); }}
+                onMainChange={(index, next) => { const source = next ?? images; setThumbnailIndex(index); setMainPreview(source[index ?? 0]?.url || firstNonEmptyUrl(source) || placeholder); }} />
           </div>
         </div>
       </form>
-
-      <style>{`
-        .img-row {
-          border: 1px solid var(--bs-secondary);
-          border-radius: .5rem;
-          padding: .5rem;
-          background: #111;
-        }
-        .img-row .thumb {
-          width: 56px;
-          height: 56px;
-          object-fit: cover;
-        }
-        .img-row.active-main {
-          border-color: #f59f00;
-          box-shadow: 0 0 0 2px rgba(245,159,0,.15) inset;
-        }
-        .img-row .badge-main {
-          font-size: .65rem;
-        }
-      `}</style>
     </div>
   );
 }

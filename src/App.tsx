@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { BrowserRouter as Router, Route, Routes } from "@/router/nextCompat";
 
 import { LocalizationProvider } from "@/localization/LocalizationContext";
+import { CurrencyProvider } from "@/currency/CurrencyContext";
 import { adminPermissions } from "@/auth/adminPermissions";
 import AdminTranslations from "@/pages/admin/translations/Translations";
 import FooterAdmin from "@/pages/admin/footer/FooterAdmin";
@@ -130,7 +131,7 @@ function adminShell(page: ReactNode) {
 
 export default function App({ initialPath = "/" }: { initialPath?: string }) {
   return (
-    <Router initialPath={initialPath}><LocalizationProvider>
+    <Router initialPath={initialPath}><LocalizationProvider><CurrencyProvider>
       <V1Stylesheets />
       <Routes>
         <Route element={<Layout />}>
@@ -271,6 +272,6 @@ export default function App({ initialPath = "/" }: { initialPath?: string }) {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
-    </LocalizationProvider></Router>
+    </CurrencyProvider></LocalizationProvider></Router>
   );
 }

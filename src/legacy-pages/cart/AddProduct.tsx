@@ -1,5 +1,7 @@
 "use client";
 
+import { useCurrency } from "@/currency/CurrencyContext";
+
 import { useEffect, useState } from "react";
 import { backendEndpoints, fetchBackend } from "@/config/api";
 import { Link, useNavigate, useParams } from "@/router/nextCompat";
@@ -34,6 +36,7 @@ async function readProduct(response: Response, id: string): Promise<Product> {
 }
 
 export default function AddProduct() {
+  const { formatMoney } = useCurrency();
   const { id = "" } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
@@ -91,7 +94,7 @@ export default function AddProduct() {
           <>
             <div className="mb-6 flex justify-center"><img src={product.imageUrl || "/images/placeholder.png"} alt={product.name} className="h-32 w-32 rounded-lg border border-slate-600 bg-white/5 object-contain" /></div>
             <label className="mb-4 block text-sm font-medium text-slate-300">Name<input value={product.name} disabled className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-slate-300" /></label>
-            <label className="block text-sm font-medium text-slate-300">Price<input value={`$${product.price.toFixed(2)}`} disabled className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-slate-300" /></label>
+            <label className="block text-sm font-medium text-slate-300">Price<input value={formatMoney(product.price)} disabled className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-slate-300" /></label>
             {error ? <p className="mt-4 rounded border border-red-500/40 bg-red-500/10 p-3 text-red-200">{error}</p> : null}
             <div className="my-6 h-px bg-amber-400/50" />
             <div className="flex justify-center gap-3">

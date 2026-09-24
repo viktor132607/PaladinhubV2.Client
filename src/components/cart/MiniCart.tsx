@@ -1,5 +1,7 @@
 "use client";
 
+import { useCurrency } from "@/currency/CurrencyContext";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { backendEndpoints, backendUrl, fetchBackend, readApiJson } from "@/config/api";
 import { Link } from "@/router/nextCompat";
@@ -101,13 +103,6 @@ function resolveImageUrl(imageUrl: string): string {
   return backendUrl(normalized);
 }
 
-function formatMoney(value: number): string {
-  return `${value.toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  })} $`;
-}
-
 function isAbortError(error: unknown): boolean {
   return error instanceof DOMException && error.name === "AbortError";
 }
@@ -117,6 +112,7 @@ export default function MiniCart({
   initialTotalPrice = 0,
   onChanged,
 }: MiniCartProps) {
+  const { formatMoney } = useCurrency();
   const [data, setData] = useState<MiniCartData>(() => ({
     items: initialItems ?? [],
     totalPrice: initialTotalPrice,

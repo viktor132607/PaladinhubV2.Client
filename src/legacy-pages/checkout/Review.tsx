@@ -1,5 +1,7 @@
 "use client";
 
+import { useCurrency } from "@/currency/CurrencyContext";
+
 import {
   useCallback,
   useEffect,
@@ -35,6 +37,7 @@ type CheckoutReviewData = {
   total: number;
   items: number;
   walletBalance: number | null;
+  walletUsdPerEur: number;
   paymentError: string | null;
   orderId: string | null;
 };
@@ -56,6 +59,7 @@ const emptyReview: CheckoutReviewData = {
   total: 0,
   items: 0,
   walletBalance: null,
+  walletUsdPerEur: 0,
   paymentError: null,
   orderId: null,
 };
@@ -258,6 +262,8 @@ function normalizeReview(
           source.WalletBalance,
       ),
 
+    walletUsdPerEur: Math.max(0, numberValue(source.walletUsdPerEur ?? source.WalletUsdPerEur)),
+
     paymentError:
       stringValue(
         source.paymentError ??
@@ -337,18 +343,6 @@ function paymentLabel(
   }
 }
 
-function formatMoney(
-  amount: number,
-): string {
-  return new Intl.NumberFormat(
-    undefined,
-    {
-      style: "currency",
-      currency: "USD",
-    },
-  ).format(amount);
-}
-
 function appendOrderId(
   route: string,
   orderId: string | undefined,
@@ -386,6 +380,9 @@ function isAbortError(
 }
 
 export default function Review() {
+  const { formatMoney, currency } = useCurrency();
+  const formatCheckoutMoney = (amount: number, method: PaymentMethod | null) =>
+    method === "Card" ? formatMoney(amount) : new Intl.NumberFormat(undefined, { style: "currency", currency: "EUR" }).format(amount);
   const navigate = useNavigate();
 
   const [data, setData] =
@@ -729,9 +726,7 @@ export default function Review() {
           data.walletBalance !== null ? (
             <span className="text-sm text-[#a8b0bd]">
               Wallet:{" "}
-              {formatMoney(
-                data.walletBalance,
-              )}
+              {new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(data.walletBalance)}
             </span>
           ) : null}
         </div>
@@ -757,11 +752,14 @@ export default function Review() {
             </span>
 
             <span className="text-xl font-bold">
-              {formatMoney(
+              {formatCheckoutMoney(
                 data.total,
+                data.paymentMethod,
               )}
             </span>
           </div>
+          {data.paymentMethod === "Balance" && data.walletUsdPerEur > 0 && <p className="mt-2 text-sm text-[#b8c0cc]">Wallet charge: {new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(Math.round(data.total * data.walletUsdPerEur * 100) / 100)} at the verified exchange rate.</p>}
+          {currency === "USD" && data.paymentMethod === "Card" && <p className="mt-2 text-sm text-[#b8c0cc]">USD estimate; the exact USD charge appears on the card page.</p>}
         </div>
 
         {!loading &&

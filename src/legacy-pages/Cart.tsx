@@ -1,5 +1,7 @@
 "use client";
 
+import { useCurrency } from "@/currency/CurrencyContext";
+
 import { useCallback, useEffect, useState } from "react";
 import {
   backendEndpoints,
@@ -99,20 +101,12 @@ function resolveImageUrl(value: string): string {
   return backendUrl(normalized);
 }
 
-function formatMoney(value: number): string {
-  return new Intl.NumberFormat(undefined, {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
-}
-
 function isAbortError(error: unknown): boolean {
   return error instanceof DOMException && error.name === "AbortError";
 }
 
 export default function Cart() {
+  const { formatMoney } = useCurrency();
   const [cart, setCart] = useState<CartData>(emptyCart);
   const [loading, setLoading] = useState(true);
   const [busyAction, setBusyAction] = useState<{

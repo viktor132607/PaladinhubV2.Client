@@ -6,6 +6,7 @@ import { adminPermissions } from "@/auth/adminPermissions";
 import { backendEndpoints, backendUrl, fetchBackend, readApiJson } from "@/config/api";
 import { normalizeJson, type Product } from "@/pages/Products";
 import { Link } from "@/router/nextCompat";
+import { useCurrency } from "@/currency/CurrencyContext";
 
 type ProductPage = ReturnType<typeof normalizeJson>;
 
@@ -16,6 +17,7 @@ function imageSource(url: string | null): string {
 }
 
 export default function AdminProducts() {
+  const { formatMoney } = useCurrency();
   const { hasPermission } = useAuth();
   const [search, setSearch] = useState("");
   const [submittedSearch, setSubmittedSearch] = useState("");
@@ -106,7 +108,7 @@ export default function AdminProducts() {
             <tbody>{data.products.map((product) => <tr key={product.id}>
               <td data-label="Product"><div className="d-flex align-items-center gap-2"><img className="admin-product-thumb" src={imageSource(product.imageUrl)} alt="" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = "/images/placeholder.png"; }} /><strong>{product.name}</strong></div></td>
               <td data-label="Category">{product.category}</td>
-              <td data-label="Price">${product.price.toFixed(2)}</td>
+              <td data-label="Price">{formatMoney(product.price)}</td>
               <td data-label="Reviews">{product.reviewsCount}</td>
               <td data-label="Actions"><div className="d-flex flex-wrap gap-2">
                 <Link className="btn btn-sm btn-outline-secondary" to={`/Products/Details/${encodeURIComponent(product.id)}`}>View</Link>

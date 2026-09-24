@@ -1,5 +1,7 @@
 "use client";
 
+import { useCurrency } from "@/currency/CurrencyContext";
+
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import { backendEndpoints, backendUrl, fetchBackend, readApiJson } from "@/config/api";
@@ -51,10 +53,10 @@ const PAGE_SIZES = [20, 40, 100] as const;
 const DEFAULT_PAGE_SIZE = 20;
 
 const priceBands = [
-  ["0-100", "$0–100"],
-  ["100-200", "$100–200"],
-  ["200-500", "$200–500"],
-  ["500+", "$500+"],
+  ["0-100"],
+  ["100-200"],
+  ["200-500"],
+  ["500+"],
 ] as const;
 
 const sortOptions = [
@@ -701,15 +703,8 @@ function isAbortError(
   );
 }
 
-function formatPrice(
-  value: number,
-): string {
-  return `$${value.toFixed(
-    2,
-  )}`;
-}
-
 export default function Products() {
+  const { formatMoney: formatPrice } = useCurrency();
   const location =
     useLocation();
 
@@ -1228,17 +1223,12 @@ export default function Products() {
 
             <FilterGroup title="Price ranges">
               {priceBands.map(
-                ([
-                  key,
-                  label,
-                ]) => (
+                ([key]) => (
                   <Check
                     key={
                       key
                     }
-                    label={
-                      label
-                    }
+                    label={key === "500+" ? `${formatPrice(500)}+` : key.split("-").map((bound) => formatPrice(Number(bound))).join("–")}
                     checked={filters.priceRanges.includes(
                       key,
                     )}
@@ -1253,7 +1243,7 @@ export default function Products() {
               )}
             </FilterGroup>
 
-            <FilterGroup title="Price (custom)">
+            <FilterGroup title="Price (custom, EUR)">
               <div className="flex gap-2">
                 <input
                   type="number"

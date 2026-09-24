@@ -6,6 +6,7 @@ import { Link, useLocation } from "@/router/nextCompat";
 import { fetchBackend, readApiJson } from "@/config/api";
 import ManagedNavigation, { type NavigationEntry } from "./ManagedNavigation";
 import { useLocalization } from "@/localization/LocalizationContext";
+import { useCurrency } from "@/currency/CurrencyContext";
 import AuthMenu from "./AuthMenu";
 import MiniCart, { type MiniCartData } from "@/components/cart/MiniCart";
 
@@ -43,6 +44,17 @@ function LanguageFlag({ code }: { code: string }) {
       }}
     />
   );
+}
+
+function CurrencyMenu() {
+  const { currency, usdPerEur, rateDate, setCurrency } = useCurrency();
+  return <li className="nav-item d-flex align-items-center">
+    <label className="visually-hidden" htmlFor="site-currency">Currency</label>
+    <select id="site-currency" className="ph-currency-select" value={currency} title={usdPerEur ? `ECB exchange rate ${rateDate}: 1 EUR = ${usdPerEur} USD. Card charges use the selected currency.` : "USD is unavailable until the exchange rate loads."} onChange={(event) => setCurrency(event.target.value as "EUR" | "USD")}>
+      <option value="EUR">€ EUR</option>
+      <option value="USD" disabled={!usdPerEur}>$ USD</option>
+    </select>
+  </li>;
 }
 
 function LanguageMenu() {
@@ -396,6 +408,7 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
           </div>
 
           <ul className="navbar-nav ph-navbar-actions">
+              <CurrencyMenu />
               <li
                 id="nav-cart"
                 className="nav-item position-relative"
