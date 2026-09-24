@@ -22,6 +22,7 @@ import Home from "@/pages/Home";
 import NotFound from "@/pages/NotFound";
 import ProductDetails from "@/pages/ProductDetails";
 import Products from "@/pages/Products";
+import AdminProducts from "@/pages/admin/products/Products";
 
 import AccountDetails from "@/pages/account/AccountDetails";
 import AddPaymentMethod from "@/pages/account/AddPaymentMethod";
@@ -257,6 +258,7 @@ export default function App({ initialPath = "/" }: { initialPath?: string }) {
             <Route path="PageBuilder/DeleteConfirm" element={permissionPage(<DeletePage />, adminPermissions.pages.delete)} />
             <Route path="PageBuilder/Delete" element={permissionPage(<DeletePage />, adminPermissions.pages.delete)} />
 
+            <Route path="Products" element={permissionPage(<AdminProducts />, adminPermissions.products.read)} />
             <Route path="Products/Create" element={permissionPage(<CreateProduct />, adminPermissions.products.create)} />
             <Route path="Products/Edit/:id" element={permissionPage(<EditProduct />, adminPermissions.products.update)} />
 

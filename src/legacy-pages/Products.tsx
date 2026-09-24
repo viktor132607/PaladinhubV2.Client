@@ -5,7 +5,7 @@ import { useAuth } from "@/auth/AuthContext";
 import { backendEndpoints, backendUrl, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useLocation, useNavigate } from "@/router/nextCompat";
 
-type Product = {
+export type Product = {
   id: string;
   name: string;
   price: number;
@@ -483,7 +483,7 @@ function normalizeProduct(
   };
 }
 
-function normalizeJson(
+export function normalizeJson(
   payload: unknown,
 ): MerchandiseData {
   const body =

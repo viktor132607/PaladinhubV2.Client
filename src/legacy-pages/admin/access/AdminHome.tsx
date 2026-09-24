@@ -13,7 +13,7 @@ const cards = [
   { label: "Database", to: "/Admin/Database", permission: adminPermissions.database.read, icon: CircleStackIcon, group: "Data" },
   { label: "Categories", to: "/Admin/Categories", permission: adminPermissions.categories.read, icon: TagIcon, group: "Data" },
   { label: "Media library", to: "/Admin/Media", permission: adminPermissions.media.read, icon: PhotoIcon, group: "Data" },
-  { label: "Products", to: "/Merchandise/Merchandise", permission: adminPermissions.products.read, icon: ShoppingBagIcon, group: "Commerce" },
+  { label: "Products", to: "/Admin/Products", permission: adminPermissions.products.read, icon: ShoppingBagIcon, group: "Commerce" },
   { label: "Promo Codes", to: "/Admin/PromoCodes", permission: adminPermissions.promoCodes.read, icon: TagIcon, group: "Commerce" },
   { label: "Roles & permissions", to: "/Admin/Roles", permission: adminPermissions.roles.read, icon: ShieldCheckIcon, group: "Access" },
   { label: "Users & role assignments", to: "/Admin/Users", permission: adminPermissions.users.read, icon: UserGroupIcon, group: "Access" },

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
-import { Link, useNavigate } from "@/router/nextCompat";
+import { Link, useLocation, useNavigate } from "@/router/nextCompat";
 
 type GalleryImage = {
   url: string;
@@ -54,6 +54,8 @@ function isValidAbsoluteUrl(value: string): boolean {
 
 export default function CreateProduct() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnPath = new URLSearchParams(location.search).get("returnTo") === "admin" ? "/Admin/Products" : "/Merchandise/Merchandise";
   const [name, setName] = useState("");
   const [price, setPrice] = useState("0.00");
   const [category, setCategory] = useState("Other");
@@ -176,7 +178,7 @@ export default function CreateProduct() {
       });
       if (!response.ok) throw new Error(await responseMessage(response));
       await readApiJson<CreateProductResponse>(response);
-      navigate("/Merchandise/Merchandise");
+      navigate(returnPath);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "The product could not be created.");
     } finally {
@@ -229,7 +231,7 @@ export default function CreateProduct() {
             </div>
 
             <div className="d-grid gap-2 d-md-flex">
-              <Link to="/Merchandise/Merchandise" className="btn btn-outline-light">Cancel</Link>
+              <Link to={returnPath} className="btn btn-outline-light">Cancel</Link>
               <button type="submit" className="btn btn-warning fw-bold px-4" disabled={submitting}>{submitting ? "Creating…" : "Create"}</button>
             </div>
           </div>

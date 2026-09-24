@@ -92,6 +92,7 @@ const applicationStaticParams = [
   { slug: ["Admin", "PageBuilder", "DeleteConfirm"] },
   { slug: ["Admin", "PageBuilder", "Delete"] },
   { slug: ["Admin", "Products", "Create"] },
+  { slug: ["Admin", "Products"] },
   { slug: ["Admin", "PromoCodes"] },
   { slug: ["Admin", "PromoCodes", "Index"] },
   { slug: ["Admin", "PromoCodes", "Create"] },

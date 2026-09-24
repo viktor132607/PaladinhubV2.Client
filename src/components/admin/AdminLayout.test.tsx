@@ -30,6 +30,8 @@ describe("administrative navigation localization", () => {
     expect(html).toContain('href="/Admin/PageBuilder"');
     expect(html).toContain('href="/Admin/Translations"');
     expect(html).toContain('href="/Admin/Database"');
+    expect(html).toContain('href="/Admin/Products"');
+    expect(html).not.toContain('href="/Merchandise/Merchandise"');
     if (language === "bg") expect(html).not.toContain(">Page Builder<");
   });
   it("does not expose links without permission in either language", () => {

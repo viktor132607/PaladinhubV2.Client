@@ -44,7 +44,7 @@ const sidebarSections: ReadonlyArray<{ title: string; links: readonly AdminLink[
   {
     title: "Commerce",
     links: [
-      { label: "Products", to: "/Merchandise/Merchandise", permissions: [adminPermissions.products.read] },
+      { label: "Products", to: "/Admin/Products", permissions: [adminPermissions.products.read] },
       { label: "Promo Codes", to: "/Admin/PromoCodes", permissions: [adminPermissions.promoCodes.read] },
       { label: "Create Promo Code", to: "/Admin/PromoCodes/Create", permissions: [adminPermissions.promoCodes.create] },
     ],

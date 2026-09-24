@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
-import { Link, useNavigate, useParams } from "@/router/nextCompat";
+import { Link, useLocation, useNavigate, useParams } from "@/router/nextCompat";
 
 type GalleryImage = {
   id: number | null;
@@ -121,6 +121,8 @@ function isValidImageUrl(value: string): boolean {
 }
 
 export default function EditProduct() {
+  const location = useLocation();
+  const returnPath = new URLSearchParams(location.search).get("returnTo") === "admin" ? "/Admin/Products" : "/Merchandise/Merchandise";
   const { id = "" } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   const [form, setForm] = useState<ProductForm | null>(null);
@@ -286,7 +288,7 @@ export default function EditProduct() {
       });
       if (!response.ok) throw new Error(await responseMessage(response));
       await readApiJson<UpdateProductResponse>(response);
-      navigate("/Merchandise/Merchandise");
+      navigate(returnPath);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "The product could not be updated.");
     } finally {
@@ -295,7 +297,7 @@ export default function EditProduct() {
   };
 
   if (loading) return <p>Loading product…</p>;
-  if (!form) return <><p className="text-danger">{error || "Product not found."}</p><Link to="/Merchandise/Merchandise" className="btn btn-secondary">Back</Link></>;
+  if (!form) return <><p className="text-danger">{error || "Product not found."}</p><Link to={returnPath} className="btn btn-secondary">Back</Link></>;
 
   return (
     <div className="admin-record-editor">
@@ -343,7 +345,7 @@ export default function EditProduct() {
               </div>
 
               <div className="d-grid gap-2 d-md-flex">
-                <Link to="/Merchandise/Merchandise" className="btn btn-outline-light">Cancel</Link>
+                <Link to={returnPath} className="btn btn-outline-light">Cancel</Link>
                 <button type="submit" className="btn btn-warning fw-bold px-4" disabled={submitting}>{submitting ? "Saving…" : "Save"}</button>
               </div>
             </div>
