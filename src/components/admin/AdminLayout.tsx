@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import { adminPermissions } from "@/auth/adminPermissions";
 import { Link, Outlet, useLocation } from "@/router/nextCompat";
@@ -13,16 +13,6 @@ type AdminLink = {
   to: string;
   permissions: readonly string[];
 };
-
-const secondaryLinks: readonly AdminLink[] = [
-  { label: "Pages", to: "/Admin/PageBuilder", permissions: [adminPermissions.pages.read] },
-  { label: "Talent Trees", to: "/Admin/PageBuilder/TalentTrees", permissions: [adminPermissions.talentTrees.read] },
-  { label: "SEO", to: "/Admin/Seo", permissions: [adminPermissions.seo.read] },
-  { label: "Database", to: "/Admin/Database", permissions: [adminPermissions.database.read] },
-  { label: "Products", to: "/Merchandise/Merchandise", permissions: [adminPermissions.products.read] },
-  { label: "Roles", to: "/Admin/Roles", permissions: [adminPermissions.roles.read] },
-  { label: "Users", to: "/Admin/Users", permissions: [adminPermissions.users.read] },
-];
 
 const sidebarSections: ReadonlyArray<{ title: string; links: readonly AdminLink[] }> = [
   {
@@ -71,30 +61,15 @@ const sidebarSections: ReadonlyArray<{ title: string; links: readonly AdminLink[
 export default function AdminLayout({ children }: { children?: ReactNode }) {
   const { t } = useLocalization();
   const { hasAnyPermission } = useAuth();
-  const [promoOpen, setPromoOpen] = useState(false);
   const [sectionsOpen, setSectionsOpen] = useState(false);
+  const [navigationQuery, setNavigationQuery] = useState("");
   const { pathname } = useLocation();
-  const promoRef = useRef<HTMLDivElement>(null);
 
   const normalizedPath = pathname.toLowerCase().replace(/\/+$/, "") || "/";
   const fullWidthWorkspace = normalizedPath === "/admin/pagebuilder/talenttrees";
-  const canSeePromo = hasAnyPermission([
-    adminPermissions.promoCodes.read,
-    adminPermissions.promoCodes.create,
-  ]);
-
   useEffect(() => {
-    setPromoOpen(false);
     setSectionsOpen(false);
   }, [pathname]);
-
-  useEffect(() => {
-    const close = (event: MouseEvent) => {
-      if (!promoRef.current?.contains(event.target as Node)) setPromoOpen(false);
-    };
-    document.addEventListener("click", close);
-    return () => document.removeEventListener("click", close);
-  }, []);
 
   const isActive = (to: string) => {
     const target = to.toLowerCase();
@@ -108,59 +83,37 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
     return normalizedPath === target || normalizedPath.startsWith(`${target}/`);
   };
 
-  const visibleSecondary = secondaryLinks.filter((link) => hasAnyPermission(link.permissions));
+  const query = navigationQuery.trim().toLocaleLowerCase();
   const visibleSections = sidebarSections
     .map((section) => ({
       ...section,
-      links: section.links.filter((link) => hasAnyPermission(link.permissions)),
+      links: section.links.filter((link) =>
+        hasAnyPermission(link.permissions) && (!query || t(link.label).toLocaleLowerCase().includes(query))
+      ),
     }))
     .filter((section) => section.links.length > 0);
+  const currentLink = sidebarSections.flatMap((section) => section.links)
+    .filter((link) => hasAnyPermission(link.permissions) && isActive(link.to))
+    .sort((a, b) => b.to.length - a.to.length)[0];
 
   return (
     <div className="ph-admin min-vh-100">
       <Navbar forceVisible />
-
-      <header className="admin-secondary-nav">
-        <nav className="admin-secondary-nav-inner" aria-label={t("admin.navigationLabel")}>
-          {visibleSecondary.map((link) => (
-            <Link
-              key={link.label}
-              to={link.to}
-              className={`admin-secondary-link${isActive(link.to) ? " active" : ""}`}
-            >
-              {t(link.label)}
-            </Link>
-          ))}
-
-          {canSeePromo ? (
-            <div className="admin-secondary-dropdown" ref={promoRef}>
-              <button
-                type="button"
-                className={`admin-secondary-link admin-secondary-button${
-                  normalizedPath.startsWith("/admin/promocodes") ? " active" : ""
-                }`}
-                aria-expanded={promoOpen}
-                onClick={() => setPromoOpen((current) => !current)}
-              >
-                {t("admin.promoCodes")} <span aria-hidden="true">▾</span>
-              </button>
-              {promoOpen ? (
-                <div className="admin-secondary-dropdown-menu">
-                  {hasAnyPermission([adminPermissions.promoCodes.read]) ? <Link to="/Admin/PromoCodes">{t("common.all")}</Link> : null}
-                  {hasAnyPermission([adminPermissions.promoCodes.create]) ? <Link to="/Admin/PromoCodes/Create">{t("common.create")}</Link> : null}
-                </div>
-              ) : null}
-            </div>
-          ) : null}
-        </nav>
-      </header>
 
       <button type="button" className="admin-sections-toggle" aria-controls="admin-sections" aria-expanded={sectionsOpen} onClick={() => setSectionsOpen((value) => !value)}>
         {t("admin.sections")} <span aria-hidden="true">{sectionsOpen ? "−" : "+"}</span>
       </button>
       <div className="admin-shell">
         <aside id="admin-sections" className={`admin-shell-sidebar${sectionsOpen ? " is-open" : ""}`} aria-label={t("admin.sections")}>
-          <div className="admin-shell-sidebar-title">{t("nav.admin")}</div>
+          <div className="admin-shell-sidebar-title">
+            <span className="admin-brand-mark" aria-hidden="true">P</span>
+            <span>PaladinHub <small>{t("admin.panel")}</small></span>
+          </div>
+          <label className="admin-navigation-search">
+            <span className="visually-hidden">{t("admin.searchNavigation")}</span>
+            <span aria-hidden="true">⌕</span>
+            <input type="search" placeholder={t("admin.searchNavigation")} value={navigationQuery} onChange={(event) => setNavigationQuery(event.target.value)} />
+          </label>
           {visibleSections.map((section) => (
             <section className="admin-sidebar-section" key={section.title}>
               <h2>{t(section.title)}</h2>
@@ -170,6 +123,7 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
                     key={link.label}
                     to={link.to}
                     className={`admin-sidebar-link${isActive(link.to) ? " active" : ""}`}
+                    aria-current={isActive(link.to) ? "page" : undefined}
                   >
                     {t(link.label)}
                   </Link>
@@ -184,6 +138,14 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
             fullWidthWorkspace ? " admin-shell-main--full" : ""
           }`}
         >
+          {!fullWidthWorkspace ? (
+            <div className="admin-workspace-bar">
+              <nav aria-label={t("admin.navigationLabel")}>
+                {visibleSections.length ? <Link to="/Admin">{t("nav.admin")}</Link> : <span>{t("nav.admin")}</span>}
+                {currentLink ? <><span aria-hidden="true">/</span><span aria-current="page">{t(currentLink.label)}</span></> : null}
+              </nav>
+            </div>
+          ) : null}
           {children ?? <Outlet />}
         </div>
       </div>

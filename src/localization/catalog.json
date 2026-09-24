@@ -62,6 +62,11 @@
   "admin.sections": { "en": "Admin sections", "bg": "Административни раздели" },
   "admin.sectionLinks": { "en": "{name} admin links", "bg": "Административни връзки: {name}" },
   "admin.panel": { "en": "Admin Panel", "bg": "Административен панел" },
+  "admin.searchNavigation": { "en": "Search navigation", "bg": "Търси в менюто" },
+  "admin.overview": { "en": "Administration overview", "bg": "Административен преглед" },
+  "admin.overviewDescription": { "en": "Manage your content, data, store and access from one place.", "bg": "Управлявайте съдържанието, данните, магазина и достъпа от едно място." },
+  "admin.openSection": { "en": "Open section", "bg": "Отвори раздела" },
+  "admin.noSections": { "en": "No dashboard sections are available for your account.", "bg": "Няма достъпни раздели за вашия профил." },
   "common.all": { "en": "All", "bg": "Всички" },
   "common.create": { "en": "Create", "bg": "Създаване" },
   "nav.home": {
