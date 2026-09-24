@@ -104,3 +104,73 @@
         border-left: .3em solid transparent;
     }
 }
+
+/* Keep account/cart/language controls visible outside the mobile collapse. */
+.ph-v1-navbar .ph-navbar-actions {
+    margin-left: .25rem;
+}
+
+@media (max-width: 575.98px) {
+    .ph-v1-navbar > .container-fluid {
+        align-items: center;
+    }
+
+    .ph-v1-navbar .navbar-toggler {
+        order: 1;
+        width: 52px;
+        height: 52px;
+        min-width: 52px;
+        min-height: 52px;
+        padding: 0 !important;
+        border-radius: 12px !important;
+        flex: 0 0 52px;
+    }
+
+    .ph-v1-navbar .navbar-toggler-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .ph-v1-navbar .ph-navbar-actions {
+        order: 2;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center;
+        justify-content: flex-end;
+        gap: .1rem;
+        width: auto;
+        margin: 0 0 0 auto !important;
+        padding-left: 0;
+        flex: 0 1 auto;
+    }
+
+    .ph-v1-navbar .ph-navbar-actions .nav-item {
+        margin-right: 0 !important;
+    }
+
+    .ph-v1-navbar .ph-navbar-actions .nav-link {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: .4rem .45rem !important;
+    }
+
+    .ph-v1-navbar .ph-navbar-actions #userMenu > span {
+        display: none;
+    }
+
+    .ph-v1-navbar .ph-navbar-actions .ms-2 {
+        margin-left: .1rem !important;
+    }
+
+    .ph-v1-navbar #primary-navigation {
+        order: 3;
+        width: 100%;
+        flex-basis: 100%;
+    }
+
+    .ph-v1-navbar .ph-collapsible-utility-nav {
+        margin-left: 0 !important;
+    }
+}
