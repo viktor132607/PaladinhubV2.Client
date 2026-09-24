@@ -232,7 +232,7 @@ export default function Database() {
           ))}
         </ul>
 
-        <form onSubmit={submitSearch} className="row g-2 mb-3">
+        <form onSubmit={submitSearch} className="admin-database-filters row g-2 mb-3">
           {canReadTags || canReadPatches || (entity === "Items" && canReadRarities) ? <div className="col-12 col-md-auto">
             {canReadTags ? <select className="form-select" aria-label="Filter by tag" value={tagId} onChange={event => changeQuery({ tagId: event.target.value, page: 1 })}>
               <option value="">All tags</option><option value="0">No tags</option>
@@ -259,14 +259,14 @@ export default function Database() {
               {categories.filter(category => !category.isDeleted).map(category => <option key={category.id} value={category.id}>{categoryPath(category.id, categories)}{category.isArchived ? " (archived)" : ""}</option>)}
             </select>
           </div> : null}
-          <div className="col-auto">
+          <div className="col-12 col-md-auto admin-database-search">
             <input className="form-control" type="text" name="search" value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="Search..." aria-label="Search database records" />
           </div>
-          <div className="col-auto">
+          <div className="col-12 col-md-auto admin-database-actions">
             <button className="btn btn-primary" type="submit">Search</button>{" "}
             <Link className="btn btn-secondary" to={`/Admin/Database?entity=${entity}`}>Clear</Link>
           </div>
-          {canCreateEntity ? <div className="col ms-auto text-end">
+          {canCreateEntity ? <div className="col-12 col-md-auto ms-md-auto admin-database-create">
             <Link className="btn btn-success" to={`/Admin/${entity}/Create`}>Create</Link>
           </div> : null}
         </form>

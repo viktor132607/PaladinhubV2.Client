@@ -153,6 +153,20 @@
 }
 .ph-admin .admin-shell-main :where(input, select, textarea):disabled { opacity: .65; }
 .ph-admin .admin-shell-main :where(.btn, button, .page-link):not(.admin-home-card) { border-radius: 7px; }
+.ph-admin .admin-shell-main .btn { overflow-wrap: normal; word-break: normal; }
+.ph-admin .admin-shell-main .d-flex > .btn { flex-shrink: 0; }
+.ph-admin .admin-users-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, auto);
+  align-items: end;
+  gap: 16px;
+}
+.ph-admin .admin-users-search { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.ph-admin .admin-users-search .form-control { flex: 1 1 210px; min-width: 0; }
+.ph-admin .admin-users-search .btn { flex: none; white-space: nowrap; min-width: 84px; }
+.ph-admin .admin-database-filters .form-select { min-width: 0; }
+.ph-admin .admin-database-actions { display: flex; align-items: center; gap: 8px; }
+.ph-admin .admin-database-actions .btn { white-space: nowrap; }
 .ph-admin .admin-shell-main :where(.btn-primary, .list-group-item.active) {
   border-color: var(--admin-accent);
   background: var(--admin-accent);
@@ -243,6 +257,9 @@
 .ph-admin .admin-shell-main :where(.border-secondary) { border-color: var(--admin-line) !important; }
 
 @media (max-width: 991.98px) {
+  .ph-admin .admin-users-header { grid-template-columns: minmax(0, 1fr); }
+  .ph-admin .admin-users-search { width: 100%; }
+  .ph-admin .admin-shell-main .d-flex > .btn { flex-shrink: 1; }
   .ph-admin .admin-mobile-toolbar { display: flex; border-bottom: 1px solid #29414a; background: #152b33; }
   .ph-admin .admin-sections-toggle { flex: 1; width: auto; border: 0; }
   .ph-admin .admin-mobile-theme-button {
@@ -260,6 +277,19 @@
   .ph-admin .admin-shell-main > .admin-record-editor { padding: 18px; }
 }
 @media (max-width: 575.98px) {
+  .ph-admin .admin-shell-main .d-flex.flex-wrap:has(> input[type="search"]) > :is(.form-control, .form-select) {
+    flex: 1 1 100% !important;
+    width: 100%;
+  }
+  .ph-admin .admin-shell-main .d-flex.flex-wrap:has(> input[type="search"]) > .btn { flex: 1 1 auto; }
+  .ph-admin .admin-users-search .form-control { flex-basis: 100%; }
+  .ph-admin .admin-users-search .btn { flex: 1 1 0; }
+  .ph-admin .admin-database-filters .admin-database-search,
+  .ph-admin .admin-database-filters .admin-database-actions,
+  .ph-admin .admin-database-filters .admin-database-create { width: 100%; }
+  .ph-admin .admin-database-filters .admin-database-search .form-control { width: 100%; }
+  .ph-admin .admin-database-filters .admin-database-actions .btn { flex: 1; }
+  .ph-admin .admin-database-filters .admin-database-create .btn { width: 100%; }
   .ph-admin .admin-shell-main > :is(section, main, .container, .container-fluid, #admin-db-bleed):not(.admin-home):not(.admin-page-builder):not(.admin-talent-workspace) { padding: 14px; }
   .ph-admin .admin-shell-main > .admin-record-editor { padding: 14px; }
   .ph-admin .admin-record-table tbody tr { border-color: var(--admin-line); background: var(--admin-surface); }

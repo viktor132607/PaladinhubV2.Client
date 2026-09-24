@@ -68,13 +68,13 @@ export default function UsersAdmin() {
 
   return (
     <div className="container-fluid py-3">
-      <div className="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+      <div className="admin-users-header mb-3">
         <div>
           <h1 className="h3 mb-1">Users & role assignments</h1>
           <p className="text-muted mb-0">Search existing Identity users and manage their current role memberships.</p>
         </div>
         <form
-          className="d-flex flex-column flex-sm-row gap-2"
+          className="admin-users-search"
           role="search"
           onSubmit={(event) => {
             event.preventDefault();
