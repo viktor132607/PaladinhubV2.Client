@@ -81,6 +81,8 @@ const applicationStaticParams = [
   { slug: ["Admin", "Roles"] },
   { slug: ["Admin", "Users"] },
   { slug: ["Admin", "PageBuilder", "History"] },
+  { slug: ["Admin", "PageBuilder"] },
+  { slug: ["Admin", "PageBuilder", "Index"] },
   { slug: ["Admin", "Database", "Index"] },
   { slug: ["Admin", "Items", "Create"] },
   { slug: ["Admin", "Spells", "Create"] },
@@ -104,7 +106,7 @@ const applicationStaticParams = [
   { slug: ["products"] },
   { slug: ["discussions"] },
   { slug: ["privacy"] },
-  { slug: ["admin"] },
+  { slug: ["Admin"] },
 ];
 
 export async function generateStaticParams(): Promise<Array<{ slug: string[] }>> {
@@ -134,4 +136,11 @@ export async function generateMetadata({
   return metadataForPath(await getSeoSnapshot(), requestedPath);
 }
 
-export default function Page() { return <AppEntry />; }
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ slug: string[] }>;
+}) {
+  const { slug } = await params;
+  return <AppEntry initialPath={`/${slug.join("/")}`} />;
+}

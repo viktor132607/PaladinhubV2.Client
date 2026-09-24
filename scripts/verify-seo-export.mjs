@@ -56,6 +56,13 @@ const adminSeo = await readRoute("Admin/Seo.html", "Admin/Seo/index.html");
 assertIncludes(adminSeo, "noindex", "Admin SEO HTML");
 assertIncludes(adminSeo, "nofollow", "Admin SEO HTML");
 
+const adminHome = await readRoute("Admin.html", "Admin/index.html");
+assertIncludes(adminHome, "noindex", "Admin home HTML");
+await readRoute("Admin/PageBuilder.html", "Admin/PageBuilder/index.html");
+const notFound = await read("404.html");
+assertIncludes(notFound, "/images/404.jpg", "Custom 404 HTML");
+assertIncludes(notFound, "Page not found", "Custom 404 HTML");
+
 const sitemap = await read("sitemap.xml");
 assertIncludes(sitemap, "<urlset", "sitemap.xml");
 assertIncludes(sitemap, "<loc>", "sitemap.xml");

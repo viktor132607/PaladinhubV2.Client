@@ -43,10 +43,10 @@ const RouterContext = createContext<RouterContextValue | null>(null);
 const ParamsContext = createContext<Record<string, string>>({});
 const OutletContext = createContext<ReactNode>(null);
 
-function getCurrentLocation(): LocationValue {
+function getCurrentLocation(initialPath = "/"): LocationValue {
   if (typeof window === "undefined") {
     return {
-      pathname: "/",
+      pathname: initialPath,
       search: "",
       hash: "",
       state: undefined,
@@ -218,13 +218,23 @@ function buildCandidates(
 
 export function BrowserRouter({
   children,
+  initialPath = "/",
 }: {
   children: ReactNode;
+  initialPath?: string;
 }) {
   const [location, setLocation] =
-    useState<LocationValue>(getCurrentLocation);
+    useState<LocationValue>(() => ({
+      pathname: initialPath,
+      search: "",
+      hash: "",
+      state: undefined,
+    }));
 
   useEffect(() => {
+    // Match the exported HTML during hydration, then use the actual URL.
+    // The latter can differ when Render rewrites a dynamic deep link.
+    setLocation(getCurrentLocation());
     const handlePopState = () => {
       setLocation(getCurrentLocation());
     };

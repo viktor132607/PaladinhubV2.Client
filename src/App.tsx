@@ -127,9 +127,9 @@ function adminShell(page: ReactNode) {
   return <PermissionRoute allowAnyAdminPermission>{page}</PermissionRoute>;
 }
 
-export default function App() {
+export default function App({ initialPath = "/" }: { initialPath?: string }) {
   return (
-    <Router><LocalizationProvider>
+    <Router initialPath={initialPath}><LocalizationProvider>
       <V1Stylesheets />
       <Routes>
         <Route element={<Layout />}>
