@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import Script from "next/script";
 import Providers from "./providers";
 import {
   configuredSiteUrl,
@@ -34,6 +35,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <Script id="wowhead-tooltip-options" strategy="beforeInteractive">
+          {`const whTooltips = { colorLinks: false, iconizeLinks: false, renameLinks: false, hide: { extra: true } };`}
+        </Script>
+        <Script src="https://wow.zamimg.com/js/tooltips.js" strategy="afterInteractive" />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"

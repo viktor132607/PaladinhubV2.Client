@@ -1,0 +1,21 @@
+.card {
+  box-sizing: border-box;
+  width: min(350px, calc(100vw - 20px));
+  padding: 10px 11px;
+  border: 1px solid #77706a;
+  border-radius: 4px;
+  background: linear-gradient(140deg, #101525 0%, #090d1a 100%);
+  box-shadow: 0 3px 14px #000b, inset 0 0 0 1px #272c38;
+  color: #fff;
+  font: 14px/1.35 Arial, sans-serif;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.heading { display: flex; gap: 9px; align-items: flex-start; }
+.icon { width: 36px; height: 36px; flex: none; border: 1px solid #726957; border-radius: 3px; object-fit: cover; }
+.name { display: block; color: var(--tooltip-quality); font-size: 16px; font-weight: 600; line-height: 1.25; }
+.level { display: block; color: #ffd100; }
+.detail { margin-top: 8px; color: #fff; white-space: pre-line; }
+.description { margin: 9px 0 0; color: #ffd100; white-space: pre-line; }
+.requirement { margin: 9px 0 0; color: #fff; white-space: pre-line; }
+.popup { position: fixed; z-index: 2147483000; pointer-events: none; }

@@ -81,7 +81,11 @@ export function TreeGrid({
             onClick={() => onNode(n.id)}
             aria-label={`${n.name}, ${ranks[n.id] || 0} of ${n.maxRank} ranks`}
             aria-pressed={selected === n.id}
-            title={n.description}
+            data-tooltip-kind="talent"
+            data-tooltip-name={n.name}
+            data-tooltip-description={n.description}
+            data-tooltip-icon={n.icon ? spellIconSource(n.icon) : undefined}
+            data-tooltip-detail={`Rank ${ranks[n.id] || 0}/${n.maxRank}`}
             className={`absolute flex flex-col items-center justify-center rounded border-2 bg-slate-900 text-xs ${selected === n.id ? "border-amber-400" : "border-slate-500"}`}
             style={{
               left: (n.column - 1) * 88 + 10,

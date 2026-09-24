@@ -421,15 +421,6 @@ export default function TalentTree({
             const isActive = selectedSet.has(node.id);
             const requirements = requirementsOf(node);
             const cost = costOf(node);
-            const title = [
-              node.name,
-              node.description,
-              requirements.length > 0 ? `Requires: ${requirements.join(", ")}` : null,
-              `Cost: ${cost} point${cost === 1 ? "" : "s"}`,
-            ]
-              .filter(Boolean)
-              .join("\n");
-
             return (
               <button
                 key={node.id}
@@ -450,7 +441,12 @@ export default function TalentTree({
                   ${adminMode && !isEditing ? "cursor-default" : "cursor-pointer"}
                 `}
                 style={nodeStyle(node)}
-                title={title}
+                data-tooltip-kind="talent"
+                data-tooltip-name={node.name}
+                data-tooltip-description={node.description}
+                data-tooltip-icon={node.icon ? spellIconSource(node.icon) : defaultIconPath(node.name)}
+                data-tooltip-detail={`Cost: ${cost} point${cost === 1 ? "" : "s"}`}
+                data-tooltip-requirement={requirements.length ? `Requires: ${requirements.join(", ")}` : undefined}
                 aria-pressed={isActive}
                 aria-label={node.name}
               >
