@@ -383,7 +383,7 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
               ) : null}
             </ul>
 
-            <ul className="navbar-nav ms-auto">
+            <ul className="navbar-nav ms-auto ph-collapsible-utility-nav">
               {navigation !== null ? <ManagedNavigation entries={navigation} location="utility" /> : <>
               <li className="nav-item">
                 <Link to="/Merchandise/Merchandise" className={`nav-link${normalizedPathname.startsWith("/merchandise") ? " active" : ""}`}>
@@ -392,6 +392,10 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
               </li>
 
               </>}
+            </ul>
+          </div>
+
+          <ul className="navbar-nav ph-navbar-actions">
               <li
                 id="nav-cart"
                 className="nav-item position-relative"
@@ -441,7 +445,6 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
 
               <LanguageMenu />
             </ul>
-          </div>
         </div>
       </nav>
     </header>
