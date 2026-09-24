@@ -589,102 +589,102 @@ const html = String.raw`<div class="outer-wrapper">
 <div class="tier-row">
 <div class="tier-label tier-S">S</div>
 <div class="trinket-icons">
-<div class="trinket">
+<a class="trinket" href="https://www.wowhead.com/item=230198" target="_blank" rel="noopener noreferrer">
 <img alt="Eye of Kezan" src="/images/itemIcons/EyeOfKezan.jpg"/>
-<div class="trinket-name">Eye of Kezan</div>
-</div>
-<div class="trinket">
+<span class="trinket-name">Eye of Kezan</span>
+</a>
+<a class="trinket" href="https://www.wowhead.com/item=230186" target="_blank" rel="noopener noreferrer">
 <img alt="Mister Pick-Me-Up" src="/images/itemIcons/MisterPick-Me-Up.jpg"/>
-<div class="trinket-name">Mister Pick-Me-Up</div>
-</div>
+<span class="trinket-name">Mister Pick-Me-Up</span>
+</a>
 </div>
 </div>
 </div>
 <div class="tier-row">
 <div class="tier-label tier-A">A</div>
 <div class="trinket-icons">
-<div class="trinket">
+<a class="trinket" href="https://www.wowhead.com/item=230192" target="_blank" rel="noopener noreferrer">
 <img alt="Mug's Moxie Jug" src="/images/itemIcons/Mug'sMoxieJug.jpg"/>
-<div class="trinket-name">Mug's Moxie Jug</div>
-</div>
-<div class="trinket">
+<span class="trinket-name">Mug's Moxie Jug</span>
+</a>
+<a class="trinket" href="https://www.wowhead.com/item=230194" target="_blank" rel="noopener noreferrer">
 <img alt="Reverb Radio" src="/images/itemIcons/Reverbradio.png"/>
-<div class="trinket-name">Reverb Radio</div>
-</div>
-<div class="trinket">
+<span class="trinket-name">Reverb Radio</span>
+</a>
+<a class="trinket" href="https://www.wowhead.com/item=219305" target="_blank" rel="noopener noreferrer">
 <img alt="Carved Blazikon Wax" src="/images/itemIcons/CarvedBlazikonWax.jpg"/>
-<div class="trinket-name">Blazikon Wax</div>
-</div>
-<div class="trinket">
+<span class="trinket-name">Blazikon Wax</span>
+</a>
+<a class="trinket" href="https://www.wowhead.com/item=219308" target="_blank" rel="noopener noreferrer">
 <img alt="Signet of the Priory" src="/images/itemIcons/SignetOfThePriory.jpg"/>
-<div class="trinket-name">Signet of the Priory</div>
-</div>
-<div class="trinket">
+<span class="trinket-name">Signet of the Priory</span>
+</a>
+<a class="trinket" href="https://www.wowhead.com/item=210816" target="_blank" rel="noopener noreferrer">
 <img alt="Algari Alchemist Stone" src="/images/itemIcons/AlgarialchemistStone.png"/>
-<div class="trinket-name">Algari Alchemist Stone</div>
-</div>
-<div class="trinket">
+<span class="trinket-name">Algari Alchemist Stone</span>
+</a>
+<a class="trinket" href="https://www.wowhead.com/item=178809" target="_blank" rel="noopener noreferrer">
 <img alt="Soulletting Ruby" src="/images/itemIcons/SoullettingRuby.jpg"/>
-<div class="trinket-name">Soulletting Ruby</div>
-</div>
+<span class="trinket-name">Soulletting Ruby</span>
+</a>
 </div>
 </div>
 <div class="tier-row">
 <div class="tier-label tier-B">B</div>
 <div class="trinket-icons">
-<div class="trinket">
+<a class="trinket" href="https://www.wowhead.com/item=225668" target="_blank" rel="noopener noreferrer">
 <img alt="Unstable Power Suit Core" src="/images/itemIcons/Unstable Power Suit Core.jpg"/>
-<div class="trinket-name">Unstable Power Suit Core</div>
-</div>
-<div class="trinket">
+<span class="trinket-name">Unstable Power Suit Core</span>
+</a>
+<a class="trinket" href="https://www.wowhead.com/item=234217" target="_blank" rel="noopener noreferrer">
 <img alt="Funhouse Lens" src="/images/itemIcons/Funhouse Lens.png"/>
-<div class="trinket-name">Funhouse Lens</div>
-</div>
-<div class="trinket">
+<span class="trinket-name">Funhouse Lens</span>
+</a>
+<a class="trinket" href="https://www.wowhead.com/item=230027" target="_blank" rel="noopener noreferrer">
 <img alt="House of Cards" src="/images/itemIcons/HouseOfCards.jpg"/>
-<div class="trinket-name">House of Cards</div>
-</div>
-<div class="trinket">
+<span class="trinket-name">House of Cards</span>
+</a>
+<a class="trinket" href="https://www.wowhead.com/item=219296" target="_blank" rel="noopener noreferrer">
 <img alt="Entropic Skardyn Core" src="/images/itemIcons/Entropic Skardyn Core.jpg"/>
-<div class="trinket-name">Entropic Skardyn Core</div>
-</div>
+<span class="trinket-name">Entropic Skardyn Core</span>
+</a>
 </div>
 </div>
 <div class="tier-row">
 <div class="tier-label tier-C">C</div>
 <div class="trinket-icons">
-<div class="trinket">
+<a class="trinket" href="https://www.wowhead.com/item=219295" target="_blank" rel="noopener noreferrer">
 <img alt="Sigil of Algari Concordance" src="/images/itemIcons/Sigil of Algari Concordance.jpg"/>
-<div class="trinket-name">Sigil of Algari Concordance</div>
-</div>
-<div class="trinket">
+<span class="trinket-name">Sigil of Algari Concordance</span>
+</a>
+<a class="trinket" href="https://www.wowhead.com/item=232542" target="_blank" rel="noopener noreferrer">
 <img alt="Darkfuse Medichopper" src="/images/itemIcons/Darkfuse Medichopper.jpg"/>
-<div class="trinket-name">Darkfuse Medichopper</div>
-</div>
-<div class="trinket">
+<span class="trinket-name">Darkfuse Medichopper</span>
+</a>
+<a class="trinket" href="https://www.wowhead.com/item=219306" target="_blank" rel="noopener noreferrer">
 <img alt="Burin of the Candle King" src="/images/itemIcons/Burin of the Candle King.jpg"/>
-<div class="trinket-name">Burin of the Candle King</div>
-</div>
-<div class="trinket">
+<span class="trinket-name">Burin of the Candle King</span>
+</a>
+<a class="trinket" href="https://www.wowhead.com/item=219299" target="_blank" rel="noopener noreferrer">
 <img alt="Synergistic Brewtializer" src="/images/itemIcons/Synergistic Brewterializer.jpg"/>
-<div class="trinket-name">Synergistic Brewtializer</div>
-</div>
-<div class="trinket">
+<span class="trinket-name">Synergistic Brewtializer</span>
+</a>
+<a class="trinket" href="https://www.wowhead.com/item=178810" target="_blank" rel="noopener noreferrer">
 <img alt="Vial of Spectral Essence" src="/images/itemIcons/Vial of Spectral Essence.jpg"/>
-<div class="trinket-name">Vial of Spectral Essence</div>
-</div>
-<div class="trinket">
+<span class="trinket-name">Vial of Spectral Essence</span>
+</a>
+<a class="trinket" href="https://www.wowhead.com/item=219307" target="_blank" rel="noopener noreferrer">
 <img alt="Remnant of Darkness" src="/images/itemIcons/Remnant of Darkness.jpg"/>
-<div class="trinket-name">Remnant of Darkness</div>
-</div>
-<div class="trinket">
+<span class="trinket-name">Remnant of Darkness</span>
+</a>
+<a class="trinket" href="https://www.wowhead.com/item=169344" target="_blank" rel="noopener noreferrer">
 <img alt="Ingenious Mana Battery" src="/images/itemIcons/Ingenious Mana Battery.jpg"/>
-<div class="trinket-name">Ingenious Mana Battery</div>
-</div>
-<div class="trinket">
+<span class="trinket-name">Ingenious Mana Battery</span>
+</a>
+<a class="trinket" href="https://www.wowhead.com/item=230188" target="_blank" rel="noopener noreferrer">
 <img alt="Gallagio Bottle Service" src="/images/itemIcons/GallagioBottleService.jpg"/>
-<div class="trinket-name">Gallagio Bottle Service</div>
-</div>
+<span class="trinket-name">Gallagio Bottle Service</span>
+</a>
 </div>
 </div>
 </section>

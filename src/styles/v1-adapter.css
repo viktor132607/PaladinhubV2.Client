@@ -253,6 +253,84 @@
 
 /* Tailwind preflight makes every img display:block. V1 relies on inline images in headings.
    Restore the original V1 behavior for section titles across all class guide pages. */
+.ph-v1-layout [data-guide-page] img.item-icon,
+.ph-v1-layout [data-guide-page] img.source-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    max-width: 20px;
+    vertical-align: -0.22em;
+    object-fit: cover;
+}
+.ph-v1-layout [data-guide-page] a.item,
+.ph-v1-layout [data-guide-page] a.item-link {
+    display: inline;
+    white-space: normal;
+}
+
+/* Trinket tiers need enough width for item names and a focusable hover target. */
+.ph-v1-layout [data-guide-page] #trinkets .tier-row {
+    align-items: flex-start;
+}
+.ph-v1-layout [data-guide-page] #trinkets .tier-label {
+    display: grid;
+    place-items: center;
+}
+.ph-v1-layout [data-guide-page] #trinkets .trinket-icons {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    gap: 18px 12px;
+    min-width: 0;
+}
+.ph-v1-layout [data-guide-page] #trinkets .trinket {
+    display: flex;
+    flex: 0 0 136px;
+    flex-direction: column;
+    align-items: center;
+    width: 136px;
+    min-width: 0;
+    cursor: help;
+    border-radius: 6px;
+    color: #fff;
+    text-decoration: none;
+}
+.ph-v1-layout [data-guide-page] #trinkets .trinket:hover {
+    color: #ffd100;
+    text-decoration: none;
+}
+.ph-v1-layout [data-guide-page] #trinkets .trinket:focus-visible {
+    outline: 2px solid #ffd100;
+    outline-offset: 3px;
+}
+.ph-v1-layout [data-guide-page] #trinkets .trinket > img {
+    display: block;
+    flex: none;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 6px;
+    object-fit: cover;
+}
+.ph-v1-layout [data-guide-page] #trinkets .trinket-name {
+    width: 100%;
+    line-height: 1.35;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+@media (max-width: 520px) {
+    .ph-v1-layout [data-guide-page] #trinkets .tier-label {
+        width: 52px;
+        height: 52px;
+        flex-basis: 52px;
+        padding: 0;
+    }
+    .ph-v1-layout [data-guide-page] #trinkets .trinket {
+        flex-basis: min(120px, calc((100vw - 118px) / 2));
+        width: min(120px, calc((100vw - 118px) / 2));
+    }
+}
 .ph-v1-layout [data-guide-page] h2.section-header > img.section-icon,
 .ph-v1-layout [data-guide-page] h2 > img.section-icon,
 .ph-v1-layout [data-guide-page] h3.section-title > img.section-icon,
