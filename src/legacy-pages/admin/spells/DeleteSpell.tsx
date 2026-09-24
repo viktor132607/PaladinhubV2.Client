@@ -97,7 +97,7 @@ export default function DeleteSpell() {
   if (loading) return <p>Loading spell...</p>;
 
   return (
-    <>
+    <div className="admin-record-editor">
       <h2>Delete Spell</h2>
       {error ? <div className="alert alert-danger" role="alert">{error}</div> : null}
       {spell ? (
@@ -130,6 +130,6 @@ export default function DeleteSpell() {
       ) : (
         <Link to="/Admin/Database?entity=Spells" className="btn btn-secondary">Back</Link>
       )}
-    </>
+    </div>
   );
 }

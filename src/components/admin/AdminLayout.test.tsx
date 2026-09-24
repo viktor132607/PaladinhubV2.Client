@@ -25,6 +25,8 @@ describe("administrative navigation localization", () => {
     expect(html).toContain(language === "bg" ? "Административни връзки: Съдържание" : "Content admin links");
     expect(html).toContain(language === "bg" ? "Административни раздели" : "Admin sections");
     expect(html).toContain(language === "bg" ? "Административен панел" : "Admin Panel");
+    expect(html).toContain('data-admin-theme="light"');
+    expect(html).toContain(language === "bg" ? "Превключи към тъмна тема" : "Switch to dark theme");
     expect(html).toContain('href="/Admin/PageBuilder"');
     expect(html).toContain('href="/Admin/Translations"');
     expect(html).toContain('href="/Admin/Database"');

@@ -196,7 +196,7 @@ export default function EditItem() {
   }
 
   return (
-    <>
+    <div className="admin-record-editor">
       <h2>Edit Item</h2>
 
       {error && error !== "Name is required." ? (
@@ -243,6 +243,6 @@ export default function EditItem() {
         <button type="submit" className="btn btn-primary" disabled={saving || iconBusy || secondIconBusy}>{saving ? "Saving..." : "Save"}</button>{" "}
         <Link to="/Admin/Database?entity=Items" className="btn btn-secondary">Cancel</Link>
       </form>
-    </>
+    </div>
   );
 }

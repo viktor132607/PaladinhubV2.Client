@@ -150,7 +150,7 @@ export default function EditSpell() {
   if (!spellLoaded) return <><h2>Edit Spell</h2><div className="alert alert-danger" role="alert">{error || "The spell could not be loaded."}</div><Link className="btn btn-secondary" to="/Admin/Database?entity=Spells">Back</Link></>;
 
   return (
-    <>
+    <div className="admin-record-editor">
       <h2>Edit Spell</h2>
       {error && error !== "Name is required." ? <div className="text-danger mb-3" role="alert">{error}</div> : null}
       <form onSubmit={submit}>
@@ -180,6 +180,6 @@ export default function EditSpell() {
         <button type="submit" className="btn btn-primary" disabled={saving || iconUploading || typeBusy || !typeValid}>{saving ? "Saving..." : "Save"}</button>{" "}
         <Link to="/Admin/Database?entity=Spells" className="btn btn-secondary">Cancel</Link>
       </form>
-    </>
+    </div>
   );
 }

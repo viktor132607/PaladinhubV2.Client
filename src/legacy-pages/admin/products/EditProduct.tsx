@@ -298,7 +298,7 @@ export default function EditProduct() {
   if (!form) return <><p className="text-danger">{error || "Product not found."}</p><Link to="/Merchandise/Merchandise" className="btn btn-secondary">Back</Link></>;
 
   return (
-    <>
+    <div className="admin-record-editor">
       <div className="container py-4">
         <h2 className="mb-3">Edit Product</h2>
 
@@ -411,6 +411,6 @@ export default function EditProduct() {
           font-size: .65rem;
         }
       `}</style>
-    </>
+    </div>
   );
 }

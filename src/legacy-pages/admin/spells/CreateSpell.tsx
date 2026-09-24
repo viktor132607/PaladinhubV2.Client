@@ -107,7 +107,7 @@ export default function CreateSpell() {
   };
 
   return (
-    <>
+    <div className="admin-record-editor">
       <h2>Create Spell</h2>
 
       {error && error !== "Name is required." ? (
@@ -149,6 +149,6 @@ export default function CreateSpell() {
         <button type="submit" className="btn btn-success" disabled={saving || iconUploading || typeBusy || !typeValid}>{saving ? "Creating..." : "Create"}</button>{" "}
         <Link to="/Admin/Database?entity=Spells" className="btn btn-secondary">Cancel</Link>
       </form>
-    </>
+    </div>
   );
 }

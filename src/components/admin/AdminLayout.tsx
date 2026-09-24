@@ -58,11 +58,14 @@ const sidebarSections: ReadonlyArray<{ title: string; links: readonly AdminLink[
   },
 ];
 
+const ADMIN_THEME_KEY = "paladinhub.admin.theme";
+
 export default function AdminLayout({ children }: { children?: ReactNode }) {
   const { t } = useLocalization();
   const { hasAnyPermission } = useAuth();
   const [sectionsOpen, setSectionsOpen] = useState(false);
   const [navigationQuery, setNavigationQuery] = useState("");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   const { pathname } = useLocation();
 
   const normalizedPath = pathname.toLowerCase().replace(/\/+$/, "") || "/";
@@ -70,6 +73,22 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
   useEffect(() => {
     setSectionsOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(ADMIN_THEME_KEY);
+      if (saved === "light" || saved === "dark") setTheme(saved);
+      else if (window.matchMedia("(prefers-color-scheme: dark)").matches) setTheme("dark");
+    } catch {
+      // Browser storage can be unavailable; the light theme stays usable.
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const next = theme === "light" ? "dark" : "light";
+    setTheme(next);
+    try { window.localStorage.setItem(ADMIN_THEME_KEY, next); } catch { /* private browsing */ }
+  };
 
   const isActive = (to: string) => {
     const target = to.toLowerCase();
@@ -97,12 +116,17 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
     .sort((a, b) => b.to.length - a.to.length)[0];
 
   return (
-    <div className="ph-admin min-vh-100">
+    <div className="ph-admin min-vh-100" data-admin-theme={theme}>
       <Navbar forceVisible />
 
-      <button type="button" className="admin-sections-toggle" aria-controls="admin-sections" aria-expanded={sectionsOpen} onClick={() => setSectionsOpen((value) => !value)}>
-        {t("admin.sections")} <span aria-hidden="true">{sectionsOpen ? "−" : "+"}</span>
-      </button>
+      <div className="admin-mobile-toolbar">
+        <button type="button" className="admin-sections-toggle" aria-controls="admin-sections" aria-expanded={sectionsOpen} onClick={() => setSectionsOpen((value) => !value)}>
+          {t("admin.sections")} <span aria-hidden="true">{sectionsOpen ? "−" : "+"}</span>
+        </button>
+        <button type="button" className="admin-mobile-theme-button" onClick={toggleTheme} aria-label={t(theme === "light" ? "admin.switchToDark" : "admin.switchToLight")}>
+          <span aria-hidden="true">{theme === "light" ? "☾" : "☀"}</span>
+        </button>
+      </div>
       <div className="admin-shell">
         <aside id="admin-sections" className={`admin-shell-sidebar${sectionsOpen ? " is-open" : ""}`} aria-label={t("admin.sections")}>
           <div className="admin-shell-sidebar-title">
@@ -114,6 +138,10 @@ export default function AdminLayout({ children }: { children?: ReactNode }) {
             <span aria-hidden="true">⌕</span>
             <input type="search" placeholder={t("admin.searchNavigation")} value={navigationQuery} onChange={(event) => setNavigationQuery(event.target.value)} />
           </label>
+          <button type="button" className="admin-theme-toggle" onClick={toggleTheme} aria-label={t(theme === "light" ? "admin.switchToDark" : "admin.switchToLight")}>
+            <span aria-hidden="true">{theme === "light" ? "☾" : "☀"}</span>
+            {t(theme === "light" ? "admin.darkTheme" : "admin.lightTheme")}
+          </button>
           {visibleSections.map((section) => (
             <section className="admin-sidebar-section" key={section.title}>
               <h2>{t(section.title)}</h2>

@@ -80,7 +80,7 @@ export default function ItemDetails() {
   }
 
   return (
-    <>
+    <div className="admin-record-editor">
       <h2>Item Details</h2>
 
       <dl className="row">
@@ -134,6 +134,6 @@ export default function ItemDetails() {
       </dl>
 
       <Link to="/Admin/Database?entity=Items" className="btn btn-secondary">Back</Link>
-    </>
+    </div>
   );
 }

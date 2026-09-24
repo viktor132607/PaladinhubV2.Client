@@ -98,7 +98,7 @@ export default function DeleteItem() {
   if (loading) return <p>Loading item...</p>;
 
   return (
-    <>
+    <div className="admin-record-editor">
       <h2>Delete Item</h2>
 
       {error ? <div className="text-danger mb-3" role="alert">{error}</div> : null}
@@ -130,6 +130,6 @@ export default function DeleteItem() {
       ) : (
         <Link to="/Admin/Database?entity=Items" className="btn btn-secondary">Back</Link>
       )}
-    </>
+    </div>
   );
 }

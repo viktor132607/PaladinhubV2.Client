@@ -185,7 +185,7 @@ export default function CreateProduct() {
   };
 
   return (
-    <>
+    <div className="admin-record-editor">
       <h1 className="text-center mb-4">Create Product</h1>
 
       <form onSubmit={submit} className="mx-auto" style={{ maxWidth: 960 }}>
@@ -295,6 +295,6 @@ export default function CreateProduct() {
           font-size: .65rem;
         }
       `}</style>
-    </>
+    </div>
   );
 }

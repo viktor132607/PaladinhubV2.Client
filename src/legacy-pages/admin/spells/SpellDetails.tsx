@@ -68,7 +68,7 @@ export default function SpellDetails() {
   const iconSource = spellIconSource(spell.icon);
 
   return (
-    <>
+    <div className="admin-record-editor">
       <h2>Spell Details</h2>
       <dl className="row">
         <dt className="col-sm-3">Tags</dt>
@@ -100,6 +100,6 @@ export default function SpellDetails() {
       </dl>
 
       <Link to="/Admin/Database?entity=Spells" className="btn btn-secondary">Back</Link>
-    </>
+    </div>
   );
 }

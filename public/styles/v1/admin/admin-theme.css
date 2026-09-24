@@ -1,0 +1,266 @@
+/* One palette for every admin route, including the legacy Bootstrap and Tailwind screens. */
+.ph-admin[data-admin-theme="light"] {
+  --admin-bg: #f3f6f7;
+  --admin-surface: #fff;
+  --admin-surface-muted: #f7faf9;
+  --admin-control: #eef4f2;
+  --admin-ink: #1b3039;
+  --admin-muted: #586d75;
+  --admin-line: #d5e1e1;
+  --admin-accent: #087f6d;
+  --admin-accent-dark: #086353;
+  --admin-accent-soft: #e2f5ed;
+  --admin-shadow: 0 2px 8px #203f4812;
+  --admin-warning-bg: #fff5dc;
+  --admin-warning-ink: #735019;
+  --admin-success-bg: #e4f7ed;
+  --admin-success-ink: #126b50;
+  --admin-danger-bg: #fff0ee;
+  --admin-danger-ink: #a02e39;
+  color-scheme: light;
+}
+.ph-admin[data-admin-theme="dark"] {
+  --admin-bg: #111c23;
+  --admin-surface: #1b2a32;
+  --admin-surface-muted: #202f38;
+  --admin-control: #293c44;
+  --admin-ink: #edf4f3;
+  --admin-muted: #b3c6c8;
+  --admin-line: #3b535b;
+  --admin-accent: #45c4a4;
+  --admin-accent-dark: #6ed4b6;
+  --admin-accent-soft: #244c45;
+  --admin-shadow: 0 3px 14px #0003;
+  --admin-warning-bg: #493b20;
+  --admin-warning-ink: #ffe3a0;
+  --admin-success-bg: #1c4338;
+  --admin-success-ink: #a4eec9;
+  --admin-danger-bg: #4b292f;
+  --admin-danger-ink: #ffbac2;
+  color-scheme: dark;
+}
+
+.ph-admin, .ph-admin .admin-shell, .ph-admin .admin-shell-main {
+  background: var(--admin-bg);
+  color: var(--admin-ink);
+}
+.ph-admin .admin-shell-main { --bs-body-bg: var(--admin-surface); --bs-body-color: var(--admin-ink); }
+.ph-admin .admin-workspace-bar, .ph-admin .footer {
+  border-color: var(--admin-line);
+  background: var(--admin-surface) !important;
+  color: var(--admin-muted) !important;
+}
+.ph-admin .admin-workspace-bar nav, .ph-admin .admin-home-heading p,
+.ph-admin .admin-home-card-copy small { color: var(--admin-muted); }
+.ph-admin .admin-workspace-bar a,
+.ph-admin .admin-shell-main :where(.card, .table) a:not(.btn) { color: var(--admin-accent-dark); }
+.ph-admin .admin-workspace-bar [aria-current="page"],
+.ph-admin .admin-home-heading h1, .ph-admin .admin-home-section h2,
+.ph-admin .admin-home-card-copy strong { color: var(--admin-ink); }
+.ph-admin .admin-home-eyebrow { color: var(--admin-accent-dark); }
+.ph-admin .admin-home-card {
+  border-color: var(--admin-line);
+  background: var(--admin-surface);
+  color: var(--admin-ink) !important;
+  box-shadow: var(--admin-shadow);
+}
+.ph-admin .admin-home-card-icon { background: var(--admin-accent-soft); color: var(--admin-accent-dark); }
+.ph-admin .admin-home-card:hover, .ph-admin .admin-home-card:focus-visible { border-color: var(--admin-accent); }
+.ph-admin .admin-shell-sidebar { background: #152b33; }
+.ph-admin[data-admin-theme="dark"] .admin-shell-sidebar { background: #0d1920; }
+.ph-admin .admin-sidebar-link.active { background: var(--admin-accent-soft); color: var(--admin-accent-dark) !important; }
+.ph-admin .admin-theme-toggle {
+  display: flex;
+  width: calc(100% - 4px);
+  min-height: 40px;
+  align-items: center;
+  gap: 10px;
+  margin: -12px 2px 22px;
+  padding: 7px 11px;
+  border: 1px solid #49636c;
+  border-radius: 7px;
+  background: #203942;
+  color: #e8f1f2;
+  font-size: .83rem;
+  text-align: left;
+  cursor: pointer;
+}
+.ph-admin .admin-theme-toggle:hover, .ph-admin .admin-theme-toggle:focus-visible { border-color: #83d4b2; background: #29474e; }
+.ph-admin .admin-theme-toggle span, .ph-admin .admin-mobile-theme-button span { font-size: 1.25rem; line-height: 1; }
+.ph-admin .admin-mobile-toolbar { display: none; }
+
+/* Standard panel and heading treatment for the CRUD, access and commerce pages. */
+.ph-admin .admin-shell-main > :is(section, main, .container, .container-fluid, #admin-db-bleed):not(.admin-home):not(.admin-page-builder):not(.admin-talent-workspace) {
+  max-width: 100%;
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  background: var(--admin-surface);
+  color: var(--admin-ink);
+  box-shadow: var(--admin-shadow);
+  padding: 24px;
+}
+.ph-admin .admin-shell-main > .admin-record-editor {
+  width: 100%;
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  background: var(--admin-surface);
+  color: var(--admin-ink);
+  box-shadow: var(--admin-shadow);
+  padding: 24px;
+}
+.ph-admin .admin-record-editor > :is(h1, h2),
+.ph-admin .admin-record-editor > .container > :is(h1, h2) {
+  margin: 0 0 22px;
+  padding: 0;
+  color: var(--admin-ink);
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
+  font-weight: 700;
+  text-align: left !important;
+}
+.ph-admin .admin-record-editor dl { padding: 15px; border: 1px solid var(--admin-line); border-radius: 8px; background: var(--admin-surface-muted); }
+.ph-admin .admin-shell-main :where(h1, h2, h3, h4, h5, h6, p, label, legend, strong, li):not([class*="text-"]) { color: var(--admin-ink); }
+.ph-admin .admin-shell-main :where(h1, h2, h3, h4, h5, h6) { text-align: left; padding-bottom: 0; }
+.ph-admin .admin-shell-main > :is(section, main, .container, .container-fluid) > :is(h1, h2):first-child {
+  margin-bottom: 20px;
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+.ph-admin .admin-shell-main :where(.card, .list-group-item:not(.active), .modal-content, .dropdown-menu) {
+  border-color: var(--admin-line);
+  background: var(--admin-surface);
+  color: var(--admin-ink);
+  box-shadow: var(--admin-shadow);
+}
+.ph-admin .admin-shell-main .card-header { border-color: var(--admin-line); background: var(--admin-surface-muted); color: var(--admin-ink); }
+.ph-admin .admin-shell-main .card :where(h1, h2, h3, h4, h5, h6, strong, p) { color: var(--admin-ink); }
+.ph-admin .admin-shell-main :where(.form-control, .form-select, input:not([type="checkbox"]):not([type="radio"]), textarea, select) {
+  border-color: var(--admin-line);
+  background: var(--admin-surface);
+  color: var(--admin-ink);
+}
+.ph-admin .admin-shell-main :where(input, textarea)::placeholder { color: var(--admin-muted); opacity: 1; }
+.ph-admin .admin-shell-main :where(input, textarea, select):focus-visible,
+.ph-admin .admin-shell-main :where(button, a):focus-visible {
+  outline: 2px solid var(--admin-accent);
+  outline-offset: 2px;
+}
+.ph-admin .admin-shell-main :where(.form-control, .form-select):focus {
+  border-color: var(--admin-accent);
+  background: var(--admin-surface);
+  color: var(--admin-ink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--admin-accent) 20%, transparent);
+}
+.ph-admin .admin-shell-main :where(input, select, textarea):disabled { opacity: .65; }
+.ph-admin .admin-shell-main :where(.btn, button, .page-link):not(.admin-home-card) { border-radius: 7px; }
+.ph-admin .admin-shell-main :where(.btn-primary, .list-group-item.active) {
+  border-color: var(--admin-accent);
+  background: var(--admin-accent);
+  color: #fff;
+}
+.ph-admin[data-admin-theme="dark"] .admin-shell-main :where(.btn-primary, .list-group-item.active) { color: #0b2221; }
+.ph-admin .admin-shell-main .btn-primary:hover { background: var(--admin-accent-dark); }
+.ph-admin .admin-shell-main :where(.btn-secondary, .btn-outline-secondary, .page-link) {
+  border-color: var(--admin-line);
+  background: var(--admin-control);
+  color: var(--admin-ink);
+}
+.ph-admin .admin-shell-main :where(.btn-secondary, .btn-outline-secondary, .page-link):hover { border-color: var(--admin-accent); color: var(--admin-accent-dark); }
+.ph-admin .admin-shell-main .nav-pills .nav-link { color: var(--admin-accent-dark); }
+.ph-admin .admin-shell-main .nav-pills .nav-link.active { background: var(--admin-accent); color: #fff; }
+.ph-admin[data-admin-theme="dark"] .admin-shell-main .nav-pills .nav-link.active { color: #0b2221; }
+.ph-admin .admin-shell-main :where(.table, .table-dark) {
+  --bs-table-bg: var(--admin-surface);
+  --bs-table-striped-bg: var(--admin-surface-muted);
+  --bs-table-striped-color: var(--admin-ink);
+  --bs-table-color: var(--admin-ink);
+  --bs-table-border-color: var(--admin-line);
+  border-color: var(--admin-line);
+  color: var(--admin-ink);
+}
+.ph-admin .admin-shell-main :where(.table, .admin-record-table) thead { background: var(--admin-control); color: var(--admin-ink); }
+.ph-admin .admin-shell-main :where(.table, .admin-record-table) :where(th, td) { border-color: var(--admin-line); }
+.ph-admin .admin-shell-main .text-muted { color: var(--admin-muted) !important; }
+.ph-admin .admin-shell-main .text-secondary { color: var(--admin-muted) !important; }
+.ph-admin .admin-shell-main .alert { border-radius: 8px; }
+.ph-admin .admin-shell-main .alert-warning { border-color: var(--admin-warning-ink); background: var(--admin-warning-bg); color: var(--admin-warning-ink); }
+.ph-admin .admin-shell-main .alert-success { border-color: var(--admin-success-ink); background: var(--admin-success-bg); color: var(--admin-success-ink); }
+.ph-admin .admin-shell-main .alert-danger { border-color: var(--admin-danger-ink); background: var(--admin-danger-bg); color: var(--admin-danger-ink); }
+.ph-admin .admin-shell-main .alert-info { border-color: var(--admin-line); background: var(--admin-accent-soft); color: var(--admin-accent-dark); }
+.ph-admin[data-admin-theme="dark"] .admin-shell-main .text-danger { color: var(--admin-danger-ink) !important; }
+.ph-admin .admin-shell-main a:not([class*="bg-"]):not(.btn):not(.admin-home-card) { color: var(--admin-accent-dark); }
+.ph-admin .admin-shell-main .btn-link.text-white { color: var(--admin-accent-dark) !important; }
+.ph-admin .admin-shell-main :where(.btn-success, .btn-outline-primary) { border-color: var(--admin-accent); color: var(--admin-accent-dark); }
+.ph-admin .admin-shell-main .btn-success { background: var(--admin-accent); color: #fff; }
+.ph-admin .admin-shell-main .btn-outline-primary:hover { background: var(--admin-accent); color: #fff; }
+.ph-admin .admin-shell-main :where(.btn-dark, .img-row) { border-color: var(--admin-line); background: var(--admin-surface-muted); color: var(--admin-ink); }
+.ph-admin .admin-shell-main :where(.btn-dark, .img-row):hover { border-color: var(--admin-accent); }
+.ph-admin .admin-shell-main :where(.badge.text-bg-secondary, .badge.bg-secondary) { background: var(--admin-control) !important; color: var(--admin-ink) !important; }
+
+/* Tailwind screens: Page Builder, translations, footer and Talent Trees. */
+.ph-admin .admin-shell-main :is(.text-slate-100, .text-slate-200, .text-slate-300) { color: var(--admin-ink); }
+.ph-admin .admin-shell-main :is(.text-slate-400, .text-slate-500, .text-slate-600) { color: var(--admin-muted); }
+.ph-admin .admin-shell-main .text-amber-400:not(.bg-amber-500) { color: var(--admin-accent-dark); }
+.ph-admin .admin-shell-main :is(.bg-slate-950, .bg-slate-900, .bg-slate-800, .bg-slate-700, .bg-slate-600,
+  [class*="bg-slate-950/"], [class*="bg-slate-900/"], [class~="bg-[#0b1020]"],
+  [class~="bg-[#101010]"], [class~="bg-[#171717]"], [class~="bg-[#1f2327]"]) {
+  background: var(--admin-surface);
+  color: var(--admin-ink);
+}
+.ph-admin .admin-shell-main :is(.bg-slate-800, .bg-slate-700, .bg-slate-600, [class*="bg-slate-950/"]) { background: var(--admin-control); }
+.ph-admin .admin-shell-main :is(.border-slate-600, .border-slate-700, .border-slate-800, .divide-slate-800) { border-color: var(--admin-line); }
+.ph-admin .admin-shell-main .divide-slate-800 > :not([hidden]) ~ :not([hidden]) { border-color: var(--admin-line); }
+.ph-admin .admin-shell-main :is(.admin-page-builder, .admin-talent-workspace) { color: var(--admin-ink); background: var(--admin-bg); }
+.ph-admin .admin-shell-main :is(.admin-page-builder, .admin-talent-workspace) :where(h1, h2, h3) { color: var(--admin-ink); }
+.ph-admin .admin-shell-main :is(.admin-page-builder, .admin-talent-workspace) :where(section.rounded-xl, section.rounded-lg) {
+  border-color: var(--admin-line);
+  background: var(--admin-surface);
+  box-shadow: var(--admin-shadow);
+}
+.ph-admin .admin-shell-main .admin-talent-sources { border-color: var(--admin-line); background: var(--admin-surface); color: var(--admin-ink); }
+.ph-admin .admin-shell-main .admin-talent-workspace > div > section { background: var(--admin-bg); color: var(--admin-ink); }
+.ph-admin .admin-shell-main .admin-talent-workspace :where(input, select, textarea) { background: var(--admin-surface); color: var(--admin-ink); }
+.ph-admin .admin-shell-main :where(.admin-page-builder, .admin-talent-workspace) [aria-pressed="true"]:not(.bg-red-800) {
+  border-color: var(--admin-accent);
+  background: var(--admin-accent-soft);
+  color: var(--admin-accent-dark);
+}
+.ph-admin .admin-shell-main :is(.bg-amber-400, .bg-amber-500, .bg-blue-600, .bg-blue-700, .bg-emerald-700, .bg-emerald-800) {
+  border-color: var(--admin-accent);
+  background: var(--admin-accent);
+  color: #fff;
+}
+.ph-admin[data-admin-theme="dark"] .admin-shell-main :is(.bg-amber-400, .bg-amber-500, .bg-blue-600, .bg-blue-700, .bg-emerald-700, .bg-emerald-800, .btn-success) { color: #0b2221; }
+.ph-admin .admin-shell-main .bg-amber-500.text-slate-950 { color: #fff; }
+.ph-admin[data-admin-theme="dark"] .admin-shell-main .bg-amber-500.text-slate-950 { color: #0b2221; }
+.ph-admin .admin-shell-main :is([class*="bg-amber-950/"], [class*="bg-amber-400/"], [class*="bg-amber-500/"]) { background: var(--admin-warning-bg); color: var(--admin-warning-ink); }
+.ph-admin .admin-shell-main :is([class*="bg-emerald-950/"]) { background: var(--admin-success-bg); color: var(--admin-success-ink); }
+.ph-admin .admin-shell-main :is([class*="bg-red-950/"]) { background: var(--admin-danger-bg); color: var(--admin-danger-ink); }
+.ph-admin .admin-shell-main :is(.text-amber-100, .text-amber-300) { color: var(--admin-warning-ink); }
+.ph-admin .admin-shell-main .text-green-300 { color: var(--admin-success-ink); }
+.ph-admin .admin-shell-main :is(.text-red-100, .text-red-200, .text-red-300) { color: var(--admin-danger-ink); }
+.ph-admin .admin-shell-main :where(.bg-dark, .bg-black) { background: var(--admin-surface) !important; color: var(--admin-ink) !important; }
+.ph-admin .admin-shell-main :where(.border-secondary) { border-color: var(--admin-line) !important; }
+
+@media (max-width: 991.98px) {
+  .ph-admin .admin-mobile-toolbar { display: flex; border-bottom: 1px solid #29414a; background: #152b33; }
+  .ph-admin .admin-sections-toggle { flex: 1; width: auto; border: 0; }
+  .ph-admin .admin-mobile-theme-button {
+    display: grid;
+    width: 52px;
+    min-height: 48px;
+    flex: none;
+    place-items: center;
+    border: 0;
+    border-left: 1px solid #29414a;
+    background: transparent;
+    color: #e8f1f2;
+  }
+  .ph-admin .admin-shell-main > :is(section, main, .container, .container-fluid, #admin-db-bleed):not(.admin-home):not(.admin-page-builder):not(.admin-talent-workspace) { padding: 18px; }
+  .ph-admin .admin-shell-main > .admin-record-editor { padding: 18px; }
+}
+@media (max-width: 575.98px) {
+  .ph-admin .admin-shell-main > :is(section, main, .container, .container-fluid, #admin-db-bleed):not(.admin-home):not(.admin-page-builder):not(.admin-talent-workspace) { padding: 14px; }
+  .ph-admin .admin-shell-main > .admin-record-editor { padding: 14px; }
+  .ph-admin .admin-record-table tbody tr { border-color: var(--admin-line); background: var(--admin-surface); }
+}
