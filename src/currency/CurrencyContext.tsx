@@ -43,7 +43,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     usdPerEur: rate?.usdPerEur ?? null,
     rateDate: rate?.asOf ?? "",
     setCurrency,
-    formatMoney: (euros) => new Intl.NumberFormat(undefined, { style: "currency", currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(currency === "USD" && rate ? euros * rate.usdPerEur : euros),
+    formatMoney: (euros) => new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(currency === "USD" && rate ? euros * rate.usdPerEur : euros),
   }), [currency, rate]);
 
   return <CurrencyContext.Provider value={value}>{children}</CurrencyContext.Provider>;
