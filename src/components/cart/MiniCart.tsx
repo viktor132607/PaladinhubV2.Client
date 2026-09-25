@@ -265,10 +265,14 @@ export default function MiniCart({
                       <img
                         src={imageUrl}
                         alt={item.name}
-                        className="mini-cart-thumb h-[52px] w-[52px] shrink-0 rounded-md border border-[#333] object-cover"
+                        className="mini-cart-thumb h-[52px] w-[52px] shrink-0 rounded-md object-contain"
+                        onError={(event) => {
+                          event.currentTarget.onerror = null;
+                          event.currentTarget.src = "/placeholder-image.jpg";
+                        }}
                       />
                     ) : (
-                      <div className="h-[52px] w-[52px] shrink-0 rounded-md border border-[#333] bg-[#111]" aria-hidden="true" />
+                      <img src="/placeholder-image.jpg" alt={item.name} className="mini-cart-thumb h-[52px] w-[52px] shrink-0 rounded-md object-contain" />
                     )}
 
                     <div className="mini-cart-text min-w-0 pl-[6px]">
@@ -304,14 +308,14 @@ export default function MiniCart({
           <div className="mini-cart-actions grid grid-cols-2 gap-[10px] border-t border-[#2a2a2a] bg-[#111] p-3">
             <Link
               to="/cart"
-              className="go-to-cart-btn rounded-md border border-[#3b3b3b] bg-[#242424] px-4 py-[9px] text-center font-semibold text-white no-underline transition hover:-translate-y-px hover:brightness-110 hover:shadow-lg"
+              className="go-to-cart-btn rounded-md border-0 bg-[#242424] px-4 py-[9px] text-center font-semibold text-white no-underline transition hover:-translate-y-px hover:brightness-110 hover:shadow-lg"
             >
               My Cart
             </Link>
 
             <Link
               to="/checkout"
-              className="mini-buy-btn rounded-md border border-[#e0a10f] bg-[#f6b21a] px-4 py-[9px] text-center font-semibold text-[#111] no-underline transition hover:-translate-y-px hover:brightness-110 hover:shadow-lg"
+              className="mini-buy-btn rounded-md border-0 bg-[#f6b21a] px-4 py-[9px] text-center font-semibold text-[#111] no-underline transition hover:-translate-y-px hover:brightness-110 hover:shadow-lg"
             >
               Buy
             </Link>

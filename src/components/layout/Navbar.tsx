@@ -419,7 +419,7 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
                   to="/Cart/MyCart"
                   title={t("cart.mine", "My Cart")}
                   aria-label={t("cart.mine", "My Cart")}
-                  className={`nav-link position-relative${normalizedPathname.startsWith("/cart") ? " active" : ""}`}
+                  className={`nav-link ph-cart-link position-relative${normalizedPathname.startsWith("/cart") ? " active" : ""}`}
                 >
                   <i className="fa-solid fa-cart-shopping" aria-hidden="true" />
                   <span

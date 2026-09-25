@@ -10,6 +10,7 @@ import {
   readApiJson,
 } from "@/config/api";
 import { Link } from "@/router/nextCompat";
+import styles from "./Cart.module.css";
 
 type CartItem = {
   id: string;
@@ -274,13 +275,19 @@ export default function Cart() {
   }, [busyAction, publishCart]);
 
   const busyId = busyAction?.id ?? null;
+  const itemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <main className="min-h-[calc(100vh-56px)] bg-[#0f1216] px-4 py-8 text-[#e9ecef]">
-      <section className="mx-auto max-w-6xl">
-        <h1 className="mb-6 text-center text-3xl font-semibold text-[#ff5fb3]">
-          My Cart
-        </h1>
+    <main className={styles.page}>
+      <section className={styles.container}>
+        <header className={styles.heading}>
+          <div>
+            <p className={styles.eyebrow}>Merchandise</p>
+            <h1>My Cart</h1>
+            {!loading && cart.items.length > 0 ? <p>{itemCount} {itemCount === 1 ? "item" : "items"} in your cart</p> : null}
+          </div>
+          <Link to="/products" className={styles.continueLink}>Continue shopping <span aria-hidden="true">→</span></Link>
+        </header>
 
         {notice ? (
           <div className="mb-5 rounded-lg border border-emerald-500/40 bg-emerald-950/40 px-4 py-3 text-emerald-200" role="status">
@@ -302,18 +309,19 @@ export default function Cart() {
         ) : null}
 
         {loading ? (
-          <div className="rounded-xl border border-[#313a45] bg-[#1a1f24] p-10 text-center text-[#a8b0bd]">
+          <div className={styles.loading}>
             Loading your cart...
           </div>
         ) : null}
 
         {!loading && !error && cart.items.length === 0 ? (
-          <div className="rounded-xl border border-blue-400/30 bg-blue-950/20 p-10 text-center">
-            <div className="text-5xl" aria-hidden="true">🛒</div>
-            <h2 className="mt-4 text-2xl font-semibold">Your cart is empty.</h2>
+          <div className={styles.empty}>
+            <div className={styles.emptyIcon} aria-hidden="true"><i className="fa-solid fa-cart-shopping" /></div>
+            <h2>Your cart is empty.</h2>
+            <p>Explore the merchandise and add something you like.</p>
             <Link
               to="/products"
-              className="mt-5 inline-block rounded-md bg-[#f6b21a] px-5 py-2.5 font-semibold text-white hover:bg-[#e0a10f]"
+              className={styles.primaryButton}
             >
               Browse merchandise
             </Link>
@@ -321,118 +329,51 @@ export default function Cart() {
         ) : null}
 
         {!loading && cart.items.length > 0 ? (
-          <div className="overflow-hidden rounded-xl border border-[#313a45] bg-[#1a1f24] shadow-xl">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[820px] text-left">
-                <thead className="border-b border-[#313a45] bg-[#151a1f] text-sm uppercase tracking-wide text-[#a8b0bd]">
-                  <tr>
-                    <th className="w-[84px] px-5 py-4"><span className="sr-only">Image</span></th>
-                    <th className="px-5 py-4">Product</th>
-                    <th className="w-[190px] px-5 py-4 text-center">Quantity</th>
-                    <th className="w-[130px] px-5 py-4 text-right">Price</th>
-                    <th className="w-[150px] px-5 py-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#313a45]">
-                  {cart.items.map((item) => {
-                    const imageUrl = resolveImageUrl(item.imageUrl);
-                    const productPath = `/products/${encodeURIComponent(item.id)}`;
-                    const itemBusy = busyId === item.id;
-
-                    return (
-                      <tr key={item.id} className="hover:bg-[#20262d]">
-                        <td className="px-5 py-4">
-                          <Link to={productPath}>
-                            {imageUrl ? (
-                              <img
-                                src={imageUrl}
-                                alt={item.name}
-                                className="h-14 w-14 rounded-md border border-[#46515e] object-cover"
-                                loading="lazy"
-                                onError={(event) => {
-                                  event.currentTarget.onerror = null;
-                                  event.currentTarget.src = "/images/placeholder.png";
-                                }}
-                              />
-                            ) : (
-                              <div className="h-14 w-14 rounded-md border border-dashed border-[#46515e]" aria-hidden="true" />
-                            )}
-                          </Link>
-                        </td>
-                        <td className="px-5 py-4">
-                          <Link to={productPath} className="font-semibold text-white hover:text-[#ff5fb3]">
-                            {item.name}
-                          </Link>
-                        </td>
-                        <td className="px-5 py-4">
-                          <div className="mx-auto flex w-fit items-center overflow-hidden rounded-md border border-[#46515e]">
-                            <button
-                              type="button"
-                              onClick={() => void runAction("decrease", item.id)}
-                              disabled={busyAction !== null}
-                              aria-label={`Decrease ${item.name} quantity`}
-                              className="h-9 w-10 bg-[#151a1f] text-xl hover:bg-[#2a3139] disabled:opacity-50"
-                            >
-                              −
-                            </button>
-                            <span className="min-w-12 px-3 text-center font-semibold">{itemBusy ? "…" : item.quantity}</span>
-                            <button
-                              type="button"
-                              onClick={() => void runAction("increase", item.id)}
-                              disabled={busyAction !== null}
-                              aria-label={`Increase ${item.name} quantity`}
-                              className="h-9 w-10 bg-[#151a1f] text-xl hover:bg-[#2a3139] disabled:opacity-50"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </td>
-                        <td className="px-5 py-4 text-right">
-                          <div>{formatMoney(item.price)}</div>
-                          {item.quantity > 1 ? (
-                            <div className="mt-1 text-xs text-[#a8b0bd]">
-                              {formatMoney(item.price * item.quantity)} total
-                            </div>
-                          ) : null}
-                        </td>
-                        <td className="px-5 py-4 text-right">
-                          <button
-                            type="button"
-                            onClick={() => void runAction("remove", item.id)}
-                            disabled={busyAction !== null}
-                            className="rounded-md bg-red-700 px-3 py-2 text-sm font-semibold text-white hover:bg-red-600 disabled:opacity-50"
-                          >
-                            {itemBusy ? "Working..." : "Remove"}
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+          <div className={styles.layout}>
+            <div className={styles.products}>
+              <h2>Products <span>{itemCount}</span></h2>
+              {cart.items.map((item) => {
+                const imageUrl = resolveImageUrl(item.imageUrl);
+                const productPath = `/products/${encodeURIComponent(item.id)}`;
+                const itemBusy = busyId === item.id;
+                return (
+                  <article key={item.id} className={styles.product}>
+                    <Link to={productPath} className={styles.imageLink} aria-label={`View ${item.name}`}>
+                      <img src={imageUrl || "/placeholder-image.jpg"} alt={item.name} loading="lazy"
+                        onError={(event) => {
+                          event.currentTarget.onerror = null;
+                          event.currentTarget.src = "/placeholder-image.jpg";
+                        }} />
+                    </Link>
+                    <div className={styles.productInfo}>
+                      <Link to={productPath} className={styles.productName}>{item.name}</Link>
+                      <span className={styles.unitPrice}>{formatMoney(item.price)} each</span>
+                      <div className={styles.productControls}>
+                        <div className={styles.quantity} aria-label={`Quantity of ${item.name}`}>
+                          <button type="button" onClick={() => void runAction("decrease", item.id)} disabled={busyAction !== null} aria-label={`Decrease ${item.name} quantity`}>−</button>
+                          <span aria-live="polite">{itemBusy ? "…" : item.quantity}</span>
+                          <button type="button" onClick={() => void runAction("increase", item.id)} disabled={busyAction !== null} aria-label={`Increase ${item.name} quantity`}>+</button>
+                        </div>
+                        <button type="button" onClick={() => void runAction("remove", item.id)} disabled={busyAction !== null} className={styles.remove}>
+                          {itemBusy ? "Working..." : "Remove"}
+                        </button>
+                      </div>
+                    </div>
+                    <strong className={styles.lineTotal}>{formatMoney(item.price * item.quantity)}</strong>
+                  </article>
+                );
+              })}
             </div>
-
-            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#313a45] bg-[#151a1f] px-5 py-5">
-              <h2 className="text-xl font-semibold">
-                Total: <span className="text-[#ff5fb3]">{formatMoney(cart.totalPrice)}</span>
-              </h2>
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  to="/Checkout/Shipping"
-                  className="rounded-md bg-emerald-600 px-5 py-2.5 font-semibold text-white hover:bg-emerald-500"
-                >
-                  Checkout
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => setCancelOpen(true)}
-                  disabled={busyAction !== null}
-                  className="rounded-md bg-red-700 px-5 py-2.5 font-semibold text-white hover:bg-red-600 disabled:opacity-50"
-                >
-                  Clear cart
-                </button>
-              </div>
-            </div>
+            <aside className={styles.summary} aria-label="Order summary">
+              <h2>Order summary</h2>
+              <div className={styles.summaryRow}><span>Items ({itemCount})</span><span>{formatMoney(cart.totalPrice)}</span></div>
+              <div className={styles.summaryTotal}><span>Subtotal</span><strong>{formatMoney(cart.totalPrice)}</strong></div>
+              <p>Shipping and payment details are selected during checkout.</p>
+              <Link to="/Checkout/Shipping" className={styles.primaryButton}>Proceed to checkout <span aria-hidden="true">→</span></Link>
+              <button type="button" onClick={() => setCancelOpen(true)} disabled={busyAction !== null} className={styles.clear}>
+                Clear cart
+              </button>
+            </aside>
           </div>
         ) : null}
       </section>

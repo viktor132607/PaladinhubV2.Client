@@ -106,6 +106,17 @@
 }
 
 /* Keep account/cart/language controls visible outside the mobile collapse. */
+.ph-v1-navbar .navbar-nav #nav-cart > .ph-cart-link,
+.ph-v1-navbar .navbar-nav #nav-cart > .ph-cart-link:hover,
+.ph-v1-navbar .navbar-nav #nav-cart > .ph-cart-link:focus-visible,
+.ph-v1-navbar .navbar-nav #nav-cart > .ph-cart-link.active {
+    text-decoration: none !important;
+}
+
+.ph-v1-navbar #nav-cart > .ph-cart-link { display: inline-flex; align-items: center; gap: 8px; }
+.ph-v1-navbar #cart-badge { position: static; display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; font-size: 12px; font-weight: 700; line-height: 1; color: #ffd700; }
+.ph-v1-navbar #cart-badge.d-none { display: none; }
+
 .ph-v1-navbar .ph-navbar-actions {
     margin-left: .25rem;
 }
