@@ -137,6 +137,15 @@ export default function TalentTree({
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const markerId = useId().replace(/[^a-zA-Z0-9_-]/g, "_");
 
+  useEffect(() => {
+    if (!readOnly) return;
+    const frame = requestAnimationFrame(() => {
+      (window as Window & { $WowheadPower?: { refreshLinks?: () => void } })
+        .$WowheadPower?.refreshLinks?.();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [readOnly, nodes, selectedNodeIds]);
+
   const ruleSet = useMemo(() => rulesForTree(treeKey), [treeKey]);
   const pointLimit = maxPoints === undefined ? ruleSet.max : maxPoints;
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
@@ -484,7 +493,10 @@ export default function TalentTree({
               : primaryDescription;
             const url = selectedChoice === 1 && alternative ? alternative.url || alternativeSpell?.url
               : node.url || spell?.url;
-            const wowheadUrl = url && /^https:\/\/(?:www\.)?wowhead\.com\/spell=\d+(?:[/?#-]|$)/i.test(url) ? url : undefined;
+            const isWowheadSpell = (value?: string) => Boolean(value && /^https:\/\/(?:www\.)?wowhead\.com\/spell=\d+(?:[/?#-]|$)/i.test(value));
+            const wowheadUrl = isWowheadSpell(url) ? url : undefined;
+            const primaryChoiceUrl = node.url || spell?.url;
+            const alternativeChoiceUrl = alternative?.url || alternativeSpell?.url;
             const choices = alternative ? JSON.stringify([
               { name: node.name, icon: primaryIcon, description: primaryDescription },
               { name: alternative.name, icon: alternativeIcon, description: alternative.description?.trim() || alternativeSpell?.description || undefined },
@@ -502,7 +514,7 @@ export default function TalentTree({
               "aria-label": `${name}, ${formatMessage(t("talent.rank.aria", "{rank} of {maxRank} ranks"), { rank, maxRank })}${alternative ? `, ${selectedChoice < 0
                 ? t("talent.choice.none", "no choice selected")
                 : formatMessage(t("talent.choice.aria", "choice {choice} of 2"), { choice: selectedChoice + 1 })}` : ""}`,
-              "data-tooltip-kind": "talent",
+              "data-tooltip-kind": readOnly && wowheadUrl ? undefined : "talent",
               "data-tooltip-name": name,
               "data-tooltip-description": alternative ? undefined : description,
               "data-tooltip-icon": icon,
@@ -530,13 +542,23 @@ export default function TalentTree({
               </>;
             return (
               <div key={node.id} className={styles.slot} style={nodeStyle(node)}>
-                {alternative && <span className={styles.choiceArrows} aria-hidden="true">
-                  <span className={selectedChoice === 0 ? styles.choiceArrowActive : ""}>◀</span>
-                  <span className={selectedChoice === 1 ? styles.choiceArrowActive : ""}>▶</span>
+                {alternative && <span className={styles.choiceArrows}>
+                  {readOnly && isWowheadSpell(primaryChoiceUrl) ?
+                    <a href={primaryChoiceUrl} target="_blank" rel="noopener noreferrer"
+                      className={selectedChoice === 0 ? styles.choiceArrowActive : ""}
+                      aria-label={node.name}>◀</a> :
+                    <span className={selectedChoice === 0 ? styles.choiceArrowActive : ""}>◀</span>}
+                  {readOnly && isWowheadSpell(alternativeChoiceUrl) ?
+                    <a href={alternativeChoiceUrl} target="_blank" rel="noopener noreferrer"
+                      className={selectedChoice === 1 ? styles.choiceArrowActive : ""}
+                      aria-label={alternative.name}>▶</a> :
+                    <span className={selectedChoice === 1 ? styles.choiceArrowActive : ""}
+                      data-tooltip-kind={readOnly ? "talent" : undefined}
+                      data-tooltip-name={alternative.name}
+                      data-tooltip-description={alternative.description || alternativeSpell?.description}>▶</span>}
                 </span>}
                 {readOnly && wowheadUrl ? (
-                  <a {...attrs} href={wowheadUrl} target="_blank" rel="noopener noreferrer"
-                    data-disable-wowhead-tooltip="true">{content}</a>
+                  <a {...attrs} href={wowheadUrl} target="_blank" rel="noopener noreferrer">{content}</a>
                 ) : readOnly ? (
                   <span {...attrs} tabIndex={0}>{content}</span>
                 ) : (

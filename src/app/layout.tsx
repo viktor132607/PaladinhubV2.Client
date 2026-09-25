@@ -36,7 +36,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <Script id="wowhead-tooltip-options" strategy="beforeInteractive">
-          {`const whTooltips = { colorLinks: false, iconizeLinks: false, renameLinks: false, hide: { extra: true } };`}
+          {`const whTooltips = { colorLinks: false, iconizeLinks: false, renameLinks: false };`}
         </Script>
         <Script src="https://wow.zamimg.com/js/tooltips.js" strategy="afterInteractive" />
         <link

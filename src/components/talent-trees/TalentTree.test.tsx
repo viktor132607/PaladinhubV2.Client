@@ -22,6 +22,8 @@ describe("published talent trees", () => {
     expect(html).toContain('href="https://www.wowhead.com/spell=385633/auras-of-the-resolute"');
     expect(html).toContain("Devotion%20Aura.jpg");
     expect(html).toContain('href="https://www.wowhead.com/spell=385414/afterimage"');
+    expect(html).not.toContain('data-disable-wowhead-tooltip');
+    expect(html).not.toContain('data-tooltip-kind="talent"');
     expect(html).not.toContain('type="button"');
     expect(html).not.toContain("Saving talent selection");
     expect(html).not.toContain("points</span>");
@@ -100,7 +102,10 @@ describe("published talent trees", () => {
     const unranked = renderToStaticMarkup(<TalentTree nodes={[{ ...choice, rank: 0 }]} />);
     expect(unranked).toContain('data-tooltip-selected-choice="-1"');
     expect(unranked).toContain("Stand Against Evil");
-    expect(unranked).toContain('data-disable-wowhead-tooltip="true"');
+    expect(unranked).not.toContain('data-disable-wowhead-tooltip');
+    expect(unranked).not.toContain('data-tooltip-kind="talent"');
+    expect(unranked).toContain('href="https://www.wowhead.com/spell=339292/wrench-evil"');
+    expect(unranked).toContain('href="https://www.wowhead.com/spell=469317/stand-against-evil"');
     expect(unranked).toContain("◀");
     expect(unranked).toContain("▶");
 
