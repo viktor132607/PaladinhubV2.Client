@@ -14,10 +14,10 @@
   height: 50px;
   align-items: center;
   justify-content: center;
-  padding: 2px;
-  border: 2px solid #686868;
+  padding: 1px;
+  border: 1px solid #686868;
   background: #111;
-  box-shadow: inset 0 0 0 1px #191919, 0 1px 4px #000b;
+  box-shadow: 0 1px 3px #000b;
   color: #fff;
   cursor: pointer;
   text-decoration: none;
@@ -27,7 +27,7 @@
 .node img { min-width: 0; min-height: 0; }
 .circle {
   border-radius: 50%;
-  box-shadow: 0 0 0 1px #151515, 0 0 0 2px #626262, inset 0 0 0 1px #242424, 0 1px 4px #000b;
+  box-shadow: 0 0 0 1px #333, 0 1px 3px #000b;
 }
 .circle img { border-radius: 50%; }
 .square { border-radius: 2px; }
@@ -35,7 +35,7 @@
 /* The inset image and outer polygon form a continuous frame on every angled edge. */
 .hexagon {
   border: 0;
-  padding: 3px;
+  padding: 1.5px;
   background: #747474;
   clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%);
   filter: drop-shadow(0 1px 2px #000);
@@ -51,7 +51,7 @@
 .node:focus-visible,
 .active {
   border-color: #e1b83b;
-  box-shadow: 0 0 0 1px #211a09, 0 0 0 2px #d5aa31, 0 0 10px #d5aa3155, inset 0 0 0 1px #ffe289;
+  box-shadow: 0 0 0 1px #b99232, 0 0 6px #d5aa3138;
 }
 .inactive img { filter: grayscale(1) brightness(.47); }
 .inactive:not(:hover):not(:focus-visible) { border-color: #626262; }
