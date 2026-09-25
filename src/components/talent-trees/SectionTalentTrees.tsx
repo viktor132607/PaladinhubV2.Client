@@ -1,6 +1,9 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { fetchBackend } from "@/config/api";
+import { type Tree } from "@/features/dynamic-talents/model";
+import PublishedTalentTrees, { validPublishedTrees } from "./PublishedTalentTrees";
 
 import HolyTalentTreeHerald from "./HolyTalentTreeHerald";
 import HolyTalentTreeLightsmith from "./HolyTalentTreeLightsmith";
@@ -37,14 +40,31 @@ function BuildSection({ id, title, children, separator = false }: BuildSectionPr
 }
 
 export default function SectionTalentTrees({ section = "holy" }: SectionTalentTreesProps) {
+  const [published, setPublished] = useState<Record<string, Tree[]>>({});
+  useEffect(() => {
+    const controller = new AbortController();
+    setPublished({});
+    void fetchBackend(`/api/talent-layouts/${section}`, { signal: controller.signal, cache: "no-store" })
+      .then(async (response) => response.ok ? response.json() as Promise<Record<string, unknown>> : {})
+      .then((layouts) => {
+        if (controller.signal.aborted) return;
+        setPublished(Object.fromEntries(Object.entries(layouts).filter((entry): entry is [string, Tree[]] => validPublishedTrees(entry[1]))));
+      })
+      .catch(() => { /* Keep the built-in guide when the API is unavailable. */ });
+    return () => controller.abort();
+  }, [section]);
+
+  const show = (key: string, fallback: ReactNode) =>
+    published[key] ? <PublishedTalentTrees layoutKey={key} trees={published[key]} /> : fallback;
+
   if (section === "holy") {
     return (
       <>
         <BuildSection id="talent-tree-1" title="Holy + Herald of the Sun" separator>
-          <HolyTalentTreeHerald />
+          {show("holy-herald", <HolyTalentTreeHerald />)}
         </BuildSection>
         <BuildSection id="talent-tree-2" title="Holy + Lightsmith">
-          <HolyTalentTreeLightsmith />
+          {show("holy-lightsmith", <HolyTalentTreeLightsmith />)}
         </BuildSection>
       </>
     );
@@ -54,10 +74,10 @@ export default function SectionTalentTrees({ section = "holy" }: SectionTalentTr
     return (
       <>
         <BuildSection id="talent-tree-1" title="Protection + Lightsmith" separator>
-          <ProtectionTreeLightsmith />
+          {show("protection-lightsmith", <ProtectionTreeLightsmith />)}
         </BuildSection>
         <BuildSection id="talent-tree-2" title="Protection + Templar">
-          <ProtectionTreeTemplar />
+          {show("protection-templar", <ProtectionTreeTemplar />)}
         </BuildSection>
       </>
     );
@@ -66,10 +86,10 @@ export default function SectionTalentTrees({ section = "holy" }: SectionTalentTr
   return (
     <>
       <BuildSection id="talent-tree-1" title="Retribution + Herald of the Sun" separator>
-        <RetributionTreeHerald />
+        {show("retribution-herald", <RetributionTreeHerald />)}
       </BuildSection>
       <BuildSection id="talent-tree-2" title="Retribution + Templar">
-        <RetributionTreeTemplar />
+        {show("retribution-templar", <RetributionTreeTemplar />)}
       </BuildSection>
     </>
   );

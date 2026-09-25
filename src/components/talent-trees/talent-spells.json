@@ -1,0 +1,1027 @@
+{
+  "A Just Reward": {
+    "icon": "A Just Reward.jpg",
+    "url": "https://www.wowhead.com/spell=469411/a-just-reward",
+    "description": "Protection,  Retribution After Cleanse Toxins successfully removes an effect from an ally, they are healed for (540% of Spell power). Holy After Cleanse successfully removes an effect from an ally, they are healed for (540% of Spell power)."
+  },
+  "Adjudication": {
+    "icon": "Ardent Defender.jpg",
+    "url": "https://www.wowhead.com/spell=406157/adjudication",
+    "description": "Critical Strike damage of your abilities increased by 5% and Hammer of Wrath also has a chance to cast Highlord's Judgment."
+  },
+  "Afterimage": {
+    "icon": "Moment of Glory.jpg",
+    "url": "https://www.wowhead.com/spell=385414/afterimage",
+    "description": "After you spend 20 Holy Power, your next Word of Glory echoes onto a nearby ally at 30% effectiveness."
+  },
+  "Ardent Defender": {
+    "icon": "Ardent Defender.jpg",
+    "url": "https://www.wowhead.com/spell=31850/ardent-defender",
+    "description": "Reduces all damage you take by 20% for 8 sec. While Ardent Defender is active, the next attack that would otherwise kill you will instead bring you to 20% of your maximum health."
+  },
+  "Aura Mastery": {
+    "icon": "Aura Mastery.jpg",
+    "url": "https://www.wowhead.com/spell=31821/aura-mastery",
+    "description": ""
+  },
+  "Auras of the Resolute": {
+    "icon": "Devotion Aura.jpg",
+    "url": "https://www.wowhead.com/spell=385633/auras-of-the-resolute",
+    "description": ""
+  },
+  "Aurora": {
+    "icon": "Breaking Dawn.jpg",
+    "url": "https://www.wowhead.com/spell=439760/aurora",
+    "description": ""
+  },
+  "Authoritative Rebuke": {
+    "icon": "Authoritative Rebuke.jpg",
+    "url": "https://www.wowhead.com/spell=469886/authoritative-rebuke",
+    "description": "Successfully interrupting an enemy spellcast reduces your Rebuke's cooldown by 1.0 sec. Effect increased by 100% while wielding a Holy Armament."
+  },
+  "Avenger's Shield": {
+    "icon": "Avengers Shield.jpg",
+    "url": "https://www.wowhead.com/spell=31935/avengers-shield",
+    "description": ""
+  },
+  "Avenging Wrath": {
+    "icon": "Avenging Wrath.jpg",
+    "url": "https://www.wowhead.com/spell=31884/avenging-wrath",
+    "description": ""
+  },
+  "Awakening": {
+    "icon": "Awakening.jpg",
+    "url": "https://www.wowhead.com/spell=248033/awakening",
+    "description": ""
+  },
+  "Awestruck": {
+    "icon": "Awestruck.jpg",
+    "url": "https://www.wowhead.com/spell=417855/awestruck",
+    "description": ""
+  },
+  "Barricade of Faith": {
+    "icon": "Barrier of Faith.jpg",
+    "url": "https://www.wowhead.com/spell=385726/barricade-of-faith",
+    "description": ""
+  },
+  "Bastion of Light": {
+    "icon": "Bastion of Light.jpg",
+    "url": "https://www.wowhead.com/spell=378974/bastion-of-light",
+    "description": ""
+  },
+  "Beacon of Faith": {
+    "icon": "Beacon of Faith.jpg",
+    "url": "https://www.wowhead.com/spell=156910/beacon-of-faith",
+    "description": ""
+  },
+  "Beacon of the Lightbringer": {
+    "icon": "Lightbearer.jpg",
+    "url": "https://www.wowhead.com/spell=197446/beacon-of-the-lightbringer",
+    "description": ""
+  },
+  "Bestow Light": {
+    "icon": "Empyrean Power.jpg",
+    "url": "https://www.wowhead.com/spell=448040/bestow-light",
+    "description": "Light of the Martyr's health threshold is reduced to 70% and increases Holy Shock's healing by an additional 5% for every 5 sec Light of the Martyr is active, stacking up to 3 times.While below 70% health, the light urgently heals you for (20 % of Spell power) every 1 sec."
+  },
+  "Blade of Justice": {
+    "icon": "Blade of Justice.jpg",
+    "url": "https://www.wowhead.com/spell=184575/blade-of-justice",
+    "description": ""
+  },
+  "Blades of Light": {
+    "icon": "Blades of Light.jpg",
+    "url": "https://www.wowhead.com/spell=403664/blades-of-light",
+    "description": "[Templar Strikes: Templar Strikes] [Crusading Strikes: Crusading Strikes / Crusader Strike, ]Judgment, Hammer of Wrath and your damaging single target Holy Power abilities now deal Holystrike damage and your abilities that deal Holystrike damage deal 5% increased damage."
+  },
+  "Blessed Calling": {
+    "icon": "Blessed Calling.jpg",
+    "url": "https://www.wowhead.com/spell=469770/blessed-calling",
+    "description": ""
+  },
+  "Blessed Champion": {
+    "icon": "Blessed Champion.jpg",
+    "url": "https://www.wowhead.com/spell=403010/blessed-champion",
+    "description": ""
+  },
+  "Blessed Hammer": {
+    "icon": "Blessed Hammer.jpg",
+    "url": "https://www.wowhead.com/spell=204019/blessed-hammer",
+    "description": ""
+  },
+  "Blessing of An'she": {
+    "icon": "Blessing of Anshe.jpg",
+    "url": "https://www.wowhead.com/spell=445200/blessing-of-anshe",
+    "description": ""
+  },
+  "Blessing of Freedom": {
+    "icon": "Blessing of Freedom.jpg",
+    "url": "https://www.wowhead.com/spell=1044/blessing-of-freedom",
+    "description": ""
+  },
+  "Blessing of Protection": {
+    "icon": "Blessing of Protection.jpg",
+    "url": "https://www.wowhead.com/spell=1022/blessing-of-protection",
+    "description": ""
+  },
+  "Blessing of Sacrifice": {
+    "icon": "Blessing of Sacrifice.jpg",
+    "url": "https://www.wowhead.com/spell=6940/blessing-of-sacrifice",
+    "description": ""
+  },
+  "Blessing of Spellwarding": {
+    "icon": "Blessing of Spellwarding.jpg",
+    "url": "https://www.wowhead.com/spell=204018/blessing-of-spellwarding",
+    "description": ""
+  },
+  "Blessing of Summer": {
+    "icon": "Blessing of Summer.jpg",
+    "url": "https://www.wowhead.com/spell=388007/blessing-of-summer",
+    "description": ""
+  },
+  "Blessing of the Forge": {
+    "icon": "Blessing of the Forge.jpg",
+    "url": "https://www.wowhead.com/spell=433011/blessing-of-the-forge",
+    "description": ""
+  },
+  "Blinding Light": {
+    "icon": "Blinding Light.jpg",
+    "url": "https://www.wowhead.com/spell=115750/blinding-light",
+    "description": ""
+  },
+  "Boundless Salvation": {
+    "icon": "Boundless Salvation.jpg",
+    "url": "https://www.wowhead.com/spell=392951/boundless-salvation",
+    "description": ""
+  },
+  "Breaking Dawn": {
+    "icon": "Breaking Dawn.jpg",
+    "url": "https://www.wowhead.com/spell=409673/breaking-dawn",
+    "description": ""
+  },
+  "Bulwark of Order": {
+    "icon": "Bulwark of Order.jpg",
+    "url": "https://www.wowhead.com/spell=209389/bulwark-of-order",
+    "description": ""
+  },
+  "Bulwark of Righteous Fury": {
+    "icon": "Bulwark of Righteous Fury.jpg",
+    "url": "https://www.wowhead.com/spell=386653/bulwark-of-righteous-fury",
+    "description": ""
+  },
+  "Burn to Ash": {
+    "icon": "Burn to Ash.jpg",
+    "url": "https://www.wowhead.com/spell=446663/burn-to-ash",
+    "description": ""
+  },
+  "Burning Crusade": {
+    "icon": "Burning Crusade.jpg",
+    "url": "https://www.wowhead.com/spell=406545/burning-crusade",
+    "description": ""
+  },
+  "Cavalier": {
+    "icon": "Divine Steed.jpg",
+    "url": "https://www.wowhead.com/spell=230332/cavalier",
+    "description": ""
+  },
+  "Cleanse Toxins": {
+    "icon": "Cleanse Toxins.jpg",
+    "url": "https://www.wowhead.com/spell=213644/cleanse-toxins",
+    "description": ""
+  },
+  "Commanding Light": {
+    "icon": "Beacon of Light.jpg",
+    "url": "https://www.wowhead.com/spell=387781/commanding-light",
+    "description": ""
+  },
+  "Consecrated Ground": {
+    "icon": "Consecrated Ground.jpg",
+    "url": "https://www.wowhead.com/spell=204054/consecrated-ground",
+    "description": ""
+  },
+  "Consecration in Flame": {
+    "icon": "Burning Crusade.jpg",
+    "url": "https://www.wowhead.com/spell=379022/consecration-in-flame",
+    "description": ""
+  },
+  "Crusade": {
+    "icon": "Crusade.jpg",
+    "url": "https://www.wowhead.com/spell=231895/crusade",
+    "description": ""
+  },
+  "Crusader's Judgment": {
+    "icon": "Crusaders Judgment.jpg",
+    "url": "https://www.wowhead.com/spell=204023/crusaders-judgment",
+    "description": ""
+  },
+  "Crusader's Might": {
+    "icon": "Crusaders Might.jpg",
+    "url": "https://www.wowhead.com/spell=196926/crusaders-might",
+    "description": ""
+  },
+  "Crusading Strikes": {
+    "icon": "Crusading Strikes.jpg",
+    "url": "https://www.wowhead.com/spell=404542/crusading-strikes",
+    "description": ""
+  },
+  "Dawnlight": {
+    "icon": "Dawnlight.jpg",
+    "url": "https://www.wowhead.com/spell=431377/dawnlight",
+    "description": ""
+  },
+  "Divine Arbiter": {
+    "icon": "Divine Arbiter.jpg",
+    "url": "https://www.wowhead.com/spell=406251/divine-arbiter",
+    "description": ""
+  },
+  "Divine Favor": {
+    "icon": "Divine Favor.jpg",
+    "url": "https://www.wowhead.com/spell=210294/divine-favor",
+    "description": "The healing of your next Holy Light or Flash of Light is increased by 20%, its cast time is reduced by 30%, and its mana cost is reduced by 50%."
+  },
+  "Divine Glimpse": {
+    "icon": "Divine Glimpse.jpg",
+    "url": "https://www.wowhead.com/spell=387805/divine-glimpse",
+    "description": ""
+  },
+  "Divine Guidance": {
+    "icon": "Divine Guidance.jpg",
+    "url": "https://www.wowhead.com/spell=433106/divine-guidance",
+    "description": ""
+  },
+  "Divine Hammer": {
+    "icon": "Divine Hammer.jpg",
+    "url": "https://www.wowhead.com/spell=198034/divine-hammer",
+    "description": ""
+  },
+  "Divine Inspiration": {
+    "icon": "Divine Inspiration.jpg",
+    "url": "https://www.wowhead.com/spell=432964/divine-inspiration",
+    "description": ""
+  },
+  "Divine Purpose": {
+    "icon": "Divine Purpose.jpg",
+    "url": "https://www.wowhead.com/spell=223819/divine-purpose",
+    "description": "Holy Power spending abilities have a 15% chance to make your next Holy Power spending ability free and deal 15% increased damage and healing."
+  },
+  "Divine Reach": {
+    "icon": "Relentless Inquisitor.jpg",
+    "url": "https://www.wowhead.com/spell=469476/divine-reach",
+    "description": ""
+  },
+  "Divine Revelations": {
+    "icon": "Healing Hands.jpg",
+    "url": "https://www.wowhead.com/spell=387808/divine-revelations",
+    "description": ""
+  },
+  "Divine Spurs": {
+    "icon": "Divine Spurs.jpg",
+    "url": "https://www.wowhead.com/spell=469409/divine-spurs",
+    "description": ""
+  },
+  "Divine Steed": {
+    "icon": "Divine Steed.jpg",
+    "url": "https://www.wowhead.com/spell=190784/divine-steed",
+    "description": ""
+  },
+  "Divine Storm": {
+    "icon": "Divine Storm.jpg",
+    "url": "https://www.wowhead.com/spell=53385/divine-storm",
+    "description": ""
+  },
+  "Divine Toll": {
+    "icon": "Divine Toll.jpg",
+    "url": "https://www.wowhead.com/spell=375576/divine-toll",
+    "description": ""
+  },
+  "Divine Wrath": {
+    "icon": "Divine Wrath.jpg",
+    "url": "https://www.wowhead.com/spell=406872/divine-wrath",
+    "description": ""
+  },
+  "Echoing Blessings": {
+    "icon": "Echoing Blessings.jpg",
+    "url": "https://www.wowhead.com/spell=387801/echoing-blessings",
+    "description": "Blessing of Freedom increases the target's movement speed by 30%. [Blessing of Spellwarding / Blessing of Protection] and Blessing of Sacrifice reduce the target's damage taken by 15%. These effects linger for 8 sec after the Blessing ends."
+  },
+  "Empyreal Ward": {
+    "icon": "Lay on Hands.jpg",
+    "url": "https://www.wowhead.com/spell=387791/empyreal-ward",
+    "description": "Lay on Hands grants the target 30% increased armor for 8 sec and now ignores healing reduction effects."
+  },
+  "Empyrean Legacy": {
+    "icon": "Empyrean Legacy.jpg",
+    "url": "https://www.wowhead.com/spell=387998/empyrean-legacy",
+    "description": ""
+  },
+  "Eternal Flame": {
+    "icon": "Eternal Flame.jpg",
+    "url": "https://www.wowhead.com/spell=114163/eternal-flame",
+    "description": ""
+  },
+  "Execution Sentence": {
+    "icon": "Execution Sentence.jpg",
+    "url": "https://www.wowhead.com/spell=343527/execution-sentence",
+    "description": ""
+  },
+  "Executioner's Will": {
+    "icon": "Executioners Will.jpg",
+    "url": "https://www.wowhead.com/spell=406940/executioners-will",
+    "description": ""
+  },
+  "Expurgation": {
+    "icon": "Expurgation.jpg",
+    "url": "https://www.wowhead.com/spell=273476/expurgation",
+    "description": ""
+  },
+  "Extrication": {
+    "icon": "Extrication.jpg",
+    "url": "https://www.wowhead.com/spell=461278/extrication",
+    "description": ""
+  },
+  "Eye for an Eye": {
+    "icon": "Divine Arbiter.jpg",
+    "url": "https://www.wowhead.com/spell=469309/eye-for-an-eye",
+    "description": ""
+  },
+  "Eye of Tyr": {
+    "icon": "Eye of Tyr.jpg",
+    "url": "https://www.wowhead.com/spell=387174/eye-of-tyr",
+    "description": ""
+  },
+  "Faith in the Light": {
+    "icon": "Faith in the Light.jpg",
+    "url": "https://www.wowhead.com/spell=379043/faith-in-the-light",
+    "description": ""
+  },
+  "Faith's Armor": {
+    "icon": "Faiths Armor.jpg",
+    "url": "https://www.wowhead.com/spell=406101/faiths-armor",
+    "description": ""
+  },
+  "Ferren Marcus's Fervor": {
+    "icon": "Seal of Might.jpg",
+    "url": "https://www.wowhead.com/spell=378762/ferren-marcuss-fervor",
+    "description": ""
+  },
+  "Final Stand": {
+    "icon": "Final Stand.jpg",
+    "url": "https://www.wowhead.com/spell=204077/final-stand",
+    "description": ""
+  },
+  "Final Verdict": {
+    "icon": "Final Verdict.jpg",
+    "url": "https://www.wowhead.com/spell=383328/final-verdict",
+    "description": ""
+  },
+  "Fist of Justice": {
+    "icon": "Fist of Justice.jpg",
+    "url": "https://www.wowhead.com/spell=234299/fist-of-justice",
+    "description": ""
+  },
+  "Focused Enmity": {
+    "icon": "Divine Inspiration.jpg",
+    "url": "https://www.wowhead.com/spell=378845/focused-enmity",
+    "description": ""
+  },
+  "Gift of the Golden Val'kyr": {
+    "icon": "Gift of the Golden Valkyr.jpg",
+    "url": "https://www.wowhead.com/spell=378279/gift-of-the-golden-valkyr",
+    "description": ""
+  },
+  "Gleaming Rays": {
+    "icon": "Gleaming Rays.jpg",
+    "url": "https://www.wowhead.com/spell=431480/gleaming-rays",
+    "description": ""
+  },
+  "Glistening Radiance": {
+    "icon": "Glistening Radiance.jpg",
+    "url": "https://www.wowhead.com/spell=409647/glistening-radiance",
+    "description": ""
+  },
+  "Glorious Dawn": {
+    "icon": "Suns Avatar.jpg",
+    "url": "https://www.wowhead.com/spell=414387/glorious-dawn",
+    "description": ""
+  },
+  "Golden Path": {
+    "icon": "Golden Path.jpg",
+    "url": "https://www.wowhead.com/spell=386916/golden-path",
+    "description": ""
+  },
+  "Grand Crusader": {
+    "icon": "Grand Crusader.jpg",
+    "url": "https://www.wowhead.com/spell=85043/grand-crusader",
+    "description": ""
+  },
+  "Greater Judgment": {
+    "icon": "Judgment.jpg",
+    "url": "https://www.wowhead.com/spell=385639/greater-judgment",
+    "description": ""
+  },
+  "Guardian of Ancient Kings": {
+    "icon": "Guardian of Ancient Kings.jpg",
+    "url": "https://www.wowhead.com/spell=86659/guardian-of-ancient-kings",
+    "description": ""
+  },
+  "Hammer and Anvil": {
+    "icon": "Hammer and Anvil.jpg",
+    "url": "https://www.wowhead.com/spell=433718/hammer-and-anvil",
+    "description": ""
+  },
+  "Hammer of Wrath": {
+    "icon": "Hammer of Wrath.jpg",
+    "url": "https://www.wowhead.com/spell=24275/hammer-of-wrath",
+    "description": ""
+  },
+  "Hammerfall": {
+    "icon": "Crusaders Judgment.jpg",
+    "url": "https://www.wowhead.com/spell=432463/hammerfall",
+    "description": ""
+  },
+  "Hand of the Protector": {
+    "icon": "Power of the Silver Hand.jpg",
+    "url": "https://www.wowhead.com/spell=315341/hand-of-the-protector",
+    "description": ""
+  },
+  "Higher Calling": {
+    "icon": "Shining Light.jpg",
+    "url": "https://www.wowhead.com/spell=431687/higher-calling",
+    "description": "Retribution Crusader Strike, Hammer of Wrath and Blade of Justice extend the duration of Shake the Heavens by 1 sec. Protection Crusader Strike, Hammer of Wrath and Judgment extend the duration of Shake the Heavens by 1 sec."
+  },
+  "Highlord's Wrath": {
+    "icon": "Highlords Wrath.jpg",
+    "url": "https://www.wowhead.com/spell=405779/highlords-wrath",
+    "description": ""
+  },
+  "Holy Aegis": {
+    "icon": "Holy Aegis.jpg",
+    "url": "https://www.wowhead.com/spell=379008/holy-aegis",
+    "description": ""
+  },
+  "Holy Blade": {
+    "icon": "Holy Blade.jpg",
+    "url": "https://www.wowhead.com/spell=406158/holy-blade",
+    "description": ""
+  },
+  "Holy Bulwark": {
+    "icon": "Holy Bulwark.jpg",
+    "url": "https://www.wowhead.com/spell=432459/holy-bulwark",
+    "description": ""
+  },
+  "Holy Flames": {
+    "icon": "Holy Flames.jpg",
+    "url": "https://www.wowhead.com/spell=406545/holy-flames",
+    "description": ""
+  },
+  "Holy Prism": {
+    "icon": "Holy Prism.jpg",
+    "url": "https://www.wowhead.com/spell=114165/holy-prism",
+    "description": ""
+  },
+  "Holy Reprieve": {
+    "icon": "Holy Reprieve.jpg",
+    "url": "https://www.wowhead.com/spell=469445/holy-reprieve",
+    "description": ""
+  },
+  "Holy Ritual": {
+    "icon": "Holy Ritual.jpg",
+    "url": "https://www.wowhead.com/spell=199422/holy-ritual",
+    "description": ""
+  },
+  "Holy Shield": {
+    "icon": "Holy Shield.jpg",
+    "url": "https://www.wowhead.com/spell=152261/holy-shield",
+    "description": ""
+  },
+  "Holy Shock": {
+    "icon": "Holy Shock.jpg",
+    "url": "https://www.wowhead.com/spell=20473/holy-shock",
+    "description": ""
+  },
+  "Imbued Infusions": {
+    "icon": "Divine Inspiration.jpg",
+    "url": "https://www.wowhead.com/spell=392961/imbued-infusions",
+    "description": "Consuming Infusion of Light reduces the cooldown of Holy Shock by 1.0 sec."
+  },
+  "Improved Blessing of Protection": {
+    "icon": "Blessing of Protection.jpg",
+    "url": "https://www.wowhead.com/spell=384909/improved-blessing-of-protection",
+    "description": ""
+  },
+  "Improved Cleanse": {
+    "icon": "Cleanse.jpg",
+    "url": "https://www.wowhead.com/spell=393024/improved-cleanse",
+    "description": ""
+  },
+  "Improved Holy Shield": {
+    "icon": "Holy Shield.jpg",
+    "url": "https://www.wowhead.com/spell=393030/improved-holy-shield",
+    "description": ""
+  },
+  "Inflorescence of the Sunwell": {
+    "icon": "Inflorescence of the Sunwell.jpg",
+    "url": "https://www.wowhead.",
+    "description": ""
+  },
+  "Inmost Light": {
+    "icon": "Shining Light.jpg",
+    "url": "https://www.wowhead.com/spell=405757/inmost-light",
+    "description": "Eye of Tyr deals 300% increased damage and has 33% reduced cooldown."
+  },
+  "Inspired Guard": {
+    "icon": "Divine Protection.jpg",
+    "url": "https://www.wowhead.com/spell=469439/inspired-guard",
+    "description": ""
+  },
+  "Inspiring Vanguard": {
+    "icon": "Grand Crusader.jpg",
+    "url": "https://www.wowhead.com/spell=393022/inspiring-vanguard",
+    "description": ""
+  },
+  "Judge, Jury and Executioner": {
+    "icon": "Judge, Jury and Executioner.jpg",
+    "url": "https://www.wowhead.com/spell=405607/judge-jury-and-executioner",
+    "description": ""
+  },
+  "Judgment of Light": {
+    "icon": "Judgment of Light.jpg",
+    "url": "https://www.wowhead.com/spell=183778/judgment-of-light",
+    "description": ""
+  },
+  "Lay on Hands": {
+    "icon": "Lay on Hands.jpg",
+    "url": "https://www.wowhead.com/spell=633/lay-on-hands",
+    "description": ""
+  },
+  "Laying Down Arms": {
+    "icon": "Laying Down Arms.jpg",
+    "url": "https://www.wowhead.com/spell=432866/laying-down-arms",
+    "description": "When an Armament fades from you, the cooldown of Lay on Hands is reduced by 15.0 sec and you gain Infusion of Light."
+  },
+  "Lead the Charge": {
+    "icon": "Lead the Charge.jpg",
+    "url": "https://www.wowhead.com/spell=469780/lead-the-charge",
+    "description": ""
+  },
+  "Liberation": {
+    "icon": "Shining Light.jpg",
+    "url": "https://www.wowhead.com/spell=461287/liberation",
+    "description": ""
+  },
+  "Light of Dawn": {
+    "icon": "Light of Dawn.jpg",
+    "url": "https://www.wowhead.com/spell=85222/light-of-dawn",
+    "description": ""
+  },
+  "Light of the Martyr": {
+    "icon": "Light of the Martyr.jpg",
+    "url": "https://www.wowhead.com/spell=183998/light-of-the-martyr",
+    "description": ""
+  },
+  "Lightbearer": {
+    "icon": "Lightbearer.jpg",
+    "url": "https://www.wowhead.com/spell=469416/lightbearer",
+    "description": ""
+  },
+  "Lightforged Blessing": {
+    "icon": "Lightforged Blessing.jpg",
+    "url": "https://www.wowhead.com/spell=403479/lightforged-blessing",
+    "description": ""
+  },
+  "Light's Conviction": {
+    "icon": "Lights Conviction.jpg",
+    "url": "https://www.wowhead.com/spell=414073/lights-conviction",
+    "description": ""
+  },
+  "Light's Countenance": {
+    "icon": "Lights Countenance.jpg",
+    "url": "https://www.wowhead.com/spell=469325/lights-countenance",
+    "description": ""
+  },
+  "Light's Deliverance": {
+    "icon": "Lights Deliverance.jpg",
+    "url": "https://www.wowhead.com/spell=425518/lights-deliverance",
+    "description": ""
+  },
+  "Light's Guidance": {
+    "icon": "Rule of Law.jpg",
+    "url": "https://www.wowhead.com/spell=427445/lights-guidance",
+    "description": ""
+  },
+  "Light's Protection": {
+    "icon": "Lights Protection.jpg",
+    "url": "https://www.wowhead.com/spell=416799/lights-protection",
+    "description": "Your allies with Glimmer of Light take 10% reduced damage, split evenly among them."
+  },
+  "Light's Revocation": {
+    "icon": "Divine Shield.jpg",
+    "url": "https://www.wowhead.com/spell=146956/lights-revocation",
+    "description": ""
+  },
+  "Luminosity": {
+    "icon": "Obduracy.jpg",
+    "url": "https://www.wowhead.com/spell=431402/luminosity",
+    "description": ""
+  },
+  "Moment of Compassion": {
+    "icon": "Flash of Light.jpg",
+    "url": "https://www.wowhead.com/spell=407236/moment-of-compassion",
+    "description": "Your Flash of Light heals for an additional 50% when cast on a target affected by your Beacon of Light."
+  },
+  "Moment of Glory": {
+    "icon": "Moment of Glory.jpg",
+    "url": "https://www.wowhead.com/spell=327193/moment-of-glory",
+    "description": ""
+  },
+  "Obduracy": {
+    "icon": "Obduracy.jpg",
+    "url": "https://www.wowhead.com/spell=385427/obduracy",
+    "description": ""
+  },
+  "Of Dusk and Dawn": {
+    "icon": "Light of Dawn.jpg",
+    "url": "https://www.wowhead.com/spell=385125/of-dusk-and-dawn",
+    "description": ""
+  },
+  "Overflowing Light": {
+    "icon": "Unbreakable Spirit.jpg",
+    "url": "https://www.wowhead.com/spell=461244/overflowing-light",
+    "description": ""
+  },
+  "Penitence": {
+    "icon": "Light of the Martyr.jpg",
+    "url": "https://www.wowhead.com/spell=403026/penitence",
+    "description": ""
+  },
+  "Power of the Silver Hand": {
+    "icon": "Power of the Silver Hand.jpg",
+    "url": "https://www.wowhead.com/spell=200294/power-of-the-silver-hand",
+    "description": ""
+  },
+  "Protection of Tyr": {
+    "icon": "Aura Mastery.jpg",
+    "url": "https://www.wowhead.com/spell=200430/protection-of-tyr",
+    "description": "Aura Mastery also increases all healing received by party or raid members within 40 yards by 10%."
+  },
+  "Punishment": {
+    "icon": "Rebuke.jpg",
+    "url": "https://www.wowhead.com/spell=403537/punishment",
+    "description": ""
+  },
+  "Quickened Invocation": {
+    "icon": "Bulwark of Order.jpg",
+    "url": "https://www.wowhead.com/spell=379391/quickened-invocation",
+    "description": ""
+  },
+  "Radiant Glory": {
+    "icon": "Radiant Glory.jpg",
+    "url": "https://www.wowhead.com/spell=405757/radiant-glory",
+    "description": ""
+  },
+  "Rebuke": {
+    "icon": "Rebuke.jpg",
+    "url": "https://www.wowhead.com/spell=96231/rebuke",
+    "description": ""
+  },
+  "Reclamation": {
+    "icon": "Rule of Law.jpg",
+    "url": "https://www.wowhead.com/spell=415364/reclamation",
+    "description": "Holy Shock and Crusader Strike refund up to 10% of their Mana cost and deal up to 50% more healing or damage,  based on the target's missing health."
+  },
+  "Redoubt": {
+    "icon": "Redoubt.jpg",
+    "url": "https://www.wowhead.com/spell=280373/redoubt",
+    "description": ""
+  },
+  "Refining Fire": {
+    "icon": "Refining Fire.jpg",
+    "url": "https://www.wowhead.com/spell=469882/refining-fire",
+    "description": "Enemies struck by Avenger's Shield burn with holy fire, suffering (57.75% of Attack power) Radiant damage over 5 sec."
+  },
+  "Relentless Inquisitor": {
+    "icon": "Relentless Inquisitor.jpg",
+    "url": "https://www.wowhead.com/spell=376996/relentless-inquisitor",
+    "description": ""
+  },
+  "Resolute Defender": {
+    "icon": "Veneration.jpg",
+    "url": "https://www.wowhead.com/spell=385422/resolute-defender",
+    "description": ""
+  },
+  "Righteous Judgment": {
+    "icon": "Shake the Heavens.jpg",
+    "url": "https://www.wowhead.com/spell=414113/righteous-judgment",
+    "description": ""
+  },
+  "Righteous Protection": {
+    "icon": "Blessing of Spellwarding.jpg",
+    "url": "https://www.wowhead.com/spell=469321/righteous-protection",
+    "description": "Blessing of Sacrifice now removes and prevents all Poison and Disease effects."
+  },
+  "Righteous Protector": {
+    "icon": "Shield of Vengeance.jpg",
+    "url": "https://www.wowhead.com/spell=204074/righteous-protector",
+    "description": ""
+  },
+  "Rising Sunlight": {
+    "icon": "Rising Sunlight.jpg",
+    "url": "https://www.wowhead.com/spell=461250/rising-sunlight",
+    "description": ""
+  },
+  "Rite of Sanctification": {
+    "icon": "Rite of Sanctification.jpg",
+    "url": "https://www.wowhead.com/spell=433568/rite-of-sanctification",
+    "description": ""
+  },
+  "Rush of Light": {
+    "icon": "Rush of Light.jpg",
+    "url": "https://www.wowhead.com/spell=407067/rush-of-light",
+    "description": ""
+  },
+  "Sacrifice of the Just": {
+    "icon": "Blessing of Sacrifice.jpg",
+    "url": "https://www.wowhead.com/spell=384820/sacrifice-of-the-just",
+    "description": ""
+  },
+  "Sacrosanct Crusade": {
+    "icon": "Sacrosanct Crusade.jpg",
+    "url": "https://www.wowhead.com/spell=431730/sacrosanct-crusade",
+    "description": ""
+  },
+  "Sanctification": {
+    "icon": "Power of the Silver Hand.jpg",
+    "url": "https://www.wowhead.com/spell=432977/sanctification",
+    "description": "Casting Judgment increases the damage of Empyrean Hammer by 10% for 10 sec.Multiple applications may overlap."
+  },
+  "Sanctified Plates": {
+    "icon": "Sanctified Plates.jpg",
+    "url": "https://www.wowhead.com/spell=394081/sanctified-plates",
+    "description": ""
+  },
+  "Sanctified Wrath": {
+    "icon": "Sanctified Wrath.jpg",
+    "url": "https://www.wowhead.com/spell=53376/sanctified-wrath",
+    "description": ""
+  },
+  "Sanctuary": {
+    "icon": "Consecration.jpg",
+    "url": "https://www.wowhead.com/spell=379021/sanctuary",
+    "description": "Consecration's benefits persist for 4 seconds after you leave it."
+  },
+  "Saved by the Light": {
+    "icon": "Saved by the Light.jpg",
+    "url": "https://www.wowhead.com/spell=321136/shining-light",
+    "description": ""
+  },
+  "Seal of Charity": {
+    "icon": "Gleaming Rays.jpg",
+    "url": "https://www.wowhead.com/spell=384815/seal-of-charity",
+    "description": ""
+  },
+  "Seal of Might": {
+    "icon": "Seal of Might.jpg",
+    "url": "https://www.wowhead.com/spell=385450/seal-of-might",
+    "description": ""
+  },
+  "Seal of Reprisal": {
+    "icon": "Seal of Reprisal.jpg",
+    "url": "https://www.wowhead.com/spell=377053/seal-of-reprisal",
+    "description": "Your [Blessed Hammer] [Hammer of the Righteous / Crusader Strike] deals 20% increased damage."
+  },
+  "Seal of the Crusader": {
+    "icon": "SotC.jpg",
+    "url": "https://www.wowhead.com/spell=416770/seal-of-the-crusader",
+    "description": ""
+  },
+  "Searing Light": {
+    "icon": "Searing Light.jpg",
+    "url": "https://www.wowhead.com/spell=403221/searing-light",
+    "description": ""
+  },
+  "Second Sunrise": {
+    "icon": "Divine Guidance.jpg",
+    "url": "https://www.wowhead.com/spell=200482/second-sunrise",
+    "description": ""
+  },
+  "Seething Flames": {
+    "icon": "Seething Flames.jpg",
+    "url": "https://www.wowhead.com/spell=405355/seething-flames",
+    "description": ""
+  },
+  "Shake the Heavens": {
+    "icon": "Shake the Heavens.jpg",
+    "url": "https://www.wowhead.com/spell=431533/shake-the-heavens",
+    "description": ""
+  },
+  "Shared Resolve": {
+    "icon": "inv_hammer_04.jpg",
+    "url": "https://www.wowhead.com/spell=432803/empyrean-power",
+    "description": "Your abilities have a chance to grant you Empyrean Power, increasing your damage and healing by 5% for 10 sec. Empyrean Power can stack up to 3 times."
+  },
+  "Shield of Vengeance": {
+    "icon": "Shield of Vengeance.jpg",
+    "url": "https://www.wowhead.com/spell=184662/shield-of-vengeance",
+    "description": ""
+  },
+  "Shining Light": {
+    "icon": "Shining Light.jpg",
+    "url": "https://www.wowhead.com/spell=327510/shining-light",
+    "description": ""
+  },
+  "Shining Righteousness": {
+    "icon": "Divine Guidance.jpg",
+    "url": "https://www.wowhead.com/spell=414445/shining-righteousness",
+    "description": "[Denounce / Shield of the Righteous] deals (128% of Spell power) damage to its first target struck. Every 4 [Denounce: Denounces / Shields of the Righteous] make your next Word of Glory or Light of Dawn cost no Holy Power."
+  },
+  "Soaring Shield": {
+    "icon": "Soaring Shield.jpg",
+    "url": "https://www.wowhead.com/spell=378457/soaring-shield",
+    "description": "Avenger's Shield jumps to 2 additional targets."
+  },
+  "Solar Grace": {
+    "icon": "Truth Prevails.jpg",
+    "url": "https://www.wowhead.com/spell=431404/solar-grace",
+    "description": ""
+  },
+  "Solidarity": {
+    "icon": "inv_hammer_04.jpg",
+    "url": "https://www.wowhead.com/spell=432802/solidarity",
+    "description": "\\nIf you bestow an Armament upon an ally, you also gain its benefits.\\n\\nIf you bestow an Armament upon yourself, a nearby ally also gains its benefits."
+  },
+  "Stoicism": {
+    "icon": "Stoicism.jpg",
+    "url": "https://www.wowhead.com/spell=384820/divine-judgement",
+    "description": ""
+  },
+  "Strength in Adversity": {
+    "icon": "Eye for an Eye.jpg",
+    "url": "https://www.wowhead.com/spell=393071/strength-in-adversity",
+    "description": ""
+  },
+  "Sun Sear": {
+    "icon": "Sun Sear.jpg",
+    "url": "https://www.wowhead.com/spell=431413/sun-sear",
+    "description": ""
+  },
+  "Sun's Avatar": {
+    "icon": "Suns Avatar.jpg",
+    "url": "https://www.wowhead.com/spell=431425/suns-avatar",
+    "description": ""
+  },
+  "Tirion's Devotion": {
+    "icon": "Tirions Devotion.jpg",
+    "url": "https://www.wowhead.com/spell=414720/tirions-devotion",
+    "description": ""
+  },
+  "Tower of Radiance": {
+    "icon": "Executioners Will.jpg",
+    "url": "https://www.wowhead.com/spell=231642/tower-of-radiance",
+    "description": ""
+  },
+  "Truth Prevails": {
+    "icon": "Truth Prevails.jpg",
+    "url": "https://www.wowhead.com/spell=461273/truth-prevails",
+    "description": "Judgment heals you for (240% of Spell power) and its mana cost is reduced by 30%. 50% of overhealing from this effect is transferred onto 2 allies within 40 yds."
+  },
+  "Turn Evil": {
+    "icon": "Turn Evil.jpg",
+    "url": "https://www.wowhead.com/spell=10326/turn-evil",
+    "description": ""
+  },
+  "Tyr's Deliverance": {
+    "icon": "Tyrs Deliverance.jpg",
+    "url": "https://www.wowhead.com/spell=200652/tyrs-deliverance",
+    "description": ""
+  },
+  "Tyr's Enforcer": {
+    "icon": "Morning Star.jpg",
+    "url": "https://www.wowhead.com/spell=406570/tyrs-enforcer",
+    "description": ""
+  },
+  "Unbreakable Spirit": {
+    "icon": "Unbreakable Spirit.jpg",
+    "url": "https://www.wowhead.com/spell=114154/unbreakable-spirit",
+    "description": ""
+  },
+  "Undisputed Ruling": {
+    "icon": "Judgment.jpg",
+    "url": "https://www.wowhead.com/spell=432626/undisputed-ruling",
+    "description": ""
+  },
+  "Unending Light": {
+    "icon": "Unending Light.jpg",
+    "url": "https://www.wowhead.com/spell=405719/unending-light",
+    "description": ""
+  },
+  "Unrelenting Charger": {
+    "icon": "Unrelenting Charger.jpg",
+    "url": "https://www.wowhead.com/spell=432990/unrelenting-charger",
+    "description": ""
+  },
+  "Uther's Counsel": {
+    "icon": "Uthers Counsel.jpg",
+    "url": "https://www.wowhead.com/spell=378425/uthers-counsel",
+    "description": "Your Lay on Hands, Divine Shield, Blessing of Protection, and Blessing of Spellwarding have 15% reduced cooldown."
+  },
+  "Valiance": {
+    "icon": "Valiance.jpg",
+    "url": "https://www.wowhead.com/spell=432919/valiance",
+    "description": "Consuming Infusion of Light reduces the cooldown of Holy Armaments by 3.0 sec."
+  },
+  "Vanguard's Momentum": {
+    "icon": "Obduracy.jpg",
+    "url": "https://www.wowhead.com/spell=405065/vanguards-momentum",
+    "description": ""
+  },
+  "Veneration": {
+    "icon": "Veneration.jpg",
+    "url": "https://www.wowhead.com/spell=392902/veneration",
+    "description": ""
+  },
+  "Vengeful Wrath": {
+    "icon": "Hammer of Wrath.jpg",
+    "url": "https://www.wowhead.com/spell=403592/vengeful-wrath",
+    "description": ""
+  },
+  "Wake of Ashes": {
+    "icon": "Wake of Ashes.jpg",
+    "url": "https://www.wowhead.com/spell=255937/wake-of-ashes",
+    "description": ""
+  },
+  "Will of the Dawn": {
+    "icon": "Judgment of Light.jpg",
+    "url": "https://www.wowhead.com/spell=431462/will-of-the-dawn",
+    "description": ""
+  },
+  "Wrathful Descent": {
+    "icon": "Wrathful Descent.jpg",
+    "url": "https://www.wowhead.com/spell=431551/wrathful-descent",
+    "description": ""
+  },
+  "Wrench Evil": {
+    "icon": "Wrench Evil.jpg",
+    "url": "https://www.wowhead.com/spell=339292/wrench-evil",
+    "description": "Turn Evil's cast time is reduced by 40.0%, and its range is increased by 10 yds."
+  },
+  "Zealous Vindication": {
+    "icon": "Zealous Vindication.jpg",
+    "url": "https://www.wowhead.com/spell=431463/zealous-vindication",
+    "description": "Hammer of Light instantly calls down 2 Empyrean Hammers on your target when it is cast."
+  },
+  "Divine Auxiliary": {
+    "icon": "Divine Auxiliary.jpg",
+    "url": "https://www.wowhead.com/spell=406158/divine-auxiliary",
+    "description": "Final Reckoning and Execution Sentence grant 3 Holy Power."
+  },
+  "Heart of the Crusader": {
+    "icon": "Heart of the Crusader.jpg",
+    "url": "https://www.wowhead.com/spell=406154/heart-of-the-crusader",
+    "description": "Crusader Strike and auto-attacks deal 10% increased damage and deal 10% increased critical strike damage."
+  },
+  "Boundless Judgment": {
+    "icon": "Boundless Judgment.jpg",
+    "url": "https://www.wowhead.com/spell=405278/boundless-judgment",
+    "description": "Judgment generates 1 additional Holy Power and has a 50% increased chance to trigger Mastery: Highlord's Judgment."
+  },
+  "Zealot's Fervor": {
+    "icon": "Eye for an Eye.jpg",
+    "url": "https://www.wowhead.com/spell=403509/zealots-fervor",
+    "description": "\\r\\nAuto-attack speed increased by 20%.\\r\\n"
+  },
+  "Jurisdiction": {
+    "icon": "Rule of Law.jpg",
+    "url": "https://www.wowhead.com/spell=204979/jurisdiction",
+    "description": "Increase the range of Blade of Justice and Hammer of Justice by 10 yds, and radius of Divine Storm by 4 yds."
+  },
+  "Tempest of the Lightbringer": {
+    "icon": "Divine Storm.jpg",
+    "url": "https://www.wowhead.com/spell=337257/tempest-of-the-lightbringer",
+    "description": "Divine Storm projects an additional wave of light, striking all enemies up to 20 yards in front of you for 20% of Divine Storm's damage."
+  },
+  "Guided Prayer": {
+    "icon": "Veneration.jpg",
+    "url": "https://www.wowhead.com/spell=404357/guided-prayer",
+    "description": "When your health is brought below 25%, you instantly cast a free Word of Glory at 60% effectiveness on yourself.\\r\\n\\r\\nCannot occur more than once every 60 sec."
+  },
+  "Art of War": {
+    "icon": "Truth Prevails.jpg",
+    "url": "https://www.wowhead.com/spell=461273/truth-prevails",
+    "description": "Judgment heals you for (240% of Spell power) and its mana cost is reduced by 30%. 50% of overhealing from this effect is transferred onto 2 allies within 40 yds."
+  },
+  "Swift Justice": {
+    "icon": "Blessed Calling.jpg",
+    "url": "https://www.wowhead.com/spell=383228/swift-justice",
+    "description": "Reduces the cooldown of Judgment by 2 sec and Crusader Strike by 2 sec."
+  },
+  "Judgement of Justice": {
+    "icon": "Highlords Wrath.jpg",
+    "url": "https://www.wowhead.com/wotlk/spell=53407/judgement-of-justice",
+    "description": "Unleashes the energy of a Seal spell to judge an enemy for 20 sec, preventing them from fleeing and limiting their movement speed.  Refer to individual Seals for additional Judgement effect.  Only one Judgement per Paladin can be active at any one time."
+  },
+  "Auras of the Resololute": {
+    "icon": "Devotion Aura.jpg",
+    "url": "https://www.wowhead.com/spell=385633/auras-of-the-resolute",
+    "description": ""
+  }
+}

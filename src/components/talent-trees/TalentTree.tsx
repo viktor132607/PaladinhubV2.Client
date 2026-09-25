@@ -1,5 +1,6 @@
 "use client";
 import { spellIconSource } from "@/lib/spell-icons";
+import talentSpells from "./talent-spells.json";
 
 
 import {
@@ -32,6 +33,7 @@ export type TalentNode = {
   name: string;
   icon?: string;
   description?: string;
+  url?: string;
   row?: number;
   column?: number;
   maxRank?: number;
@@ -49,6 +51,7 @@ export type TalentTreeProps = {
   maxPoints?: number | null;
   adminMode?: boolean;
   autoSave?: boolean;
+  readOnly?: boolean;
   columns?: number;
   edges?: TalentEdge[];
 };
@@ -112,6 +115,7 @@ export default function TalentTree({
   maxPoints,
   adminMode = false,
   autoSave = true,
+  readOnly = true,
   columns,
   edges = [],
 }: TalentTreeProps) {
@@ -223,13 +227,13 @@ export default function TalentTree({
   );
 
   useEffect(() => {
-    setSelectedIds(selectedNodeIds ?? loadLocalTalentSelection(treeKey));
+    setSelectedIds(selectedNodeIds ?? (readOnly ? [] : loadLocalTalentSelection(treeKey)));
     setIsHydrated(true);
     setSaveStatus("idle");
-  }, [selectedNodeIds, treeKey]);
+  }, [readOnly, selectedNodeIds, treeKey]);
 
   useEffect(() => {
-    if (!isHydrated || adminMode || !autoSave) return;
+    if (!isHydrated || readOnly || adminMode || !autoSave) return;
 
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => void persist(selectedIds), 250);
@@ -237,7 +241,7 @@ export default function TalentTree({
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
-  }, [adminMode, autoSave, isHydrated, persist, selectedIds]);
+  }, [adminMode, autoSave, isHydrated, persist, readOnly, selectedIds]);
 
   useEffect(
     () => () => {
@@ -288,7 +292,7 @@ export default function TalentTree({
   };
 
   const toggleNode = (node: TalentNode) => {
-    if (adminMode && !isEditing) return;
+    if (readOnly || (adminMode && !isEditing)) return;
     setValidationMessage(null);
 
     if (selectedSet.has(node.id)) {
@@ -338,7 +342,7 @@ export default function TalentTree({
 
   return (
     <section className="w-full text-white" data-tree-key={treeKey} data-build={build}>
-      <div className="mb-3 flex w-full flex-wrap items-center justify-between gap-3">
+      {!readOnly && <div className="mb-3 flex w-full flex-wrap items-center justify-between gap-3">
         <span className="text-sm text-[#aaa]">
           {totalPoints}{pointLimit !== null ? ` / ${pointLimit}` : ""} points
         </span>
@@ -373,7 +377,7 @@ export default function TalentTree({
             )}
           </div>
         ) : null}
-      </div>
+      </div>}
 
       {validationMessage ? (
         <p className="mb-3 text-sm text-[#FFD700]" role="status">
@@ -381,7 +385,7 @@ export default function TalentTree({
         </p>
       ) : null}
 
-      {saveStatus !== "idle" ? (
+      {!readOnly && saveStatus !== "idle" ? (
         <p className="mb-3 text-xs text-[#aaa]" aria-live="polite">
           {saveStatus === "saving"
             ? "Saving talent selection..."
@@ -398,7 +402,7 @@ export default function TalentTree({
           className="relative mx-auto grid w-fit auto-rows-[60px] gap-5"
           style={gridStyle}
           data-tree-key={treeKey}
-          data-edit-mode={isEditing ? "1" : "0"}
+          data-edit-mode={readOnly ? "readonly" : isEditing ? "1" : "0"}
         >
           {edges.map((edge, index) => {
             const activeConnection = isEdgeActive(edge);
@@ -418,40 +422,40 @@ export default function TalentTree({
           })}
 
           {nodes.map((node) => {
-            const isActive = selectedSet.has(node.id);
+            const isActive = !readOnly && selectedSet.has(node.id);
             const requirements = requirementsOf(node);
             const cost = costOf(node);
-            return (
-              <button
-                key={node.id}
-                type="button"
-                data-id={node.id}
-                onClick={() => toggleNode(node)}
-                disabled={adminMode && !isEditing}
-                className={`
+            const spell = talentSpells[node.name as keyof typeof talentSpells];
+            const icon = spellIconSource(node.icon || spell?.icon || defaultIconPath(node.name));
+            const description = node.description?.trim() || spell?.description || undefined;
+            const url = node.url || spell?.url;
+            const wowheadUrl = url && /^https:\/\/(?:www\.)?wowhead\.com\/spell=\d+(?:[/?#-]|$)/i.test(url) ? url : undefined;
+            const attrs = {
+              "data-id": node.id,
+              className: `
                   relative z-[2] flex h-[50px] w-[50px] items-center justify-center
                   self-center justify-self-center overflow-hidden border-2 bg-[#111] p-0
                   transition-all duration-200 ${nodeShapeClass(node.shape)}
                   ${
                     isActive
                       ? "border-white shadow-[0_0_15px_5px_#FFD700]"
-                      : "border-[#FFD700] hover:scale-105 hover:shadow-[0_0_15px_5px_#FFD700]"
+                      : readOnly ? "border-[#555] hover:border-[#FFD700]" : "border-[#FFD700] hover:scale-105 hover:shadow-[0_0_15px_5px_#FFD700]"
                   }
                   ${flashNodeId === node.id ? "animate-pulse border-red-500" : ""}
-                  ${adminMode && !isEditing ? "cursor-default" : "cursor-pointer"}
-                `}
-                style={nodeStyle(node)}
-                data-tooltip-kind="talent"
-                data-tooltip-name={node.name}
-                data-tooltip-description={node.description}
-                data-tooltip-icon={node.icon ? spellIconSource(node.icon) : defaultIconPath(node.name)}
-                data-tooltip-detail={`Cost: ${cost} point${cost === 1 ? "" : "s"}`}
-                data-tooltip-requirement={requirements.length ? `Requires: ${requirements.join(", ")}` : undefined}
-                aria-pressed={isActive}
-                aria-label={node.name}
-              >
+                  ${readOnly ? "cursor-help" : adminMode && !isEditing ? "cursor-default" : "cursor-pointer"}
+                `,
+              style: nodeStyle(node),
+              "aria-label": node.name,
+              "data-tooltip-kind": readOnly && wowheadUrl ? undefined : "talent",
+              "data-tooltip-name": node.name,
+              "data-tooltip-description": description,
+              "data-tooltip-icon": icon,
+              "data-tooltip-detail": `Cost: ${cost} point${cost === 1 ? "" : "s"}`,
+              "data-tooltip-requirement": requirements.length ? `Requires: ${requirements.join(", ")}` : undefined,
+            } as const;
+            const content = <>
                 <img
-                  src={node.icon ? spellIconSource(node.icon) : defaultIconPath(node.name)}
+                  src={icon}
                   alt=""
                   aria-hidden="true"
                   className="h-full w-full object-cover"
@@ -461,7 +465,14 @@ export default function TalentTree({
                   }}
                 />
                 <span className="sr-only">{node.name}</span>
-              </button>
+              </>;
+            return readOnly && wowheadUrl ? (
+              <a key={node.id} {...attrs} href={wowheadUrl} target="_blank" rel="noopener noreferrer">{content}</a>
+            ) : readOnly ? (
+              <span key={node.id} {...attrs} tabIndex={0}>{content}</span>
+            ) : (
+              <button key={node.id} {...attrs} type="button" aria-pressed={isActive}
+                onClick={() => toggleNode(node)} disabled={adminMode && !isEditing}>{content}</button>
             );
           })}
         </div>

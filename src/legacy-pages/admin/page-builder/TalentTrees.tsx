@@ -20,6 +20,7 @@ import RuntimeTalentTree, {
   type TalentEdge,
   type TalentNode,
 } from "@/components/talent-trees/TalentTree";
+import talentSpells from "@/components/talent-trees/talent-spells.json";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import {
   createTree,
@@ -45,6 +46,8 @@ type StoredTalentLayout = {
   version: 1;
   spec: Spec;
   trees: Tree[];
+  targetKey?: string;
+  published?: boolean;
 };
 
 type StaticColumn = {
@@ -200,6 +203,7 @@ function staticColumnToTree(layoutKey: string, column: StaticColumn, index: numb
     columns: column.columns,
     points: column.maxPoints,
     nodes: column.nodes.map((node) => {
+      const spell = talentSpells[node.name as keyof typeof talentSpells];
       const columnNumber = node.column ?? 1;
       const rowNumber = node.row ?? 1;
       const requires = column.edges
@@ -210,8 +214,9 @@ function staticColumnToTree(layoutKey: string, column: StaticColumn, index: numb
       return {
         id: node.id,
         name: node.name,
-        description: node.description ?? "",
-        icon: node.icon ?? defaultIconPath(node.name),
+        description: node.description || spell?.description || "",
+        icon: node.icon || spell?.icon || defaultIconPath(node.name),
+        url: node.url || spell?.url,
         row: rowNumber,
         column: columnNumber,
         maxRank: node.maxRank ?? 1,
@@ -267,6 +272,7 @@ function runtimeNodes(tree: Tree): TalentNode[] {
     name: node.name,
     description: node.description,
     icon: node.icon || undefined,
+    url: node.url,
     row: node.row,
     column: node.column,
     maxRank: node.maxRank,
@@ -348,6 +354,8 @@ export default function TalentTrees() {
   const [presetId, setPresetId] = useState<number | null>(null);
   const [name, setName] = useState("");
   const [spec, setSpec] = useState<Spec>("Holy");
+  const [targetKey, setTargetKey] = useState("");
+  const [published, setPublished] = useState(false);
   const [trees, setTrees] = useState<Tree[]>([]);
   const [activeTreeId, setActiveTreeId] = useState("");
   const [busy, setBusy] = useState(false);
@@ -422,6 +430,8 @@ export default function TalentTrees() {
     setPresetId(null);
     setName(nextName);
     setSpec(nextSpec);
+    setTargetKey("");
+    setPublished(false);
     setTrees(nextTrees);
     setActiveTreeId(nextTrees[0]?.id ?? "");
     setDirty(nextDirty);
@@ -438,8 +448,9 @@ export default function TalentTrees() {
   function loadHardcodedLayout(layout: StaticLayout) {
     if (dirty && !window.confirm("Discard unsaved changes?")) return;
     resetWorkspace(layout.spec, layout.name, cloneTrees(layout.trees), true);
+    setTargetKey(layout.key);
     setMessage(
-      "Hardcoded layout loaded as an editable seed. The live page is unchanged.",
+      "Guide layout loaded as an editable draft. Publish it when ready.",
     );
   }
 
@@ -453,13 +464,14 @@ export default function TalentTrees() {
       true,
     );
     setMessage(
-      `${entry.tree.title} loaded from ${entry.sourceLayout} as an editable seed. The live page is unchanged.`,
+      `${entry.tree.title} loaded as an editable draft. Select a guide layout before publishing.`,
     );
   }
 
   function duplicateLayout() {
     if (!trees.length) return;
     setPresetId(null);
+    setPublished(false);
     setName(name.trim() ? `${name.trim()} Copy` : "Copied talent layout");
     setDirty(true);
     setMessage("Copy created locally. Save it to create a new layout.");
@@ -480,6 +492,8 @@ export default function TalentTrees() {
       ),
     );
     setSpec(nextSpec);
+    setTargetKey("");
+    setPublished(false);
     setDirty(true);
     setMessage("");
   }
@@ -500,6 +514,8 @@ export default function TalentTrees() {
       setPresetId(preset.id);
       setName(preset.name);
       setSpec(stored.spec);
+      setTargetKey(stored.targetKey ?? "");
+      setPublished(stored.published === true);
       setTrees(stored.trees);
       setActiveTreeId(stored.trees[0]?.id ?? "");
       setDirty(false);
@@ -535,11 +551,15 @@ export default function TalentTrees() {
       setError(validationErrors.join(" "));
       return;
     }
+    if (published && !STATIC_LAYOUT_DEFINITIONS.some((layout) => layout.key === targetKey && layout.spec === spec)) {
+      setError("Select the matching guide layout before publishing.");
+      return;
+    }
 
     setBusy(true);
     try {
       const token = await getCsrfToken();
-      const stored: StoredTalentLayout = { version: 1, spec, trees };
+      const stored: StoredTalentLayout = { version: 1, spec, trees, targetKey, published };
       const body = presetId
         ? {
             name: name.trim(),
@@ -570,7 +590,7 @@ export default function TalentTrees() {
       setPresetId(saved.id);
       setName(saved.name || name.trim());
       setDirty(false);
-      setMessage("Talent layout saved.");
+      setMessage(published ? "Talent layout published to the guide." : "Talent layout saved as a draft.");
       await refreshList();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Could not save layout.");
@@ -735,9 +755,7 @@ export default function TalentTrees() {
             <div>
               <h1 className="text-3xl">Talent Tree Builder</h1>
               <p className="mt-2 text-sm text-slate-400">
-                Hardcoded layouts and trees are read-only sources. Loading one creates
-                an editable seed here and does not change the live Holy, Protection or
-                Retribution pages.
+                Load a guide layout as a seed, edit its talents, then publish it to the selected guide.
               </p>
             </div>
 
@@ -834,6 +852,22 @@ export default function TalentTrees() {
                       </option>
                     ))}
                   </select>
+                </label>
+                <label>
+                  Guide layout
+                  <select className={input} value={targetKey} onChange={(event) => {
+                    setTargetKey(event.target.value); setDirty(true);
+                  }}>
+                    <option value="">Draft without guide target</option>
+                    {STATIC_LAYOUT_DEFINITIONS.filter((layout) => layout.spec === spec).map((layout) =>
+                      <option key={layout.key} value={layout.key}>{layout.name}</option>)}
+                  </select>
+                </label>
+                <label className="flex items-center gap-2 self-center">
+                  <input type="checkbox" checked={published} onChange={(event) => {
+                    setPublished(event.target.checked); setDirty(true);
+                  }} />
+                  Publish to the guide (visible to all visitors)
                 </label>
               </div>
 

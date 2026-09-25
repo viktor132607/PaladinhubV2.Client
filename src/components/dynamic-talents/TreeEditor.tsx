@@ -262,6 +262,7 @@ export default function TreeEditor({
     const sourceName = pieceDraft?.name.trim() || armedSource?.name;
     const sourceDescription = pieceDraft?.description ?? armedSource?.description ?? "";
     const sourceIcon = pieceDraft?.icon ?? armedSource?.icon ?? "";
+    const sourceUrl = pieceDraft?.url ?? armedSource?.url ?? "";
     const id = armedSource
       ? `db-spell-${armedSource.id}-${crypto.randomUUID()}`
       : crypto.randomUUID();
@@ -275,6 +276,7 @@ export default function TreeEditor({
           name: sourceName || "New talent",
           description: sourceDescription,
           icon: spellIconPath(sourceIcon),
+          url: sourceUrl,
           row,
           column,
           maxRank: 1,
@@ -638,6 +640,12 @@ export default function TreeEditor({
                   ))}
 
                   <SpellIconPicker key={node.id} value={node.icon} onChange={(icon) => updateNode({ icon: spellIconPath(icon) })} />
+
+                  <label className="block">
+                    Wowhead spell URL
+                    <input className={field} type="url" value={node.url ?? ""}
+                      onChange={(event) => updateNode({ url: event.target.value })} />
+                  </label>
 
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
                     {(["row", "column", "maxRank"] as const).map((name) => (

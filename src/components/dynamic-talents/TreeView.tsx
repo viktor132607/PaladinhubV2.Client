@@ -105,7 +105,7 @@ export function TreeGrid({
     </div>
   );
 }
-export default function TreeView({ tree }: { tree: Tree }) {
+export default function TreeView({ tree, readOnly = true }: { tree: Tree; readOnly?: boolean }) {
   const [ranks, setRanks] = useState<Ranks>({}),
     [selected, setSelected] = useState("");
   const errors = validateTree(tree);
@@ -115,10 +115,10 @@ export default function TreeView({ tree }: { tree: Tree }) {
   return (
     <section className="space-y-3">
       <h3 className="text-xl">{tree.title}</h3>
-      <p>
+      {!readOnly && <p>
         Points: {Object.values(ranks).reduce((a, b) => a + b, 0)} /{" "}
         {tree.points}
-      </p>
+      </p>}
       <TreeGrid
         tree={tree}
         ranks={ranks}
@@ -135,7 +135,7 @@ export default function TreeView({ tree }: { tree: Tree }) {
               .map((id) => tree.nodes.find((n) => n.id === id)?.name)
               .join(", ") || "None"}
           </p>
-          <div className="flex gap-2">
+          {!readOnly && <div className="flex gap-2">
             <button
               type="button"
               className="rounded bg-amber-500 px-3 py-2 text-slate-950 disabled:opacity-40"
@@ -152,16 +152,16 @@ export default function TreeView({ tree }: { tree: Tree }) {
             >
               Refund rank
             </button>
-          </div>
+          </div>}
         </div>
       )}
-      <button
+      {!readOnly && <button
         type="button"
         className="rounded bg-slate-700 px-3 py-2"
         onClick={() => setRanks({})}
       >
         Reset points
-      </button>
+      </button>}
     </section>
   );
 }

@@ -5,6 +5,7 @@ export type Talent = {
   name: string;
   description: string;
   icon: string;
+  url?: string;
   row: number;
   column: number;
   maxRank: number;
