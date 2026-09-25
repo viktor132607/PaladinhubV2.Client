@@ -485,21 +485,21 @@
   color: var(--admin-ink);
   box-shadow: 0 1px 3px #183a4420;
 }
-.ph-admin .admin-shell-main .card-header:not(.bg-dark) { border-bottom-color: var(--admin-line); background: #f9fbfb; color: var(--admin-ink); }
+.ph-admin .admin-shell-main .card-header:not(.bg-dark) { border-bottom-color: var(--admin-line); background: var(--admin-surface-muted); color: var(--admin-ink); }
 .ph-admin .admin-shell-main :where(.form-control, .form-select) { border-color: #bacbd0; border-radius: 6px; }
 .ph-admin .admin-shell-main :where(.form-control, .form-select):focus { border-color: var(--admin-accent); box-shadow: 0 0 0 3px #087f6d24; }
 .ph-admin .admin-shell-main :where(.btn-primary, .list-group-item.active) { border-color: var(--admin-accent-dark); background: var(--admin-accent); color: #fff; }
 .ph-admin .admin-shell-main .btn-primary:hover { background: var(--admin-accent-dark); }
 .ph-admin .admin-shell-main .table-dark {
-  --bs-table-bg: #fff;
-  --bs-table-striped-bg: #f6f9f9;
+  --bs-table-bg: var(--admin-surface);
+  --bs-table-striped-bg: var(--admin-surface-muted);
   --bs-table-striped-color: var(--admin-ink);
   --bs-table-color: var(--admin-ink);
   --bs-table-border-color: var(--admin-line);
   color: var(--admin-ink);
   border-color: var(--admin-line);
 }
-.ph-admin .admin-shell-main .table-dark thead { background: #e9f1f1; }
+.ph-admin .admin-shell-main .table-dark thead { background: var(--admin-control); }
 .ph-admin .admin-shell-main .text-muted { color: var(--admin-muted) !important; }
 .ph-admin .admin-shell-main > :where(section, main, .container, .container-fluid) > :where(h1, h2, h3, p),
 .ph-admin .admin-shell-main :where(.row > div > h2, .row > div > h3) {
@@ -556,6 +556,6 @@
   .ph-admin .admin-home-grid { grid-template-columns: minmax(0, 1fr); }
   .ph-admin .admin-home-heading { margin-top: 0; margin-bottom: 25px; }
   .ph-admin .admin-home-card { min-height: 78px; padding: 13px; }
-  .ph-admin .admin-record-table tbody tr { border-color: var(--admin-line); border-radius: 9px; background: #fff; }
+  .ph-admin .admin-record-table tbody tr { border-color: var(--admin-line); border-radius: 9px; background: var(--admin-surface); }
   .ph-admin .admin-record-table td[data-label]::before { color: var(--admin-muted); }
 }

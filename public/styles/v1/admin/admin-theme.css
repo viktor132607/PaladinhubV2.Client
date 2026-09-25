@@ -8,6 +8,7 @@
   --admin-muted: #586d75;
   --admin-line: #d5e1e1;
   --admin-accent: #087f6d;
+  --admin-on-accent: #fff;
   --admin-accent-dark: #086353;
   --admin-accent-soft: #e2f5ed;
   --admin-shadow: 0 2px 8px #203f4812;
@@ -28,6 +29,7 @@
   --admin-muted: #b3c6c8;
   --admin-line: #3b535b;
   --admin-accent: #45c4a4;
+  --admin-on-accent: #0b2221;
   --admin-accent-dark: #6ed4b6;
   --admin-accent-soft: #244c45;
   --admin-shadow: 0 3px 14px #0003;
@@ -139,6 +141,22 @@
   background: var(--admin-surface);
   color: var(--admin-ink);
 }
+.ph-admin .admin-shell-main :where(select option, select optgroup) {
+  background: var(--admin-surface);
+  color: var(--admin-ink);
+}
+.ph-admin .admin-shell-main :where(input, textarea):-webkit-autofill {
+  -webkit-text-fill-color: var(--admin-ink);
+  box-shadow: inset 0 0 0 1000px var(--admin-surface);
+}
+.ph-admin .admin-shell-main .form-check-input {
+  border-color: var(--admin-line);
+  background-color: var(--admin-surface);
+}
+.ph-admin .admin-shell-main .form-check-input:checked {
+  border-color: var(--admin-accent);
+  background-color: var(--admin-accent);
+}
 .ph-admin .admin-shell-main :where(input, textarea)::placeholder { color: var(--admin-muted); opacity: 1; }
 .ph-admin .admin-shell-main :where(input, textarea, select):focus-visible,
 .ph-admin .admin-shell-main :where(button, a):focus-visible {
@@ -194,7 +212,9 @@
 .ph-admin .admin-shell-main .nav-pills .nav-link { color: var(--admin-accent-dark); }
 .ph-admin .admin-shell-main .nav-pills .nav-link.active { background: var(--admin-accent); color: #fff; }
 .ph-admin[data-admin-theme="dark"] .admin-shell-main .nav-pills .nav-link.active { color: #0b2221; }
-.ph-admin .admin-shell-main :where(.table, .table-dark) {
+.ph-admin .admin-shell-main .list-group-item.active .text-white-50 { color: var(--admin-on-accent) !important; opacity: .85; }
+.ph-admin .admin-shell-main .table,
+.ph-admin .admin-shell-main .table-dark {
   --bs-table-bg: var(--admin-surface);
   --bs-table-striped-bg: var(--admin-surface-muted);
   --bs-table-striped-color: var(--admin-ink);
@@ -205,6 +225,17 @@
 }
 .ph-admin .admin-shell-main :where(.table, .admin-record-table) thead { background: var(--admin-control); color: var(--admin-ink); }
 .ph-admin .admin-shell-main :where(.table, .admin-record-table) :where(th, td) { border-color: var(--admin-line); }
+/* The shared site stylesheet forces table text white; keep the cells and their surfaces in the same admin palette. */
+.ph-admin .admin-shell-main :is(.table, .admin-record-table) :is(thead th, tbody th, tbody td) {
+  color: var(--admin-ink) !important;
+  background-color: var(--admin-surface);
+}
+.ph-admin .admin-shell-main :is(.table, .admin-record-table) thead th {
+  background-color: var(--admin-control);
+}
+.ph-admin .admin-shell-main :is(.table-striped, .admin-record-table.table-striped) tbody tr:nth-of-type(odd) > :is(th, td) {
+  background-color: var(--admin-surface-muted);
+}
 .ph-admin .admin-shell-main .text-muted { color: var(--admin-muted) !important; }
 .ph-admin .admin-shell-main .text-secondary { color: var(--admin-muted) !important; }
 .ph-admin .admin-shell-main .alert { border-radius: 8px; }
