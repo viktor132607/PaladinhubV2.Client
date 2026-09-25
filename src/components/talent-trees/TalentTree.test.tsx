@@ -8,6 +8,7 @@ import { seedTalentRanks } from "./seedTalentRanks";
 import { validateTree } from "@/features/dynamic-talents/model";
 import TalentTooltip from "@/components/tooltips/TalentTooltip";
 import { withTalentChoice } from "./talentChoices";
+import { resolveMessage } from "@/localization/catalog";
 
 describe("published talent trees", () => {
   it("shows the existing spell effect and icon without selection or save controls", () => {
@@ -99,6 +100,7 @@ describe("published talent trees", () => {
     const unranked = renderToStaticMarkup(<TalentTree nodes={[{ ...choice, rank: 0 }]} />);
     expect(unranked).toContain('data-tooltip-selected-choice="-1"');
     expect(unranked).toContain("Stand Against Evil");
+    expect(unranked).not.toContain('href="https://www.wowhead.com/spell=');
     expect(unranked).toContain("◀");
     expect(unranked).toContain("▶");
 
@@ -111,8 +113,12 @@ describe("published talent trees", () => {
     ]} selectedChoice={1} />);
     expect(tooltip).toContain("First effect");
     expect(tooltip).toContain("Second effect");
-    expect(tooltip).toContain("Избран");
-    expect(tooltip).toContain("Неактивен");
+    expect(tooltip).toContain("Selected");
+    expect(tooltip).toContain("Inactive");
+    expect(tooltip).not.toContain("Избран");
+    expect(tooltip).not.toContain("Неактивен");
+    expect(resolveMessage("bg", {}, "talent.choice.selected")).toBe("Избран");
+    expect(resolveMessage("bg", {}, "talent.choice.inactive")).toBe("Неактивен");
     expect(withTalentChoice({ id: "not-choice", name: "Blinding Light", shape: "hexagon" }).shape).toBe("circle");
   });
 

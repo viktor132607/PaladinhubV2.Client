@@ -218,5 +218,15 @@
   "backup.restored": {"en": "Database restored successfully. Reload the site to load restored data; you may need to sign in again.", "bg": "Базата е възстановена успешно. Презаредете сайта за възстановените данни; може да е необходим нов вход."},
   "backup.failed": {"en": "The database operation failed.", "bg": "Операцията с базата е неуспешна."},
   "backup.exporting": {"en": "Creating the full archive. Keep this page open.", "bg": "Създава се пълният архив. Оставете страницата отворена."},
-  "backup.restoring": {"en": "Restoring the database. Keep this page open.", "bg": "Базата се възстановява. Оставете страницата отворена."}
+  "backup.restoring": {"en": "Restoring the database. Keep this page open.", "bg": "Базата се възстановява. Оставете страницата отворена."},
+  "talent.choice.selected": {"en": "Selected", "bg": "Избран"},
+  "talent.choice.inactive": {"en": "Inactive", "bg": "Неактивен"},
+  "talent.choice.none": {"en": "no choice selected", "bg": "няма избран вариант"},
+  "talent.choice.aria": {"en": "choice {choice} of 2", "bg": "вариант {choice} от 2"},
+  "talent.rank.aria": {"en": "{rank} of {maxRank} ranks", "bg": "{rank} от {maxRank} ранга"},
+  "talent.rank.label": {"en": "Rank", "bg": "Ранг"},
+  "talent.cost": {"en": "Cost: {cost} {unit}", "bg": "Цена: {cost} {unit}"},
+  "talent.point": {"en": "point", "bg": "точка"},
+  "talent.points": {"en": "points", "bg": "точки"},
+  "talent.requires": {"en": "Requires", "bg": "Изисква"}
 }

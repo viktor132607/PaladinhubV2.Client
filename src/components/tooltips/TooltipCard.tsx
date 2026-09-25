@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import styles from "./tooltips.module.css";
+import { useLocalization } from "@/localization/LocalizationContext";
 
 export type TooltipCardProps = {
   name?: string;
@@ -21,6 +22,7 @@ const qualityColors: Record<string, string> = {
 export default function TooltipCard({
   kind, name, description, icon, quality, level, detail, requirement, choices, selectedChoice,
 }: TooltipCardProps & { kind: "item" | "spell" | "talent" }) {
+  const { t } = useLocalization();
   const color = qualityColors[quality?.toLowerCase() ?? ""] ?? (kind === "item" ? "#a335ee" : "#ffd100");
   return (
     <div className={styles.card} style={{ "--tooltip-quality": color } as CSSProperties}>
@@ -40,7 +42,8 @@ export default function TooltipCard({
             {choice.icon && <img src={choice.icon} alt="" className={styles.choiceIcon} />}
             <div>
               <strong>{choice.name}</strong>
-              <span className={styles.choiceStatus}>{selectedChoice === index ? "Избран" : "Неактивен"}</span>
+              <span className={styles.choiceStatus}>{selectedChoice === index
+                ? t("talent.choice.selected", "Selected") : t("talent.choice.inactive", "Inactive")}</span>
               {choice.description && <p>{choice.description}</p>}
             </div>
           </div>

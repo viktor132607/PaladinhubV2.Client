@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { BrowserRouter as Router, Route, Routes } from "@/router/nextCompat";
 
 import { LocalizationProvider } from "@/localization/LocalizationContext";
+import TooltipLayer from "@/components/tooltips/TooltipLayer";
 import { CurrencyProvider } from "@/currency/CurrencyContext";
 import { adminPermissions } from "@/auth/adminPermissions";
 import AdminTranslations from "@/pages/admin/translations/Translations";
@@ -272,6 +273,7 @@ export default function App({ initialPath = "/" }: { initialPath?: string }) {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
+      <TooltipLayer />
     </CurrencyProvider></LocalizationProvider></Router>
   );
 }

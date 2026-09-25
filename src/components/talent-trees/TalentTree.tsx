@@ -13,6 +13,8 @@ import {
   type CSSProperties,
 } from "react";
 import styles from "./TalentTree.module.css";
+import { useLocalization } from "@/localization/LocalizationContext";
+import { formatMessage } from "@/localization/catalog";
 
 import {
   loadLocalTalentSelection,
@@ -118,6 +120,7 @@ export default function TalentTree({
   columns,
   edges = [],
 }: TalentTreeProps) {
+  const { t } = useLocalization();
   const [selectedIds, setSelectedIds] = useState<string[]>(selectedNodeIds ?? []);
   const [isHydrated, setIsHydrated] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -477,15 +480,19 @@ export default function TalentTree({
               onMouseLeave: () => setHighlightedNodeId(null),
               onFocus: () => setHighlightedNodeId(node.id),
               onBlur: () => setHighlightedNodeId(null),
-              "aria-label": `${name}, ${rank} of ${maxRank} ranks${alternative ? `, choice ${selectedChoice < 0 ? "none" : selectedChoice + 1} of 2` : ""}`,
+              "aria-label": `${name}, ${formatMessage(t("talent.rank.aria", "{rank} of {maxRank} ranks"), { rank, maxRank })}${alternative ? `, ${selectedChoice < 0
+                ? t("talent.choice.none", "no choice selected")
+                : formatMessage(t("talent.choice.aria", "choice {choice} of 2"), { choice: selectedChoice + 1 })}` : ""}`,
               "data-tooltip-kind": readOnly && wowheadUrl && !alternative ? undefined : "talent",
               "data-tooltip-name": name,
               "data-tooltip-description": alternative ? undefined : description,
               "data-tooltip-icon": icon,
               "data-tooltip-choices": choices,
               "data-tooltip-selected-choice": alternative ? selectedChoice : undefined,
-              "data-tooltip-detail": `Rank: ${rank}/${maxRank} · Cost: ${cost} point${cost === 1 ? "" : "s"}`,
-              "data-tooltip-requirement": requirements.length ? `Requires: ${requirements.join(", ")}` : undefined,
+              "data-tooltip-detail": `${t("talent.rank.label", "Rank")}: ${rank}/${maxRank} · ${formatMessage(t("talent.cost", "Cost: {cost} {unit}"), {
+                cost, unit: cost === 1 ? t("talent.point", "point") : t("talent.points", "points"),
+              })}`,
+              "data-tooltip-requirement": requirements.length ? `${t("talent.requires", "Requires")}: ${requirements.join(", ")}` : undefined,
             } as const;
             const content = <>
                 <img
@@ -506,7 +513,7 @@ export default function TalentTree({
                   <span className={selectedChoice === 0 ? styles.choiceArrowActive : ""}>◀</span>
                   <span className={selectedChoice === 1 ? styles.choiceArrowActive : ""}>▶</span>
                 </span>}
-                {readOnly && wowheadUrl ? (
+                {readOnly && wowheadUrl && !alternative ? (
                   <a {...attrs} href={wowheadUrl} target="_blank" rel="noopener noreferrer">{content}</a>
                 ) : readOnly ? (
                   <span {...attrs} tabIndex={0}>{content}</span>
