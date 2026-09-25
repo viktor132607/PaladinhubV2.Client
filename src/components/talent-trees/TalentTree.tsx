@@ -452,12 +452,12 @@ export default function TalentTree({
             })}
           </svg>
 
-          {gateStatuses.filter((gate) => gate.row <= rowCount).map((gate) => (
-            <div key={gate.row} className={`${styles.gate} ${gate.missing ? styles.gateLocked : styles.gateOpen}`}
-              style={{ top: `${(gate.row - 1) * STEP_Y - GRID_GAP / 2}px`, width: gridWidth }}
+          {gateStatuses.filter((gate) => gate.row <= rowCount && gate.missing > 0).map((gate) => (
+            <div key={gate.row} className={styles.gate}
+              style={{ top: `${(gate.row - 1) * STEP_Y - GRID_GAP / 2}px` }}
               data-gate-row={gate.row} data-gate-required={gate.points} data-gate-spent={gate.spent}
               aria-label={formatMessage(t("talent.gate.aria", "Row {row} requires {points} points above"), gate)}>
-              <span>{gate.points}</span><span className={styles.gateLock} aria-hidden="true">{gate.missing ? "🔒" : "✓"}</span>
+              <span className={styles.gatePoints}>{gate.points}</span><span className={styles.gateLock} aria-hidden="true" />
               <span className={styles.gateLine} />
             </div>
           ))}

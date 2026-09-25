@@ -45,9 +45,21 @@ describe("talent point gates", () => {
       { id: "d", name: "Divine Toll", row: 5, column: 1, rank: 1, maxRank: 1 },
       { id: "e", name: "Golden Path", row: 8, column: 1, rank: 1, maxRank: 1 },
     ]} />);
-    expect(html).toContain('data-gate-spent="6"');
+    expect(html).toContain('data-gate-spent="7"');
     expect(html).toContain('data-tooltip-rank="1/1"');
     expect(html).toContain('data-tooltip-locked-points="5"');
+    expect(html).not.toContain('data-gate-row="5"');
+    expect(html).toContain('data-gate-row="8"');
+  });
+
+  it("removes every gate marker once all thresholds are met", () => {
+    const nodes = Array.from({ length: 12 }, (_, index) => ({
+      id: `node-${index}`, name: `Talent ${index}`, row: index < 6 ? 1 : 5,
+      column: index + 1, rank: 1, maxRank: 1,
+    }));
+    const html = renderToStaticMarkup(<TalentTree build="Paladin" nodes={nodes} />);
+    expect(html).not.toContain('data-gate-row=');
+    expect(html).not.toContain('data-tooltip-locked-points=');
   });
 
   it("rejects duplicate or unreachable admin gate thresholds", () => {
