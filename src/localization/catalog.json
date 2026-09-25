@@ -228,5 +228,8 @@
   "talent.cost": {"en": "Cost: {cost} {unit}", "bg": "Цена: {cost} {unit}"},
   "talent.point": {"en": "point", "bg": "точка"},
   "talent.points": {"en": "points", "bg": "точки"},
-  "talent.requires": {"en": "Requires", "bg": "Изисква"}
+  "talent.requires": {"en": "Requires", "bg": "Изисква"},
+  "talent.passive": {"en": "Passive", "bg": "Пасивен"},
+  "talent.unlock.points": {"en": "Spend {points} more points to unlock this talent.", "bg": "Изхарчете още {points} точки, за да отключите този талант."},
+  "talent.gate.aria": {"en": "Row {row} requires {points} points above", "bg": "Ред {row} изисква {points} точки в горните редове"}
 }

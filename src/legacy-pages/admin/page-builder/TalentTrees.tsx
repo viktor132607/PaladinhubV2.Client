@@ -22,6 +22,7 @@ import RuntimeTalentTree, {
 } from "@/components/talent-trees/TalentTree";
 import talentSpells from "@/components/talent-trees/talent-spells.json";
 import { withTalentChoice } from "@/components/talent-trees/talentChoices";
+import { defaultTalentGates } from "@/components/talent-trees/talentGates";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import {
   createTree,
@@ -202,6 +203,7 @@ function staticColumnToTree(layoutKey: string, column: StaticColumn, index: numb
     rows,
     columns: column.columns,
     points: column.maxPoints,
+    gateRows: defaultTalentGates(column.title, rows),
     nodes: column.nodes.map((node) => {
       const spell = talentSpells[node.name as keyof typeof talentSpells];
       const columnNumber = node.column ?? 1;
@@ -321,6 +323,7 @@ function RuntimePreview({ tree }: { tree: Tree }) {
           maxPoints={tree.points}
           columns={tree.columns}
           edges={runtimeEdges(tree)}
+          gateRows={tree.gateRows ?? defaultTalentGates(tree.title, tree.rows)}
           autoSave={false}
         />
       </div>

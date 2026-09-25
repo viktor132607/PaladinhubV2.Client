@@ -55,6 +55,8 @@
 }
 .inactive img { filter: grayscale(1) brightness(.47); }
 .inactive:not(:hover):not(:focus-visible) { border-color: #626262; }
+.locked img { filter: grayscale(1) brightness(.32); }
+.locked:hover, .locked:focus-visible { border-color: #777; box-shadow: 0 0 0 1px #444; }
 .node:hover,
 .node:focus-visible { transform: translateY(-1px); }
 .node:focus-visible { outline: 2px solid #ffe289; outline-offset: 4px; }
@@ -93,3 +95,18 @@
   text-shadow: 0 1px 2px #000;
 }
 .choiceArrowActive { color: #ffd65e; }
+.gate {
+  position: absolute;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  height: 20px;
+  align-items: center;
+  gap: 7px;
+  font: bold 15px/20px Georgia, serif;
+  pointer-events: none;
+}
+.gateLocked { color: #ec765a; }
+.gateOpen { color: #d5aa31; }
+.gateLock { font: 12px/20px Arial, sans-serif; }
+.gateLine { height: 1px; flex: 1; background: currentColor; opacity: .55; }

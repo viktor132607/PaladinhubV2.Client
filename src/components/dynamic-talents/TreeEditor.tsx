@@ -11,6 +11,7 @@ import TagPicker from "@/components/admin/TagPicker";
 import SpellIconPicker from "@/components/admin/SpellIconPicker";
 import { spellIconSource as spellIconPath } from "@/lib/spell-icons";
 import TreeView, { TreeGrid } from "./TreeView";
+import { defaultTalentGates } from "@/components/talent-trees/talentGates";
 import {
   removeTalent,
   validateTree,
@@ -100,6 +101,9 @@ export default function TreeEditor({
 
   const errors = validateTree(tree);
   const node = tree.nodes.find((n) => n.id === selected);
+  const gateRows = tree.gateRows ?? defaultTalentGates(tree.title, tree.rows);
+  const nextGateRow = [5, 8, ...Array.from({ length: Math.max(0, tree.rows - 1) }, (_, index) => index + 2)]
+    .find((row) => row <= tree.rows && !gateRows.some((gate) => gate.row === row));
   const armedSource = library.find((item) => item.id === armedSourceId) ?? null;
 
   useEffect(() => {
@@ -326,6 +330,7 @@ export default function TreeEditor({
           <span className="text-sm text-slate-500">Manual + mode</span>
         )}
       </div>
+
 
       <div className="flex flex-wrap gap-2">
         <input
@@ -585,6 +590,32 @@ export default function TreeEditor({
           </label>
         ))}
       </div>
+
+      <fieldset className="rounded border border-slate-600 p-3">
+        <legend className="px-1">Talent point gates</legend>
+        <p className="mb-2 text-sm text-slate-300">Lock talents from this row until enough ranks are spent in earlier rows.</p>
+        {gateRows.map((gate, index) => (
+          <div key={index} className="mb-2 flex flex-wrap items-end gap-2">
+            <label>Start row
+              <input className={field} type="number" min={2} max={tree.rows} value={gate.row}
+                onChange={(event) => onChange({ ...tree, gateRows: gateRows
+                  .map((item, position) => position === index ? { ...item, row: Number(event.target.value) } : item) })} />
+            </label>
+            <label>Points above
+              <input className={field} type="number" min={1} max={tree.points} value={gate.points}
+                onChange={(event) => onChange({ ...tree, gateRows: gateRows
+                  .map((item, position) => position === index ? { ...item, points: Number(event.target.value) } : item) })} />
+            </label>
+            <button type="button" className="rounded border border-slate-500 px-3 py-2"
+              onClick={() => onChange({ ...tree, gateRows: gateRows
+                .filter((_, position) => position !== index) })}>Remove</button>
+          </div>
+        ))}
+        <button type="button" className="rounded border border-slate-500 px-3 py-2"
+          disabled={nextGateRow === undefined}
+          onClick={() => nextGateRow && onChange({ ...tree, gateRows: [...gateRows,
+            { row: nextGateRow, points: Math.min(6, tree.points) }] })}>Add gate</button>
+      </fieldset>
 
       {errors.length > 0 && (
         <p role="alert" className="text-red-300">

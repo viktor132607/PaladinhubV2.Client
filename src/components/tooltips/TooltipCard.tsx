@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import styles from "./tooltips.module.css";
 import { useLocalization } from "@/localization/LocalizationContext";
+import { formatMessage } from "@/localization/catalog";
 
 export type TooltipCardProps = {
   name?: string;
@@ -12,6 +13,8 @@ export type TooltipCardProps = {
   requirement?: string;
   choices?: { name: string; icon?: string; description?: string }[];
   selectedChoice?: number;
+  rank?: string;
+  lockedPoints?: number;
 };
 
 const qualityColors: Record<string, string> = {
@@ -20,10 +23,32 @@ const qualityColors: Record<string, string> = {
 };
 
 export default function TooltipCard({
-  kind, name, description, icon, quality, level, detail, requirement, choices, selectedChoice,
+  kind, name, description, icon, quality, level, detail, requirement, choices, selectedChoice, rank, lockedPoints,
 }: TooltipCardProps & { kind: "item" | "spell" | "talent" }) {
   const { t } = useLocalization();
   const color = qualityColors[quality?.toLowerCase() ?? ""] ?? (kind === "item" ? "#a335ee" : "#ffd100");
+  if (kind === "talent") return (
+    <div className={styles.talentCard}>
+      <strong className={styles.talentName}>{name || "Talent"}</strong>
+      {rank && <span className={styles.talentRank}>{t("talent.rank.label", "Rank")} {rank}</span>}
+      {(description || choices?.length) && <div className={styles.talentPassive}>{t("talent.passive", "Passive")}</div>}
+      {description && <p className={styles.talentEffect}>{description}</p>}
+      {choices?.length === 2 && <div className={styles.talentChoices}>
+        {choices.map((choice, index) => (
+          <div key={index} className={`${styles.talentChoice} ${selectedChoice === index ? styles.talentChoiceSelected : styles.talentChoiceInactive}`}>
+            <strong>{choice.name}</strong>
+            <span>{selectedChoice === index
+              ? t("talent.choice.selected", "Selected") : t("talent.choice.inactive", "Inactive")}</span>
+            {choice.description && <p>{choice.description}</p>}
+          </div>
+        ))}
+      </div>}
+      {requirement && <p className={styles.talentRequirement}>{requirement}</p>}
+      {lockedPoints !== undefined && lockedPoints > 0 && <p className={styles.talentLock}>
+        {formatMessage(t("talent.unlock.points", "Spend {points} more points to unlock this talent."), { points: lockedPoints })}
+      </p>}
+    </div>
+  );
   return (
     <div className={styles.card} style={{ "--tooltip-quality": color } as CSSProperties}>
       <div className={styles.heading}>
@@ -36,19 +61,6 @@ export default function TooltipCard({
       {detail && <div className={styles.detail}>{detail}</div>}
       {description && <p className={styles.description}>{description}</p>}
       {requirement && <p className={styles.requirement}>{requirement}</p>}
-      {choices?.length === 2 && <div className={styles.choices}>
-        {choices.map((choice, index) => (
-          <div key={index} className={`${styles.choice} ${selectedChoice === index ? styles.choiceSelected : styles.choiceInactive}`}>
-            {choice.icon && <img src={choice.icon} alt="" className={styles.choiceIcon} />}
-            <div>
-              <strong>{choice.name}</strong>
-              <span className={styles.choiceStatus}>{selectedChoice === index
-                ? t("talent.choice.selected", "Selected") : t("talent.choice.inactive", "Inactive")}</span>
-              {choice.description && <p>{choice.description}</p>}
-            </div>
-          </div>
-        ))}
-      </div>}
     </div>
   );
 }

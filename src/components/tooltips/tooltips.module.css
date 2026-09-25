@@ -19,12 +19,28 @@
 .description { margin: 9px 0 0; color: #ffd100; white-space: pre-line; }
 .requirement { margin: 9px 0 0; color: #fff; white-space: pre-line; }
 .popup { position: fixed; z-index: 2147483000; pointer-events: none; }
-.choices { display: grid; gap: 7px; margin-top: 10px; border-top: 1px solid #555; padding-top: 9px; }
-.choice { display: flex; gap: 8px; border: 1px solid #555; border-radius: 3px; padding: 6px; }
-.choice strong { display: block; font-size: 13px; }
-.choice p { margin: 3px 0 0; font-size: 12px; line-height: 1.3; }
-.choiceIcon { width: 30px; height: 30px; flex: none; object-fit: cover; }
-.choiceStatus { display: block; font-size: 11px; }
-.choiceSelected { border-color: #b99232; color: #ffe08b; }
-.choiceInactive { color: #aaa; }
-.choiceInactive .choiceIcon { filter: grayscale(1) brightness(.55); }
+.talentCard {
+  width: min(285px, calc(100vw - 20px));
+  padding: 8px 9px;
+  border: 1px solid #747474;
+  border-radius: 3px;
+  background: #0c0b0b;
+  box-shadow: 0 3px 10px #000c;
+  color: #eee;
+  font: 14px/1.2 Georgia, "Times New Roman", serif;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.talentName { display: block; font-size: 16px; font-weight: 400; color: #f4f0e9; }
+.talentRank { display: block; margin-top: 2px; font-size: 12px; color: #a8a8a8; }
+.talentPassive { margin-top: 14px; color: #eee; }
+.talentEffect { margin: 2px 0 0; color: #f9cd40; }
+.talentChoices { display: grid; gap: 7px; margin-top: 8px; }
+.talentChoice { border-left: 2px solid #777; padding: 2px 0 2px 8px; }
+.talentChoice strong { display: block; }
+.talentChoice span { display: block; font-size: 11px; }
+.talentChoice p { margin: 4px 0 0; font-size: 13px; }
+.talentChoiceSelected { border-color: #d5aa31; color: #f9cd40; }
+.talentChoiceInactive { color: #999; }
+.talentRequirement { margin: 10px 0 0; color: #bbb; }
+.talentLock { margin: 15px 0 0; color: #ff5454; }

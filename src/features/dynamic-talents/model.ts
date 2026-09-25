@@ -1,4 +1,5 @@
 export type TalentShape = "circle" | "square" | "hexagon";
+import type { TalentGate } from "@/components/talent-trees/talentGates";
 
 export type Talent = {
   id: string;
@@ -23,6 +24,7 @@ export type Tree = {
   rows: number;
   columns: number;
   points: number;
+  gateRows?: TalentGate[];
   nodes: Talent[];
 };
 
@@ -67,6 +69,17 @@ export function validateTree(tree: Tree): string[] {
   }
 
   if (!Array.isArray(tree.nodes)) return [...errors, "Nodes must be an array."];
+
+  if (tree.gateRows !== undefined) {
+    const seen = new Set<number>();
+    if (!Array.isArray(tree.gateRows) || tree.gateRows.some((gate) => {
+      if (!gate || !Number.isInteger(gate.row) || !Number.isInteger(gate.points) ||
+        gate.row < 2 || gate.row > tree.rows || gate.points < 1 || gate.points > tree.points ||
+        seen.has(gate.row)) return true;
+      seen.add(gate.row);
+      return false;
+    })) errors.push("Talent gates need unique rows within the tree and valid point thresholds.");
+  }
 
   const ids = new Set<string>();
   const cells = new Set<string>();

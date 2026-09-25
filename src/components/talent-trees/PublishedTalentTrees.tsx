@@ -4,6 +4,7 @@ import TalentTree, { type TalentEdge, type TalentNode } from "./TalentTree";
 import { validateTree, type Tree } from "@/features/dynamic-talents/model";
 import { seedTalentRanks } from "./seedTalentRanks";
 import { withTalentChoice } from "./talentChoices";
+import { defaultTalentGates } from "./talentGates";
 
 export function validPublishedTrees(value: unknown): value is Tree[] {
   return Array.isArray(value) && value.length > 0 && value.length <= 3 &&
@@ -49,7 +50,8 @@ export default function PublishedTalentTrees({ layoutKey, trees }: { layoutKey: 
               style={{ width: `${Math.max(250, tree.columns * 70 + 65)}px` }}>
               <h2 className="mb-[15px] mt-5 text-center text-2xl font-bold text-white">{tree.title}</h2>
               <TalentTree treeKey={`${layoutKey}-${tree.id}`} build={layoutKey} nodes={toNodes(tree)}
-                maxPoints={tree.points} columns={tree.columns} edges={toEdges(tree)} readOnly />
+                maxPoints={tree.points} columns={tree.columns} edges={toEdges(tree)}
+                gateRows={tree.gateRows ?? defaultTalentGates(tree.title, tree.rows)} readOnly />
             </section>
           ))}
         </div>

@@ -100,7 +100,7 @@ describe("published talent trees", () => {
     const unranked = renderToStaticMarkup(<TalentTree nodes={[{ ...choice, rank: 0 }]} />);
     expect(unranked).toContain('data-tooltip-selected-choice="-1"');
     expect(unranked).toContain("Stand Against Evil");
-    expect(unranked).not.toContain('href="https://www.wowhead.com/spell=');
+    expect(unranked).toContain('data-disable-wowhead-tooltip="true"');
     expect(unranked).toContain("◀");
     expect(unranked).toContain("▶");
 

@@ -15,6 +15,7 @@ import {
 import styles from "./TalentTree.module.css";
 import { useLocalization } from "@/localization/LocalizationContext";
 import { formatMessage } from "@/localization/catalog";
+import { defaultTalentGates, evaluateTalentGates, lockedGateForRow, type TalentGate } from "./talentGates";
 
 import {
   loadLocalTalentSelection,
@@ -61,6 +62,7 @@ export type TalentTreeProps = {
   readOnly?: boolean;
   columns?: number;
   edges?: TalentEdge[];
+  gateRows?: TalentGate[];
 };
 
 type SaveStatus = "idle" | "saving" | "saved" | "local" | "error";
@@ -119,6 +121,7 @@ export default function TalentTree({
   readOnly = true,
   columns,
   edges = [],
+  gateRows,
 }: TalentTreeProps) {
   const { t } = useLocalization();
   const [selectedIds, setSelectedIds] = useState<string[]>(selectedNodeIds ?? []);
@@ -157,22 +160,6 @@ export default function TalentTree({
     return map;
   }, [nodes]);
 
-  const isEdgeActive = useCallback(
-    (edge: TalentEdge) => {
-      const [fromColumn, fromRow, toColumn, toRow] = edge;
-      const fromNode = nodeByPosition.get(positionKey(fromColumn, fromRow));
-      const toNode = nodeByPosition.get(positionKey(toColumn, toRow));
-
-      return Boolean(
-        fromNode &&
-          toNode &&
-          displayedRank(fromNode) > 0 &&
-          displayedRank(toNode) > 0,
-      );
-    },
-    [nodeByPosition, displayedRank],
-  );
-
   const columnCount = useMemo(() => {
     if (columns && columns > 0) return columns;
     return Math.max(1, ...nodes.map((node) => node.column ?? 1));
@@ -200,6 +187,20 @@ export default function TalentTree({
     },
     [ruleSet.nodes],
   );
+
+  const activeGates = useMemo(() => gateRows ?? defaultTalentGates(build, rowCount), [gateRows, build, rowCount]);
+  const gateStatuses = useMemo(() => evaluateTalentGates(nodes, activeGates, displayedRank, costOf),
+    [nodes, activeGates, displayedRank, costOf]);
+  const lockedFor = useCallback((node: TalentNode) => lockedGateForRow(gateStatuses, node.row ?? 1),
+    [gateStatuses]);
+  const effectiveRank = useCallback((node: TalentNode) => lockedFor(node) ? 0 : displayedRank(node),
+    [lockedFor, displayedRank]);
+
+  const isEdgeActive = useCallback((edge: TalentEdge) => {
+    const fromNode = nodeByPosition.get(positionKey(edge[0], edge[1]));
+    const toNode = nodeByPosition.get(positionKey(edge[2], edge[3]));
+    return Boolean(fromNode && toNode && effectiveRank(fromNode) > 0 && effectiveRank(toNode) > 0);
+  }, [nodeByPosition, effectiveRank]);
 
   const requirementsOf = useCallback(
     (node: TalentNode): string[] =>
@@ -304,6 +305,12 @@ export default function TalentTree({
   const toggleNode = (node: TalentNode) => {
     if (readOnly || (adminMode && !isEditing)) return;
     setValidationMessage(null);
+
+    const locked = lockedFor(node);
+    if (locked) {
+      flash(node.id, formatMessage(t("talent.unlock.points", "Spend {points} more points to unlock this talent."), { points: locked.missing }));
+      return;
+    }
 
     if (selectedSet.has(node.id)) {
       updateSelection(removeWithDependents(node));
@@ -432,7 +439,7 @@ export default function TalentTree({
               const highlighted = highlightedNodeId !== null &&
                 (fromNode?.id === highlightedNodeId || toNode?.id === highlightedNodeId);
               const gold = activeConnection || (highlighted && Boolean(fromNode && toNode &&
-                displayedRank(fromNode) > 0 && displayedRank(toNode) > 0));
+                effectiveRank(fromNode) > 0 && effectiveRank(toNode) > 0));
               return (
                 <line key={`${edge.join("-")}-${index}`} {...coordinates}
                   data-active-connection={activeConnection ? "1" : "0"}
@@ -445,8 +452,19 @@ export default function TalentTree({
             })}
           </svg>
 
+          {gateStatuses.filter((gate) => gate.row <= rowCount).map((gate) => (
+            <div key={gate.row} className={`${styles.gate} ${gate.missing ? styles.gateLocked : styles.gateOpen}`}
+              style={{ top: `${(gate.row - 1) * STEP_Y - GRID_GAP / 2}px`, width: gridWidth }}
+              data-gate-row={gate.row} data-gate-required={gate.points} data-gate-spent={gate.spent}
+              aria-label={formatMessage(t("talent.gate.aria", "Row {row} requires {points} points above"), gate)}>
+              <span>{gate.points}</span><span className={styles.gateLock} aria-hidden="true">{gate.missing ? "🔒" : "✓"}</span>
+              <span className={styles.gateLine} />
+            </div>
+          ))}
+
           {nodes.map((node) => {
-            const rank = displayedRank(node);
+            const locked = lockedFor(node);
+            const rank = effectiveRank(node);
             const maxRank = node.maxRank ?? 1;
             const isActive = rank > 0;
             const requirements = requirementsOf(node);
@@ -474,6 +492,7 @@ export default function TalentTree({
             const attrs = {
               "data-id": node.id,
               className: `${styles.node} ${styles[node.shape ?? "circle"]} ${isActive ? styles.active : styles.inactive}
+                ${locked ? styles.locked : ""}
                 ${flashNodeId === node.id ? styles.invalid : ""}
                 ${readOnly && !wowheadUrl ? styles.informational : ""}`,
               onMouseEnter: () => setHighlightedNodeId(node.id),
@@ -483,12 +502,14 @@ export default function TalentTree({
               "aria-label": `${name}, ${formatMessage(t("talent.rank.aria", "{rank} of {maxRank} ranks"), { rank, maxRank })}${alternative ? `, ${selectedChoice < 0
                 ? t("talent.choice.none", "no choice selected")
                 : formatMessage(t("talent.choice.aria", "choice {choice} of 2"), { choice: selectedChoice + 1 })}` : ""}`,
-              "data-tooltip-kind": readOnly && wowheadUrl && !alternative ? undefined : "talent",
+              "data-tooltip-kind": "talent",
               "data-tooltip-name": name,
               "data-tooltip-description": alternative ? undefined : description,
               "data-tooltip-icon": icon,
               "data-tooltip-choices": choices,
               "data-tooltip-selected-choice": alternative ? selectedChoice : undefined,
+              "data-tooltip-rank": `${rank}/${maxRank}`,
+              "data-tooltip-locked-points": locked?.missing,
               "data-tooltip-detail": `${t("talent.rank.label", "Rank")}: ${rank}/${maxRank} · ${formatMessage(t("talent.cost", "Cost: {cost} {unit}"), {
                 cost, unit: cost === 1 ? t("talent.point", "point") : t("talent.points", "points"),
               })}`,
@@ -513,8 +534,9 @@ export default function TalentTree({
                   <span className={selectedChoice === 0 ? styles.choiceArrowActive : ""}>◀</span>
                   <span className={selectedChoice === 1 ? styles.choiceArrowActive : ""}>▶</span>
                 </span>}
-                {readOnly && wowheadUrl && !alternative ? (
-                  <a {...attrs} href={wowheadUrl} target="_blank" rel="noopener noreferrer">{content}</a>
+                {readOnly && wowheadUrl ? (
+                  <a {...attrs} href={wowheadUrl} target="_blank" rel="noopener noreferrer"
+                    data-disable-wowhead-tooltip="true">{content}</a>
                 ) : readOnly ? (
                   <span {...attrs} tabIndex={0}>{content}</span>
                 ) : (

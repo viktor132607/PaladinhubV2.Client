@@ -18,6 +18,8 @@ type TooltipData = {
   requirement?: string;
   choices?: { name: string; icon?: string; description?: string }[];
   selectedChoice?: number;
+  rank?: string;
+  lockedPoints?: number;
 };
 
 function readChoices(value?: string): TooltipData["choices"] {
@@ -59,6 +61,8 @@ export default function TooltipLayer() {
           requirement: element.dataset.tooltipRequirement,
           choices: readChoices(element.dataset.tooltipChoices),
           selectedChoice: Number(element.dataset.tooltipSelectedChoice ?? -1),
+          rank: element.dataset.tooltipRank,
+          lockedPoints: element.dataset.tooltipLockedPoints === undefined ? undefined : Number(element.dataset.tooltipLockedPoints),
         });
       }
       setPosition({ x, y });
@@ -134,7 +138,8 @@ export default function TooltipLayer() {
     ? Math.max(10, position.y - size.height - 12) : position.y + 14;
   const props = { name: active.name, description: active.description, icon: active.icon,
     quality: active.quality, level: active.level, detail: active.detail, requirement: active.requirement,
-    choices: active.choices, selectedChoice: active.selectedChoice };
+    choices: active.choices, selectedChoice: active.selectedChoice,
+    rank: active.rank, lockedPoints: active.lockedPoints };
   return createPortal(
     <div ref={popup} className={styles.popup} role="tooltip" style={{ left, top }}>
       {active.kind === "item" ? <ItemTooltip {...props} /> :
