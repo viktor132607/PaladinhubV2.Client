@@ -3,6 +3,7 @@
 import TalentTree, { type TalentEdge, type TalentNode } from "./TalentTree";
 import { validateTree, type Tree } from "@/features/dynamic-talents/model";
 import { seedTalentRanks } from "./seedTalentRanks";
+import { withTalentChoice } from "./talentChoices";
 
 export function validPublishedTrees(value: unknown): value is Tree[] {
   return Array.isArray(value) && value.length > 0 && value.length <= 3 &&
@@ -21,10 +22,13 @@ function toNodes(tree: Tree): TalentNode[] {
     column: node.column,
     maxRank: node.maxRank,
     rank: node.rank,
+    selectedChoice: node.selectedChoice,
+    alternative: node.alternative,
     shape: node.shape,
     requires: node.requires.map((id) => names.get(id)).filter((name): name is string => Boolean(name)),
   }));
-  return tree.nodes.every((node) => node.rank === undefined) ? seedTalentRanks(nodes) : nodes;
+  return tree.nodes.every((node) => node.rank === undefined)
+    ? seedTalentRanks(nodes) : nodes.map(withTalentChoice);
 }
 
 function toEdges(tree: Tree): TalentEdge[] {

@@ -21,6 +21,7 @@ import RuntimeTalentTree, {
   type TalentNode,
 } from "@/components/talent-trees/TalentTree";
 import talentSpells from "@/components/talent-trees/talent-spells.json";
+import { withTalentChoice } from "@/components/talent-trees/talentChoices";
 import { backendEndpoints, fetchBackend, readApiJson } from "@/config/api";
 import {
   createTree,
@@ -220,6 +221,8 @@ function staticColumnToTree(layoutKey: string, column: StaticColumn, index: numb
         column: columnNumber,
         maxRank: node.maxRank ?? 1,
         rank: node.rank ?? 0,
+        selectedChoice: node.selectedChoice,
+        alternative: node.alternative,
         requires: [...new Set(requires)],
         shape: node.shape ?? "circle",
       };
@@ -267,7 +270,7 @@ function parseStoredLayout(preset: Preset): StoredTalentLayout {
 
 function runtimeNodes(tree: Tree): TalentNode[] {
   const nameById = new Map(tree.nodes.map((node) => [node.id, node.name]));
-  return tree.nodes.map((node) => ({
+  return tree.nodes.map((node) => withTalentChoice({
     id: node.id,
     name: node.name,
     description: node.description,
@@ -277,6 +280,8 @@ function runtimeNodes(tree: Tree): TalentNode[] {
     column: node.column,
     maxRank: node.maxRank,
     rank: node.rank,
+    selectedChoice: node.selectedChoice,
+    alternative: node.alternative,
     requires: node.requires
       .map((id) => nameById.get(id))
       .filter((name): name is string => Boolean(name)),

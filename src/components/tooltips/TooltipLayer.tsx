@@ -16,7 +16,21 @@ type TooltipData = {
   level?: string;
   detail?: string;
   requirement?: string;
+  choices?: { name: string; icon?: string; description?: string }[];
+  selectedChoice?: number;
 };
+
+function readChoices(value?: string): TooltipData["choices"] {
+  if (!value) return undefined;
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return Array.isArray(parsed) && parsed.length === 2 && parsed.every((choice) =>
+      choice && typeof choice.name === "string" &&
+      (choice.icon === undefined || typeof choice.icon === "string") &&
+      (choice.description === undefined || typeof choice.description === "string"))
+      ? parsed as TooltipData["choices"] : undefined;
+  } catch { return undefined; }
+}
 
 const triggerFor = (target: EventTarget | null) =>
   target instanceof Element ? target.closest<HTMLElement>("[data-tooltip-kind]") : null;
@@ -43,6 +57,8 @@ export default function TooltipLayer() {
           level: element.dataset.tooltipLevel,
           detail: element.dataset.tooltipDetail,
           requirement: element.dataset.tooltipRequirement,
+          choices: readChoices(element.dataset.tooltipChoices),
+          selectedChoice: Number(element.dataset.tooltipSelectedChoice ?? -1),
         });
       }
       setPosition({ x, y });
@@ -117,7 +133,8 @@ export default function TooltipLayer() {
   const top = position.y + size.height + 18 > window.innerHeight
     ? Math.max(10, position.y - size.height - 12) : position.y + 14;
   const props = { name: active.name, description: active.description, icon: active.icon,
-    quality: active.quality, level: active.level, detail: active.detail, requirement: active.requirement };
+    quality: active.quality, level: active.level, detail: active.detail, requirement: active.requirement,
+    choices: active.choices, selectedChoice: active.selectedChoice };
   return createPortal(
     <div ref={popup} className={styles.popup} role="tooltip" style={{ left, top }}>
       {active.kind === "item" ? <ItemTooltip {...props} /> :

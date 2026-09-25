@@ -10,6 +10,8 @@ export type Talent = {
   column: number;
   maxRank: number;
   rank?: number;
+  selectedChoice?: 0 | 1;
+  alternative?: { name: string; icon?: string; description?: string; url?: string };
   requires: string[];
   shape?: TalentShape;
 };
@@ -111,6 +113,22 @@ export function validateTree(tree: Tree): string[] {
     if (node.rank !== undefined &&
       (!Number.isInteger(node.rank) || node.rank < 0 || node.rank > node.maxRank)) {
       errors.push("Selected rank must be between 0 and the talent's maximum rank.");
+    }
+
+    if (node.selectedChoice !== undefined && node.selectedChoice !== 0 && node.selectedChoice !== 1) {
+      errors.push("Selected choice must be 0 or 1.");
+    }
+    if (node.alternative !== undefined &&
+      (typeof node.alternative?.name !== "string" || !node.alternative.name.trim() ||
+        [node.alternative.icon, node.alternative.description, node.alternative.url]
+          .some((value) => value !== undefined && typeof value !== "string"))) {
+      errors.push("A choice needs a named alternative with valid text fields.");
+    }
+    if (node.alternative?.name.trim() && (node.shape !== "hexagon" || node.maxRank !== 1)) {
+      errors.push("Choice talents must be hexagonal and use one point.");
+    }
+    if (node.selectedChoice === 1 && !node.alternative?.name.trim()) {
+      errors.push("The second choice must be defined before it can be selected.");
     }
 
     if (

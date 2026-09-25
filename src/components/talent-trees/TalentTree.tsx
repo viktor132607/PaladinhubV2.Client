@@ -40,6 +40,8 @@ export type TalentNode = {
   column?: number;
   maxRank?: number;
   rank?: number;
+  selectedChoice?: 0 | 1;
+  alternative?: { name: string; icon?: string; description?: string; url?: string };
   cost?: number;
   requires?: string[];
   shape?: TalentNodeShape;
@@ -447,10 +449,25 @@ export default function TalentTree({
             const requirements = requirementsOf(node);
             const cost = costOf(node);
             const spell = talentSpells[node.name as keyof typeof talentSpells];
-            const icon = spellIconSource(node.icon || spell?.icon || defaultIconPath(node.name));
-            const description = node.description?.trim() || spell?.description || undefined;
-            const url = node.url || spell?.url;
+            const primaryIcon = spellIconSource(node.icon || spell?.icon || defaultIconPath(node.name));
+            const primaryDescription = node.description?.trim() || spell?.description || undefined;
+            const alternative = node.alternative?.name.trim() ? node.alternative : undefined;
+            const alternativeSpell = alternative && talentSpells[alternative.name as keyof typeof talentSpells];
+            const alternativeIcon = alternative
+              ? spellIconSource(alternative.icon || alternativeSpell?.icon || primaryIcon) : undefined;
+            const selectedChoice = isActive ? node.selectedChoice ?? 0 : -1;
+            const name = selectedChoice === 1 && alternative ? alternative.name : node.name;
+            const icon = selectedChoice === 1 && alternativeIcon ? alternativeIcon : primaryIcon;
+            const description = selectedChoice === 1 && alternative
+              ? alternative.description?.trim() || alternativeSpell?.description || undefined
+              : primaryDescription;
+            const url = selectedChoice === 1 && alternative ? alternative.url || alternativeSpell?.url
+              : node.url || spell?.url;
             const wowheadUrl = url && /^https:\/\/(?:www\.)?wowhead\.com\/spell=\d+(?:[/?#-]|$)/i.test(url) ? url : undefined;
+            const choices = alternative ? JSON.stringify([
+              { name: node.name, icon: primaryIcon, description: primaryDescription },
+              { name: alternative.name, icon: alternativeIcon, description: alternative.description?.trim() || alternativeSpell?.description || undefined },
+            ]) : undefined;
             const attrs = {
               "data-id": node.id,
               className: `${styles.node} ${styles[node.shape ?? "circle"]} ${isActive ? styles.active : styles.inactive}
@@ -460,11 +477,13 @@ export default function TalentTree({
               onMouseLeave: () => setHighlightedNodeId(null),
               onFocus: () => setHighlightedNodeId(node.id),
               onBlur: () => setHighlightedNodeId(null),
-              "aria-label": `${node.name}, ${rank} of ${maxRank} ranks`,
-              "data-tooltip-kind": readOnly && wowheadUrl ? undefined : "talent",
-              "data-tooltip-name": node.name,
-              "data-tooltip-description": description,
+              "aria-label": `${name}, ${rank} of ${maxRank} ranks${alternative ? `, choice ${selectedChoice < 0 ? "none" : selectedChoice + 1} of 2` : ""}`,
+              "data-tooltip-kind": readOnly && wowheadUrl && !alternative ? undefined : "talent",
+              "data-tooltip-name": name,
+              "data-tooltip-description": alternative ? undefined : description,
               "data-tooltip-icon": icon,
+              "data-tooltip-choices": choices,
+              "data-tooltip-selected-choice": alternative ? selectedChoice : undefined,
               "data-tooltip-detail": `Rank: ${rank}/${maxRank} · Cost: ${cost} point${cost === 1 ? "" : "s"}`,
               "data-tooltip-requirement": requirements.length ? `Requires: ${requirements.join(", ")}` : undefined,
             } as const;
@@ -479,10 +498,14 @@ export default function TalentTree({
                     event.currentTarget.src = "/images/itemIcons/talents.jpg";
                   }}
                 />
-                <span className="sr-only">{node.name}</span>
+                <span className="sr-only">{name}</span>
               </>;
             return (
               <div key={node.id} className={styles.slot} style={nodeStyle(node)}>
+                {alternative && <span className={styles.choiceArrows} aria-hidden="true">
+                  <span className={selectedChoice === 0 ? styles.choiceArrowActive : ""}>◀</span>
+                  <span className={selectedChoice === 1 ? styles.choiceArrowActive : ""}>▶</span>
+                </span>}
                 {readOnly && wowheadUrl ? (
                   <a {...attrs} href={wowheadUrl} target="_blank" rel="noopener noreferrer">{content}</a>
                 ) : readOnly ? (

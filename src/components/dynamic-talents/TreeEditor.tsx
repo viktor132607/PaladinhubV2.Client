@@ -680,7 +680,10 @@ export default function TreeEditor({
                         className={field}
                         value={node.shape ?? "circle"}
                         onChange={(e) =>
-                          updateNode({ shape: e.target.value as TalentShape })
+                          updateNode(e.target.value === "hexagon"
+                            ? { shape: "hexagon", maxRank: 1, rank: Math.min(node.rank ?? 0, 1),
+                                alternative: node.alternative ?? { name: "" } }
+                            : { shape: e.target.value as TalentShape, alternative: undefined, selectedChoice: undefined })
                         }
                       >
                         <option value="circle">Circle</option>
@@ -689,6 +692,41 @@ export default function TreeEditor({
                       </select>
                     </label>
                   </div>
+
+                  {node.shape === "hexagon" && (
+                    <fieldset className="space-y-3 rounded border border-slate-600 p-3">
+                      <legend className="px-1">Second choice</legend>
+                      <label className="block">Talent name
+                        <input className={field} value={node.alternative?.name ?? ""}
+                          onChange={(event) => updateNode({ alternative: {
+                            ...node.alternative, name: event.target.value,
+                          } })} />
+                      </label>
+                      <SpellIconPicker value={node.alternative?.icon ?? ""}
+                        onChange={(icon) => updateNode({ alternative: {
+                          ...node.alternative, name: node.alternative?.name ?? "", icon: spellIconPath(icon),
+                        } })} />
+                      <label className="block">Effect
+                        <textarea className={field} rows={3} value={node.alternative?.description ?? ""}
+                          onChange={(event) => updateNode({ alternative: {
+                            ...node.alternative, name: node.alternative?.name ?? "", description: event.target.value,
+                          } })} />
+                      </label>
+                      <label className="block">Wowhead spell URL
+                        <input className={field} type="url" value={node.alternative?.url ?? ""}
+                          onChange={(event) => updateNode({ alternative: {
+                            ...node.alternative, name: node.alternative?.name ?? "", url: event.target.value,
+                          } })} />
+                      </label>
+                      <label className="block">Selected choice when ranked
+                        <select className={field} value={node.selectedChoice ?? 0}
+                          onChange={(event) => updateNode({ selectedChoice: Number(event.target.value) as 0 | 1 })}>
+                          <option value={0}>{node.name}</option>
+                          <option value={1}>{node.alternative?.name || "Second choice"}</option>
+                        </select>
+                      </label>
+                    </fieldset>
+                  )}
 
                   <fieldset className="max-h-[48vh] space-y-2 overflow-auto pr-2">
                     <legend>Prerequisites / connections</legend>

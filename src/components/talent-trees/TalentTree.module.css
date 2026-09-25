@@ -79,3 +79,17 @@
   pointer-events: none;
 }
 .rankActive { border-color: #bc9737; color: #ffe08b; }
+.choiceArrows {
+  position: absolute;
+  top: 17px;
+  left: -8px;
+  z-index: 3;
+  display: flex;
+  width: 66px;
+  justify-content: space-between;
+  color: #666;
+  font: bold 10px/14px Arial, sans-serif;
+  pointer-events: none;
+  text-shadow: 0 1px 2px #000;
+}
+.choiceArrowActive { color: #ffd65e; }

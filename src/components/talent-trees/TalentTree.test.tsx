@@ -3,9 +3,11 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import TalentTree, { edgeCoordinates } from "./TalentTree";
 import TreeView from "@/components/dynamic-talents/TreeView";
-import { validPublishedTrees } from "./PublishedTalentTrees";
+import PublishedTalentTrees, { validPublishedTrees } from "./PublishedTalentTrees";
 import { seedTalentRanks } from "./seedTalentRanks";
 import { validateTree } from "@/features/dynamic-talents/model";
+import TalentTooltip from "@/components/tooltips/TalentTooltip";
+import { withTalentChoice } from "./talentChoices";
 
 describe("published talent trees", () => {
   it("shows the existing spell effect and icon without selection or save controls", () => {
@@ -89,5 +91,52 @@ describe("published talent trees", () => {
       nodes: [{ id: "a", name: "Rank", description: "", icon: "", row: 1, column: 1, maxRank: 2, rank: 3, requires: [] }],
     };
     expect(validateTree(tree)).toContain("Selected rank must be between 0 and the talent's maximum rank.");
+  });
+
+  it("shows both choices, greys both when unranked, and highlights only the selected choice", () => {
+    const choice = withTalentChoice({ id: "choice", name: "Wrench Evil", shape: "hexagon", row: 1, column: 1 });
+    expect(choice.alternative?.name).toBe("Stand Against Evil");
+    const unranked = renderToStaticMarkup(<TalentTree nodes={[{ ...choice, rank: 0 }]} />);
+    expect(unranked).toContain('data-tooltip-selected-choice="-1"');
+    expect(unranked).toContain("Stand Against Evil");
+    expect(unranked).toContain("◀");
+    expect(unranked).toContain("▶");
+
+    const selected = renderToStaticMarkup(<TalentTree nodes={[{ ...choice, rank: 1, selectedChoice: 1 }]} />);
+    expect(selected).toContain('data-tooltip-selected-choice="1"');
+    expect(selected).toContain('aria-label="Stand Against Evil, 1 of 1 ranks, choice 2 of 2"');
+    const tooltip = renderToStaticMarkup(<TalentTooltip name="Stand Against Evil" choices={[
+      { name: "Wrench Evil", description: "First effect" },
+      { name: "Stand Against Evil", description: "Second effect" },
+    ]} selectedChoice={1} />);
+    expect(tooltip).toContain("First effect");
+    expect(tooltip).toContain("Second effect");
+    expect(tooltip).toContain("Избран");
+    expect(tooltip).toContain("Неактивен");
+    expect(withTalentChoice({ id: "not-choice", name: "Blinding Light", shape: "hexagon" }).shape).toBe("circle");
+  });
+
+  it("rejects invalid published choice configuration", () => {
+    const tree = {
+      type: "talenttree.dynamic" as const, id: "choice", title: "Choice", rows: 1, columns: 1, points: 1,
+      nodes: [{ id: "a", name: "First", description: "", icon: "", row: 1, column: 1,
+        maxRank: 1, rank: 1, selectedChoice: 2 as 0, alternative: { name: "" }, requires: [] }],
+    };
+    expect(validateTree(tree)).toContain("Selected choice must be 0 or 1.");
+    expect(validateTree(tree)).toContain("A choice needs a named alternative with valid text fields.");
+  });
+
+  it("renders the admin's selected alternative in a published tree", () => {
+    const tree = {
+      type: "talenttree.dynamic" as const, id: "choice", title: "Choices", rows: 1, columns: 1, points: 1,
+      nodes: [{ id: "a", name: "Wrench Evil", description: "Original effect", icon: "", row: 1, column: 1,
+        maxRank: 1, rank: 1, selectedChoice: 1 as const, shape: "hexagon" as const,
+        alternative: { name: "Stand Against Evil", description: "Other effect" }, requires: [] }],
+    };
+    expect(validPublishedTrees([tree])).toBe(true);
+    const html = renderToStaticMarkup(<PublishedTalentTrees layoutKey="example" trees={[tree]} />);
+    expect(html).toContain('data-tooltip-selected-choice="1"');
+    expect(html).toContain("Original effect");
+    expect(html).toContain("Other effect");
   });
 });

@@ -1,4 +1,5 @@
 import type { TalentNode } from "./TalentTree";
+import { withTalentChoice } from "./talentChoices";
 
 // Initial display ranks for the bundled layouts. Admins can replace these per layout.
 const twoRankTalents = new Set([
@@ -15,12 +16,13 @@ const initialRanks: Record<string, number> = {
 };
 
 export function seedTalentRanks(nodes: TalentNode[]): TalentNode[] {
-  return nodes.map((node) => {
+  return nodes.map((source) => {
+    const node = withTalentChoice(source);
     const maxRank = Math.max(node.maxRank ?? 1, twoRankTalents.has(node.name) ? 2 : 1);
     const defaultRank = (node.row ?? 1) <= 2 ||
       ((node.column ?? 1) <= 3 ? (node.column === 2 || (node.row ?? 1) % 3 === 0)
         : (node.column ?? 1) % 2 === 0 && (node.row ?? 1) % 3 !== 0)
       ? maxRank : 0;
-    return { ...node, maxRank, rank: initialRanks[node.name] ?? defaultRank };
+    return { ...node, maxRank, rank: node.rank ?? initialRanks[node.name] ?? defaultRank };
   });
 }
