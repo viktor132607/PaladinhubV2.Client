@@ -120,8 +120,6 @@
 .ph-v1-navbar .ph-navbar-actions {
     margin-left: .25rem;
 }
-.ph-v1-navbar .ph-currency-select { width: 84px; height: 36px; padding: 4px; border: 1px solid #6d7380; border-radius: 6px; background: #20242a; color: #fff; font-size: .8rem; cursor: pointer; }
-@media (max-width: 575.98px) { .ph-v1-navbar .ph-currency-select { width: 68px; height: 40px; font-size: .7rem; } }
 
 @media (max-width: 575.98px) {
     .ph-v1-navbar > .container-fluid {

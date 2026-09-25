@@ -704,7 +704,7 @@ function isAbortError(
 }
 
 export default function Products() {
-  const { formatMoney: formatPrice } = useCurrency();
+  const { formatMoney: formatPrice, currency, usdPerEur, rateDate, setCurrency } = useCurrency();
   const location =
     useLocation();
 
@@ -1400,6 +1400,17 @@ export default function Products() {
             </h1>
 
             <div className="flex items-center gap-2">
+              <label className="sr-only" htmlFor="merchandise-currency">Currency</label>
+              <select
+                id="merchandise-currency"
+                className="h-9 w-[90px] rounded-md border border-[#6d7380] bg-[#20242a] px-2 text-sm text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc107]"
+                value={currency}
+                title={usdPerEur ? `ECB exchange rate ${rateDate}: 1 EUR = ${usdPerEur} USD. Card charges use the selected currency.` : "USD is unavailable until the exchange rate loads."}
+                onChange={(event) => setCurrency(event.target.value as "EUR" | "USD")}
+              >
+                <option value="EUR">€ EUR</option>
+                <option value="USD" disabled={!usdPerEur}>$ USD</option>
+              </select>
               <Link
                 to="/Cart/MyCart"
                 className="inline-flex items-center gap-2 rounded-full bg-[#ffc107] px-4 py-1.5 text-sm font-bold text-black no-underline hover:bg-[#ffca2c]"
