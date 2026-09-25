@@ -1,5 +1,6 @@
 "use client";
 import { spellIconSource } from "@/lib/spell-icons";
+import PublishedTalentTrees from "@/components/talent-trees/PublishedTalentTrees";
 import { useState } from "react";
 import {
   changeRank,
@@ -111,14 +112,15 @@ export default function TreeView({ tree, readOnly = true }: { tree: Tree; readOn
   const errors = validateTree(tree);
   if (errors.length)
     return <p role="alert">Invalid talent tree: {errors.join(" ")}</p>;
+  if (readOnly) return <PublishedTalentTrees layoutKey={`dynamic-${tree.id}`} trees={[tree]} />;
   const node = tree.nodes.find((n) => n.id === selected);
   return (
     <section className="space-y-3">
       <h3 className="text-xl">{tree.title}</h3>
-      {!readOnly && <p>
+      <p>
         Points: {Object.values(ranks).reduce((a, b) => a + b, 0)} /{" "}
         {tree.points}
-      </p>}
+      </p>
       <TreeGrid
         tree={tree}
         ranks={ranks}
@@ -135,7 +137,7 @@ export default function TreeView({ tree, readOnly = true }: { tree: Tree; readOn
               .map((id) => tree.nodes.find((n) => n.id === id)?.name)
               .join(", ") || "None"}
           </p>
-          {!readOnly && <div className="flex gap-2">
+          <div className="flex gap-2">
             <button
               type="button"
               className="rounded bg-amber-500 px-3 py-2 text-slate-950 disabled:opacity-40"
@@ -152,16 +154,16 @@ export default function TreeView({ tree, readOnly = true }: { tree: Tree; readOn
             >
               Refund rank
             </button>
-          </div>}
+          </div>
         </div>
       )}
-      {!readOnly && <button
+      <button
         type="button"
         className="rounded bg-slate-700 px-3 py-2"
         onClick={() => setRanks({})}
       >
         Reset points
-      </button>}
+      </button>
     </section>
   );
 }

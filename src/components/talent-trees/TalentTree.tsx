@@ -9,8 +9,10 @@ import {
   useMemo,
   useRef,
   useState,
+  useId,
   type CSSProperties,
 } from "react";
+import styles from "./TalentTree.module.css";
 
 import {
   loadLocalTalentSelection,
@@ -63,44 +65,38 @@ const CELL_HEIGHT = 60;
 const GRID_GAP = 20;
 const STEP_X = CELL_WIDTH + GRID_GAP;
 const STEP_Y = CELL_HEIGHT + GRID_GAP;
-const LINE_OFFSET_X = -8;
-const LINE_OFFSET_Y = -8;
-const HEXAGON_CLIP =
-  "polygon(0% 25%, 0% 75%, 25% 100%, 75% 100%, 100% 75%, 100% 25%, 75% 0%, 25% 0%)";
+const NODE_SIZE = 50;
+const ARROW_GAP = 28;
 
 function defaultIconPath(name: string): string {
   const fileName = `${name.replace(/['’]/g, "")}.jpg`;
   return `/images/SpellIcons/${encodeURIComponent(fileName)}`;
 }
 
-function nodeShapeClass(shape: TalentNodeShape | undefined): string {
-  return shape === "square" || shape === "hexagon" ? "rounded-none" : "rounded-full";
-}
-
 function nodeStyle(node: TalentNode): CSSProperties {
-  const style: CSSProperties = {
+  return {
     gridColumnStart: node.column ?? "auto",
     gridRowStart: node.row ?? "auto",
   };
-
-  if (node.shape === "hexagon") style.clipPath = HEXAGON_CLIP;
-  return style;
 }
 
-function edgeStyle(edge: TalentEdge): CSSProperties {
+export function edgeCoordinates(edge: TalentEdge) {
   const [fromColumn, fromRow, toColumn, toRow] = edge;
-  const x = (fromColumn - 1) * STEP_X + STEP_X / 2 + LINE_OFFSET_X;
-  const y = (fromRow - 1) * STEP_Y + STEP_Y / 2 + LINE_OFFSET_Y;
-  const dx = (toColumn - fromColumn) * STEP_X;
-  const dy = (toRow - fromRow) * STEP_Y;
-  const length = Math.sqrt(dx * dx + dy * dy);
-  const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-
+  const sourceX = (fromColumn - 1) * STEP_X + NODE_SIZE / 2;
+  const sourceY = (fromRow - 1) * STEP_Y + CELL_HEIGHT / 2;
+  const targetX = (toColumn - 1) * STEP_X + NODE_SIZE / 2;
+  const targetY = (toRow - 1) * STEP_Y + CELL_HEIGHT / 2;
+  const dx = targetX - sourceX;
+  const dy = targetY - sourceY;
+  const distance = Math.hypot(dx, dy);
+  if (distance <= ARROW_GAP * 2) return null;
+  const unitX = dx / distance;
+  const unitY = dy / distance;
   return {
-    left: `${x}px`,
-    top: `${y}px`,
-    width: `${length}px`,
-    transform: `rotate(${angle}deg)`,
+    x1: sourceX + unitX * (NODE_SIZE / 2 + 2),
+    y1: sourceY + unitY * (NODE_SIZE / 2 + 2),
+    x2: targetX - unitX * ARROW_GAP,
+    y2: targetY - unitY * ARROW_GAP,
   };
 }
 
@@ -123,12 +119,14 @@ export default function TalentTree({
   const [isHydrated, setIsHydrated] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [flashNodeId, setFlashNodeId] = useState<string | null>(null);
+  const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
   const [validationMessage, setValidationMessage] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
 
   const snapshotRef = useRef<string[]>([]);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const markerId = useId().replace(/[^a-zA-Z0-9_-]/g, "_");
 
   const ruleSet = useMemo(() => rulesForTree(treeKey), [treeKey]);
   const pointLimit = maxPoints === undefined ? ruleSet.max : maxPoints;
@@ -182,6 +180,8 @@ export default function TalentTree({
     }),
     [columnCount, rowCount],
   );
+  const gridWidth = columnCount * CELL_WIDTH + (columnCount - 1) * GRID_GAP;
+  const gridHeight = rowCount * CELL_HEIGHT + (rowCount - 1) * GRID_GAP;
 
   const costOf = useCallback(
     (node: TalentNode): number => {
@@ -404,25 +404,38 @@ export default function TalentTree({
           data-tree-key={treeKey}
           data-edit-mode={readOnly ? "readonly" : isEditing ? "1" : "0"}
         >
-          {edges.map((edge, index) => {
-            const activeConnection = isEdgeActive(edge);
-            return (
-              <span
-                key={`${edge.join("-")}-${index}`}
-                aria-hidden="true"
-                data-active-connection={activeConnection ? "1" : "0"}
-                className="pointer-events-none absolute z-[1] h-px origin-left rounded"
-                style={{
-                  ...edgeStyle(edge),
-                  backgroundColor: activeConnection ? "#ffff00" : "#5a5a5a",
-                  transition: "background-color 180ms ease",
-                }}
-              />
-            );
-          })}
+          <svg className="pointer-events-none absolute inset-0 z-[1] overflow-visible" width={gridWidth} height={gridHeight} aria-hidden="true">
+            <defs>
+              <marker id={`${markerId}-muted`} markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+                <path d="M 0 0 L 7 4 L 0 8 Z" fill="#666" />
+              </marker>
+              <marker id={`${markerId}-gold`} markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+                <path d="M 0 0 L 7 4 L 0 8 Z" fill="#d5aa31" />
+              </marker>
+            </defs>
+            {edges.map((edge, index) => {
+              const coordinates = edgeCoordinates(edge);
+              if (!coordinates) return null;
+              const fromNode = nodeByPosition.get(positionKey(edge[0], edge[1]));
+              const toNode = nodeByPosition.get(positionKey(edge[2], edge[3]));
+              const activeConnection = isEdgeActive(edge);
+              const highlighted = highlightedNodeId !== null &&
+                (fromNode?.id === highlightedNodeId || toNode?.id === highlightedNodeId);
+              const gold = activeConnection || highlighted;
+              return (
+                <line key={`${edge.join("-")}-${index}`} {...coordinates}
+                  data-active-connection={activeConnection ? "1" : "0"}
+                  stroke={gold ? "#d5aa31" : "#666"}
+                  strokeWidth={gold ? 2.25 : 1.5}
+                  strokeLinecap="round"
+                  markerEnd={`url(#${markerId}-${gold ? "gold" : "muted"})`}
+                />
+              );
+            })}
+          </svg>
 
           {nodes.map((node) => {
-            const isActive = !readOnly && selectedSet.has(node.id);
+            const isActive = selectedSet.has(node.id);
             const requirements = requirementsOf(node);
             const cost = costOf(node);
             const spell = talentSpells[node.name as keyof typeof talentSpells];
@@ -432,19 +445,14 @@ export default function TalentTree({
             const wowheadUrl = url && /^https:\/\/(?:www\.)?wowhead\.com\/spell=\d+(?:[/?#-]|$)/i.test(url) ? url : undefined;
             const attrs = {
               "data-id": node.id,
-              className: `
-                  relative z-[2] flex h-[50px] w-[50px] items-center justify-center
-                  self-center justify-self-center overflow-hidden border-2 bg-[#111] p-0
-                  transition-all duration-200 ${nodeShapeClass(node.shape)}
-                  ${
-                    isActive
-                      ? "border-white shadow-[0_0_15px_5px_#FFD700]"
-                      : readOnly ? "border-[#555] hover:border-[#FFD700]" : "border-[#FFD700] hover:scale-105 hover:shadow-[0_0_15px_5px_#FFD700]"
-                  }
-                  ${flashNodeId === node.id ? "animate-pulse border-red-500" : ""}
-                  ${readOnly ? "cursor-help" : adminMode && !isEditing ? "cursor-default" : "cursor-pointer"}
-                `,
+              className: `${styles.node} ${styles[node.shape ?? "circle"]} ${isActive ? styles.active : ""}
+                ${flashNodeId === node.id ? styles.invalid : ""}
+                ${readOnly && !wowheadUrl ? styles.informational : ""}`,
               style: nodeStyle(node),
+              onMouseEnter: () => setHighlightedNodeId(node.id),
+              onMouseLeave: () => setHighlightedNodeId(null),
+              onFocus: () => setHighlightedNodeId(node.id),
+              onBlur: () => setHighlightedNodeId(null),
               "aria-label": node.name,
               "data-tooltip-kind": readOnly && wowheadUrl ? undefined : "talent",
               "data-tooltip-name": node.name,
