@@ -114,6 +114,8 @@ export const backendEndpoints = {
     csrf: "/api/auth/csrf",
     me: "/api/auth/me",
     register: "/api/auth/register",
+    usernameAvailability: (username: string) =>
+      `/api/auth/username-availability?username=${encode(username)}`,
     login: "/api/auth/login",
     loginWithTwoFactor: "/api/auth/2fa",
     loginWithRecoveryCode: "/api/auth/recovery-code",

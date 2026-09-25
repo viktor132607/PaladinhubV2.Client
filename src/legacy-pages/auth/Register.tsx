@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import { Link, useNavigate } from "@/router/nextCompat";
+import { backendEndpoints, fetchBackend } from "@/config/api";
+import PasswordField from "./PasswordField";
+import styles from "./authFields.module.css";
 
 const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : "Registration failed.";
 
@@ -16,10 +19,41 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [availability, setAvailability] = useState<{
+    username: string; state: "checking" | "available" | "taken" | "unavailable";
+  } | null>(null);
+
+  useEffect(() => {
+    const candidate = username.trim();
+    if (!candidate || candidate.length > 100) return;
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      setAvailability({ username: candidate, state: "checking" });
+      try {
+        const response = await fetchBackend(backendEndpoints.auth.usernameAvailability(candidate), {
+          signal: controller.signal, cache: "no-store",
+        });
+        if (!response.ok) throw new Error("Availability check failed.");
+        const result: { available: boolean } = await response.json();
+        if (!controller.signal.aborted)
+          setAvailability({ username: candidate, state: result.available ? "available" : "taken" });
+      } catch {
+        if (!controller.signal.aborted)
+          setAvailability({ username: candidate, state: "unavailable" });
+      }
+    }, 450);
+    return () => { controller.abort(); window.clearTimeout(timer); };
+  }, [username]);
+
+  const usernameStatus = availability?.username === username.trim() ? availability.state : null;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
+    if (usernameStatus === "taken") {
+      setError("Username is already taken.");
+      return;
+    }
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
@@ -52,7 +86,17 @@ export default function Register() {
           </div>
           <div className="mb-3">
             <label className="form-label" htmlFor="Username">Username</label>
-            <input id="Username" className="form-control" value={username} onChange={(event) => setUsername(event.target.value)} required />
+            <input id="Username" className="form-control" autoComplete="username"
+              value={username} onChange={(event) => setUsername(event.target.value)}
+              aria-invalid={usernameStatus === "taken"} aria-describedby={usernameStatus ? "username-status" : undefined}
+              required />
+            {usernameStatus && <p id="username-status" role="status" aria-live="polite"
+              className={`${styles.availability} ${styles[usernameStatus === "checking" || usernameStatus === "unavailable" ? "pending" : usernameStatus]}`}>
+              {usernameStatus === "checking" ? "Checking username…" :
+                usernameStatus === "taken" ? "That username is taken. Try another." :
+                  usernameStatus === "available" ? "Username is available." :
+                    "Could not check now; availability will be verified on registration."}
+            </p>}
           </div>
           <div className="mb-3">
             <label className="form-label" htmlFor="Email">Email</label>
@@ -60,13 +104,15 @@ export default function Register() {
           </div>
           <div className="mb-3">
             <label className="form-label" htmlFor="Password">Password</label>
-            <input id="Password" type="password" className="form-control" value={password} onChange={(event) => setPassword(event.target.value)} required />
+            <PasswordField id="Password" autoComplete="new-password" value={password} onChange={setPassword} required />
           </div>
           <div className="mb-3">
             <label className="form-label" htmlFor="ConfirmPassword">Confirm password</label>
-            <input id="ConfirmPassword" type="password" className="form-control" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} required />
+            <PasswordField id="ConfirmPassword" autoComplete="new-password"
+              value={confirmPassword} onChange={setConfirmPassword} required />
           </div>
-          <input type="submit" value="Register" className="btn btn-success w-100 p-2" disabled={submitting} />
+          <input type="submit" value="Register" className="btn btn-success w-100 p-2"
+            disabled={submitting || usernameStatus === "taken"} />
           <p className="text-center mt-2">
             Already have an account? <Link to="/Account/Login" className="text-decoration-none">Login</Link>
           </p>

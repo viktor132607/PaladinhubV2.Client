@@ -1,0 +1,25 @@
+.passwordField { position: relative; }
+.passwordField input { padding-right: 3rem !important; }
+.togglePassword {
+  position: absolute;
+  top: 50%;
+  right: .35rem;
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: .55rem;
+  transform: translateY(-50%);
+  place-items: center;
+  border: 0;
+  border-radius: .35rem;
+  background: transparent;
+  color: #545e70;
+  cursor: pointer;
+}
+.togglePassword:hover { color: #1a2839; background: #e8edf3; }
+.togglePassword:focus-visible { outline: 2px solid #236bb6; outline-offset: 1px; }
+.togglePassword svg { width: 1.2rem; height: 1.2rem; }
+.availability { margin: .35rem 0 0; font-size: .85rem; line-height: 1.35; }
+.available { color: #126f35; }
+.taken { color: #b42318; }
+.pending { color: #46566a; }

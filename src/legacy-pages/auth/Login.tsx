@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import { Link, useLocation, useNavigate } from "@/router/nextCompat";
+import PasswordField from "./PasswordField";
 
 const AUTH_RETURN_URL_KEY = "paladinhub.auth.returnUrl";
 
@@ -94,14 +95,8 @@ export default function Login() {
           </div>
           <div className="mb-3">
             <label className="form-label" htmlFor="Password">Password</label>
-            <input
-              id="Password"
-              type="password"
-              className="form-control"
-              autoComplete="current-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
+            <PasswordField id="Password" autoComplete="current-password"
+              value={password} onChange={setPassword} />
           </div>
           <div className="form-check mb-3">
             <input
