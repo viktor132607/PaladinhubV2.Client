@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react
 import { useAuth } from "@/auth/AuthContext";
 import { backendEndpoints, backendUrl, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useLocation, useNavigate } from "@/router/nextCompat";
+import toastStyles from "./ProductsToast.module.css";
 
 export type Product = {
   id: string;
@@ -758,6 +759,17 @@ export default function Products() {
     string | null
   >(null);
 
+  const [toastPaused, setToastPaused] = useState(false);
+
+  useEffect(() => {
+    if (toastPaused || loadError || (!notice && !actionError)) return;
+    const timeout = window.setTimeout(() => {
+      setNotice(null);
+      setActionError(null);
+    }, actionError ? 8000 : 4500);
+    return () => window.clearTimeout(timeout);
+  }, [notice, actionError, loadError, toastPaused]);
+
   const [
     addingProductId,
     setAddingProductId,
@@ -1140,6 +1152,40 @@ export default function Products() {
 
   return (
     <div className="w-full bg-[#0f1115] py-6 text-[#e6e6e6]">
+      {(loadError || actionError || notice) && (
+        <div
+          className={`${toastStyles.toast} ${loadError || actionError ? toastStyles.error : toastStyles.success}`}
+          role={loadError || actionError ? "alert" : "status"}
+          onMouseEnter={() => setToastPaused(true)}
+          onMouseLeave={() => setToastPaused(false)}
+          onFocusCapture={() => setToastPaused(true)}
+          onBlurCapture={() => setToastPaused(false)}
+        >
+          <span className={toastStyles.icon} aria-hidden="true">
+            <i className={`fa-solid ${loadError || actionError ? "fa-circle-exclamation" : "fa-circle-check"}`} />
+          </span>
+          <div className={toastStyles.content}>
+            <strong>{loadError ? "Could not load products" : actionError ? "Action failed" : "Done"}</strong>
+            <span>{loadError || actionError || notice}</span>
+            {!loadError && !actionError && notice?.toLowerCase().includes("cart") && (
+              <Link to="/Cart/MyCart" className={toastStyles.retry}>View cart →</Link>
+            )}
+            {loadError && (
+              <button type="button" className={toastStyles.retry} onClick={() => void load()}>
+                Try again
+              </button>
+            )}
+          </div>
+          {!loadError && (
+            <button
+              type="button"
+              className={toastStyles.dismiss}
+              aria-label="Dismiss notification"
+              onClick={() => { setNotice(null); setActionError(null); }}
+            >×</button>
+          )}
+        </div>
+      )}
       <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-12">
         <aside className="lg:col-span-3">
           <div className="min-w-[270px] rounded-xl border border-[#272b35] bg-[#171a21] p-4">
@@ -1578,32 +1624,8 @@ export default function Products() {
             </div>
           </div>
 
-          {notice && (
-            <div className="mb-3 rounded border border-[#198754] bg-[rgba(25,135,84,.15)] px-4 py-3 text-[#9ee2bd]">
-              {notice}
-            </div>
-          )}
-
-          {actionError && (
-            <div className="mb-3 rounded border border-[#dc3545] bg-[rgba(220,53,69,.15)] px-4 py-3 text-[#ffb3bb]">
-              {actionError}
-            </div>
-          )}
-
           {loadError ? (
-            <div className="rounded border border-[#dc3545] bg-[rgba(220,53,69,.15)] px-4 py-3 text-[#ffb3bb]">
-              {loadError}
-
-              <button
-                type="button"
-                onClick={() =>
-                  void load()
-                }
-                className="ml-3 rounded border border-[#dc3545] px-3 py-1"
-              >
-                Try again
-              </button>
-            </div>
+            <div className="min-h-[280px]" aria-hidden="true" />
           ) : loading ? (
             <div className="py-16 text-center text-[#6c757d]">
               Loading products…
