@@ -1,5 +1,6 @@
 "use client";
 
+import { seedTalentRanks } from "./seedTalentRanks";
 import TalentTree, {
   type TalentEdge,
   type TalentNode,
@@ -452,7 +453,7 @@ const hexagonNodeNames = new Set([
 function withOriginalNodeShapes(
   nodes: TalentNode[],
 ): TalentNode[] {
-  return nodes.map((node) => ({
+  return seedTalentRanks(nodes.map((node) => ({
     ...node,
 
     shape: squareNodeNames.has(node.name)
@@ -460,7 +461,7 @@ function withOriginalNodeShapes(
       : hexagonNodeNames.has(node.name)
         ? "hexagon"
         : "circle",
-  }));
+  })));
 }
 
 const paladinTreeNodes =

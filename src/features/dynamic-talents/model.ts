@@ -9,6 +9,7 @@ export type Talent = {
   row: number;
   column: number;
   maxRank: number;
+  rank?: number;
   requires: string[];
   shape?: TalentShape;
 };
@@ -105,6 +106,11 @@ export function validateTree(tree: Tree): string[] {
       node.maxRank > 10
     ) {
       errors.push("Talent ranks must be between 1 and 10.");
+    }
+
+    if (node.rank !== undefined &&
+      (!Number.isInteger(node.rank) || node.rank < 0 || node.rank > node.maxRank)) {
+      errors.push("Selected rank must be between 0 and the talent's maximum rank.");
     }
 
     if (

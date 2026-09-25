@@ -39,6 +39,7 @@ export type TalentNode = {
   row?: number;
   column?: number;
   maxRank?: number;
+  rank?: number;
   cost?: number;
   requires?: string[];
   shape?: TalentNodeShape;
@@ -131,6 +132,10 @@ export default function TalentTree({
   const ruleSet = useMemo(() => rulesForTree(treeKey), [treeKey]);
   const pointLimit = maxPoints === undefined ? ruleSet.max : maxPoints;
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
+  const displayedRank = useCallback((node: TalentNode) =>
+    readOnly ? Math.min(Math.max(node.rank ?? (selectedSet.has(node.id) ? 1 : 0), 0), node.maxRank ?? 1)
+      : selectedSet.has(node.id) ? 1 : 0,
+  [readOnly, selectedSet]);
 
   const nodeById = useMemo(
     () => new Map(nodes.map((node) => [node.id, node])),
@@ -156,11 +161,11 @@ export default function TalentTree({
       return Boolean(
         fromNode &&
           toNode &&
-          selectedSet.has(fromNode.id) &&
-          selectedSet.has(toNode.id),
+          displayedRank(fromNode) > 0 &&
+          displayedRank(toNode) > 0,
       );
     },
-    [nodeByPosition, selectedSet],
+    [nodeByPosition, displayedRank],
   );
 
   const columnCount = useMemo(() => {
@@ -421,7 +426,8 @@ export default function TalentTree({
               const activeConnection = isEdgeActive(edge);
               const highlighted = highlightedNodeId !== null &&
                 (fromNode?.id === highlightedNodeId || toNode?.id === highlightedNodeId);
-              const gold = activeConnection || highlighted;
+              const gold = activeConnection || (highlighted && Boolean(fromNode && toNode &&
+                displayedRank(fromNode) > 0 && displayedRank(toNode) > 0));
               return (
                 <line key={`${edge.join("-")}-${index}`} {...coordinates}
                   data-active-connection={activeConnection ? "1" : "0"}
@@ -435,7 +441,9 @@ export default function TalentTree({
           </svg>
 
           {nodes.map((node) => {
-            const isActive = selectedSet.has(node.id);
+            const rank = displayedRank(node);
+            const maxRank = node.maxRank ?? 1;
+            const isActive = rank > 0;
             const requirements = requirementsOf(node);
             const cost = costOf(node);
             const spell = talentSpells[node.name as keyof typeof talentSpells];
@@ -445,20 +453,19 @@ export default function TalentTree({
             const wowheadUrl = url && /^https:\/\/(?:www\.)?wowhead\.com\/spell=\d+(?:[/?#-]|$)/i.test(url) ? url : undefined;
             const attrs = {
               "data-id": node.id,
-              className: `${styles.node} ${styles[node.shape ?? "circle"]} ${isActive ? styles.active : ""}
+              className: `${styles.node} ${styles[node.shape ?? "circle"]} ${isActive ? styles.active : styles.inactive}
                 ${flashNodeId === node.id ? styles.invalid : ""}
                 ${readOnly && !wowheadUrl ? styles.informational : ""}`,
-              style: nodeStyle(node),
               onMouseEnter: () => setHighlightedNodeId(node.id),
               onMouseLeave: () => setHighlightedNodeId(null),
               onFocus: () => setHighlightedNodeId(node.id),
               onBlur: () => setHighlightedNodeId(null),
-              "aria-label": node.name,
+              "aria-label": `${node.name}, ${rank} of ${maxRank} ranks`,
               "data-tooltip-kind": readOnly && wowheadUrl ? undefined : "talent",
               "data-tooltip-name": node.name,
               "data-tooltip-description": description,
               "data-tooltip-icon": icon,
-              "data-tooltip-detail": `Cost: ${cost} point${cost === 1 ? "" : "s"}`,
+              "data-tooltip-detail": `Rank: ${rank}/${maxRank} · Cost: ${cost} point${cost === 1 ? "" : "s"}`,
               "data-tooltip-requirement": requirements.length ? `Requires: ${requirements.join(", ")}` : undefined,
             } as const;
             const content = <>
@@ -474,13 +481,19 @@ export default function TalentTree({
                 />
                 <span className="sr-only">{node.name}</span>
               </>;
-            return readOnly && wowheadUrl ? (
-              <a key={node.id} {...attrs} href={wowheadUrl} target="_blank" rel="noopener noreferrer">{content}</a>
-            ) : readOnly ? (
-              <span key={node.id} {...attrs} tabIndex={0}>{content}</span>
-            ) : (
-              <button key={node.id} {...attrs} type="button" aria-pressed={isActive}
-                onClick={() => toggleNode(node)} disabled={adminMode && !isEditing}>{content}</button>
+            return (
+              <div key={node.id} className={styles.slot} style={nodeStyle(node)}>
+                {readOnly && wowheadUrl ? (
+                  <a {...attrs} href={wowheadUrl} target="_blank" rel="noopener noreferrer">{content}</a>
+                ) : readOnly ? (
+                  <span {...attrs} tabIndex={0}>{content}</span>
+                ) : (
+                  <button {...attrs} type="button" aria-pressed={isActive}
+                    onClick={() => toggleNode(node)} disabled={adminMode && !isEditing}>{content}</button>
+                )}
+                <span className={`${styles.rank} ${isActive ? styles.rankActive : ""}`}
+                  aria-hidden="true">{rank}/{maxRank}</span>
+              </div>
             );
           })}
         </div>

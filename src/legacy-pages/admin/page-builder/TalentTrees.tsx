@@ -79,7 +79,6 @@ type StaticTreeEntry = {
 
 const ENTITY = "talent-layout";
 const SPECS: Spec[] = ["Holy", "Protection", "Retribution"];
-const EMPTY_SELECTION: string[] = [];
 const button =
   "rounded bg-amber-500 px-4 py-2 font-medium text-slate-950 disabled:cursor-not-allowed disabled:opacity-40";
 const secondaryButton =
@@ -220,6 +219,7 @@ function staticColumnToTree(layoutKey: string, column: StaticColumn, index: numb
         row: rowNumber,
         column: columnNumber,
         maxRank: node.maxRank ?? 1,
+        rank: node.rank ?? 0,
         requires: [...new Set(requires)],
         shape: node.shape ?? "circle",
       };
@@ -262,7 +262,7 @@ function parseStoredLayout(preset: Preset): StoredTalentLayout {
   const errors = trees.flatMap(validateTree);
   if (errors.length) throw new Error(errors.join(" "));
 
-  return { version: 1, spec, trees };
+  return { version: 1, spec, trees, targetKey: candidate.targetKey, published: candidate.published };
 }
 
 function runtimeNodes(tree: Tree): TalentNode[] {
@@ -276,6 +276,7 @@ function runtimeNodes(tree: Tree): TalentNode[] {
     row: node.row,
     column: node.column,
     maxRank: node.maxRank,
+    rank: node.rank,
     requires: node.requires
       .map((id) => nameById.get(id))
       .filter((name): name is string => Boolean(name)),
@@ -312,7 +313,6 @@ function RuntimePreview({ tree }: { tree: Tree }) {
           treeKey={`builder-preview-${tree.id}`}
           build={`builder-preview-${tree.id}`}
           nodes={runtimeNodes(tree)}
-          selectedNodeIds={EMPTY_SELECTION}
           maxPoints={tree.points}
           columns={tree.columns}
           edges={runtimeEdges(tree)}

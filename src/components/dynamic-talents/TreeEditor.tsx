@@ -280,6 +280,7 @@ export default function TreeEditor({
           row,
           column,
           maxRank: 1,
+          rank: 0,
           requires: [],
           shape: "circle",
         },
@@ -648,24 +649,27 @@ export default function TreeEditor({
                   </label>
 
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-                    {(["row", "column", "maxRank"] as const).map((name) => (
+                    {(["row", "column", "maxRank", "rank"] as const).map((name) => (
                       <label key={name}>
                         {name}
                         <input
                           className={field}
                           type="number"
-                          min={1}
+                          min={name === "rank" ? 0 : 1}
                           max={
                             name === "row"
                               ? tree.rows
                               : name === "column"
                                 ? tree.columns
-                                : 10
+                                : name === "rank" ? node.maxRank : 10
                           }
-                          value={node[name]}
-                          onChange={(e) =>
-                            updateNode({ [name]: Number(e.target.value) })
-                          }
+                          value={node[name] ?? 0}
+                          onChange={(e) => {
+                            const value = Number(e.target.value);
+                            updateNode(name === "maxRank"
+                              ? { maxRank: value, rank: Math.min(node.rank ?? 0, value) }
+                              : { [name]: value });
+                          }}
                         />
                       </label>
                     ))}

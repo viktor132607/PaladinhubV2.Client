@@ -1,15 +1,20 @@
-.node {
+.slot {
   position: relative;
   z-index: 2;
+  width: 50px;
+  height: 60px;
+  align-self: center;
+  justify-self: center;
+}
+
+.node {
+  position: relative;
   display: flex;
   width: 50px;
   height: 50px;
   align-items: center;
   justify-content: center;
-  align-self: center;
-  justify-self: center;
-  overflow: hidden;
-  padding: 0;
+  padding: 2px;
   border: 2px solid #686868;
   background: #111;
   box-shadow: inset 0 0 0 1px #191919, 0 1px 4px #000b;
@@ -19,16 +24,28 @@
   transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
+.node img { min-width: 0; min-height: 0; }
 .circle {
   border-radius: 50%;
   box-shadow: 0 0 0 1px #151515, 0 0 0 2px #626262, inset 0 0 0 1px #242424, 0 1px 4px #000b;
 }
-
+.circle img { border-radius: 50%; }
 .square { border-radius: 2px; }
 
+/* The inset image and outer polygon form a continuous frame on every angled edge. */
 .hexagon {
-  clip-path: polygon(25% 0%, 75% 0%, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0% 75%, 0% 25%);
+  border: 0;
+  padding: 3px;
+  background: #747474;
+  clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%);
+  filter: drop-shadow(0 1px 2px #000);
 }
+.hexagon img {
+  clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%);
+}
+.hexagon.active,
+.hexagon:hover,
+.hexagon:focus-visible { background: #dbb441; }
 
 .node:hover,
 .node:focus-visible,
@@ -36,13 +53,29 @@
   border-color: #e1b83b;
   box-shadow: 0 0 0 1px #211a09, 0 0 0 2px #d5aa31, 0 0 10px #d5aa3155, inset 0 0 0 1px #ffe289;
 }
-
+.inactive img { filter: grayscale(1) brightness(.47); }
+.inactive:not(:hover):not(:focus-visible) { border-color: #626262; }
 .node:hover,
 .node:focus-visible { transform: translateY(-1px); }
-
 .node:focus-visible { outline: 2px solid #ffe289; outline-offset: 4px; }
-
 .node:active { transform: translateY(0); }
-
 .invalid { border-color: #e24d4d; }
 .informational { cursor: help; }
+
+.rank {
+  position: absolute;
+  right: -7px;
+  bottom: 1px;
+  z-index: 3;
+  min-width: 25px;
+  padding: 0 3px;
+  border: 1px solid #555;
+  border-radius: 2px;
+  background: #171717;
+  box-shadow: 0 1px 3px #000;
+  color: #a8a8a8;
+  font: bold 11px/16px Arial, sans-serif;
+  text-align: center;
+  pointer-events: none;
+}
+.rankActive { border-color: #bc9737; color: #ffe08b; }
