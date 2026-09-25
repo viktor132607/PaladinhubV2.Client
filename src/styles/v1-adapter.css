@@ -198,6 +198,14 @@
 .ph-v1-layout-content { padding-top: 80px; }
 .ph-v1-main-container { padding-bottom: 3rem !important; }
 
+/* The home page uses a full-width cover and hero cards, not the narrow guide container. */
+.ph-v1-layout main.ph-v1-main-container:has(#hero-tree) {
+    width: 100%;
+    max-width: 1600px;
+    margin-inline: auto;
+}
+.ph-v1-layout #hero-tree { width: 100%; }
+
 .ph-v1-layout .outer-wrapper { width: 100%; max-width: 100%; }
 .ph-v1-layout .page-container,
 .ph-v1-layout .main-wrapper,
