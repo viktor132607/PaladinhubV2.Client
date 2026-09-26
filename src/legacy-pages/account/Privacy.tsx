@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import AccountLayout from "@/components/account/AccountLayout";
+import FloatingNotice from "@/components/feedback/FloatingNotice";
 import s from "@/components/account/account.module.css";
 
 type PreferenceValue = boolean | string;
@@ -220,14 +221,7 @@ export default function Privacy() {
   return (
     <AccountLayout active="Privacy">
       <h1>Privacy &amp; Communication</h1>
-      {saved ? (
-        <div
-          className="mb-5 rounded-lg border border-emerald-500/50 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200"
-          role="status"
-        >
-          Preferences saved on this device.
-        </div>
-      ) : null}
+      {saved && <FloatingNotice title="Success" message="Preferences saved on this device." onDismiss={() => setSaved(false)} />}
       <div className={s.stack}>
         {sections.map((section) => {
           const editing = editingSection === section.title;
