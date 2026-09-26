@@ -5,7 +5,6 @@ import { useAuth } from "@/auth/AuthContext";
 import { Link, useNavigate } from "@/router/nextCompat";
 import { backendEndpoints, fetchBackend } from "@/config/api";
 import PasswordField from "./PasswordField";
-import styles from "./authFields.module.css";
 
 const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : "Registration failed.";
 
@@ -91,7 +90,7 @@ export default function Register() {
               aria-invalid={usernameStatus === "taken"} aria-describedby={usernameStatus ? "username-status" : undefined}
               required />
             {usernameStatus && <p id="username-status" role="status" aria-live="polite"
-              className={`${styles.availability} ${styles[usernameStatus === "checking" || usernameStatus === "unavailable" ? "pending" : usernameStatus]}`}>
+              className={`!mb-0 !mt-[.35rem] text-[.85rem] leading-[1.35] ${usernameStatus === "available" ? "text-[#126f35]" : usernameStatus === "taken" ? "text-[#b42318]" : "text-[#46566a]"}`}>
               {usernameStatus === "checking" ? "Checking username…" :
                 usernameStatus === "taken" ? "That username is taken. Try another." :
                   usernameStatus === "available" ? "Username is available." :
