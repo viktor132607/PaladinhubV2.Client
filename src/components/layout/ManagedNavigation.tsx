@@ -6,7 +6,7 @@ import { Link, useLocation } from "@/router/nextCompat";
 export type NavigationEntry = { id: number; name: string; href: string; location: string; openNewTab: boolean; parentId: number | null; sortOrder: number };
 function NavAnchor({ item, className }: { item: NavigationEntry; className: string }) {
   const { t } = useLocalization();
-  const props = { className, target: item.openNewTab ? "_blank" : undefined, rel: item.openNewTab ? "noopener noreferrer" : undefined, style: { overflowWrap: "anywhere" as const } };
+  const props = { className: `${className} [overflow-wrap:anywhere]`, target: item.openNewTab ? "_blank" : undefined, rel: item.openNewTab ? "noopener noreferrer" : undefined };
   return /^https?:\/\//i.test(item.href) ? <a href={item.href} {...props}>{t(`navigation.${item.id}`, t(item.name))}</a> : <Link to={item.href} {...props}>{t(`navigation.${item.id}`, t(item.name))}</Link>;
 }
 function Menu({ item, children }: { item: NavigationEntry; children: NavigationEntry[] }) {
@@ -29,11 +29,11 @@ function Menu({ item, children }: { item: NavigationEntry; children: NavigationE
   useEffect(() => setOpen(false), [pathname]);
   return <li className="nav-item dropdown" onKeyDown={event => { if (event.key === "Escape") setOpen(false); }}>
     <div className="d-flex align-items-center"><NavAnchor item={item} className={`nav-link${children.length ? " dropdown-toggle" : ""}${isActive ? " active" : ""}`} />
-      {children.length ? <button type="button" className="nav-link border-0 bg-transparent ph-managed-submenu-toggle" style={{ minWidth: 44, minHeight: 44 }} aria-label={t("nav.submenu", "Toggle {name} submenu").replace("{name}", item.name)} aria-expanded={open} aria-controls={`managed-menu-${item.id}`} onClick={() => setOpen(v => !v)}><span className="ph-managed-submenu-caret" aria-hidden="true" /></button> : null}
+      {children.length ? <button type="button" className="nav-link border-0 bg-transparent ph-managed-submenu-toggle min-h-11 min-w-11" aria-label={t("nav.submenu", "Toggle {name} submenu").replace("{name}", item.name)} aria-expanded={open} aria-controls={`managed-menu-${item.id}`} onClick={() => setOpen(v => !v)}><span className="ph-managed-submenu-caret" aria-hidden="true" /></button> : null}
     </div>
     {children.length ? <ul id={`managed-menu-${item.id}`} className={`dropdown-menu${open ? " show" : ""}`} aria-label={t("nav.submenuLabel", "{name} submenu").replace("{name}", item.name)}>
       {children.map(child => <li className="position-relative" key={child.id}><NavAnchor item={child} className={canDelete && section ? "dropdown-item pe-5" : "dropdown-item"} />
-        {canDelete && section && child.href.startsWith(`/${section}/`) ? <Link className="text-danger position-absolute top-50 translate-middle-y" style={{ right: 12, textDecoration: "none" }} aria-label={t("page.deleteNamed", "Delete {name}").replace("{name}", child.name)} title={t("page.delete", "Delete page")} to={`/Admin/PageBuilder/DeleteConfirm?section=${encodeURIComponent(section)}&slug=${encodeURIComponent(child.href.split("/")[2].toLowerCase())}`}>✕</Link> : null}
+        {canDelete && section && child.href.startsWith(`/${section}/`) ? <Link className="text-danger position-absolute top-50 translate-middle-y right-3 no-underline" aria-label={t("page.deleteNamed", "Delete {name}").replace("{name}", child.name)} title={t("page.delete", "Delete page")} to={`/Admin/PageBuilder/DeleteConfirm?section=${encodeURIComponent(section)}&slug=${encodeURIComponent(child.href.split("/")[2].toLowerCase())}`}>✕</Link> : null}
       </li>)}
       {canCreate && section ? <><li><hr className="dropdown-divider" /></li><li><Link className="dropdown-item" to={`/Admin/PageBuilder/Create?section=${encodeURIComponent(section)}`}>{t("page.add", "Add page")}</Link></li></> : null}
     </ul> : null}

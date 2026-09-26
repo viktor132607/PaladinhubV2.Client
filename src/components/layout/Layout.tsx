@@ -105,21 +105,11 @@ export default function Layout() {
     );
 
   return (
-    <div
-      className="ph-v1-layout"
-      style={
-        discussionLayout
-          ? { display: "flex", flexDirection: "column" }
-          : undefined
-      }
-    >
+    <div className={`ph-v1-layout${discussionLayout ? " flex flex-col" : ""}`}>
       <BannerZone position="above-navbar" />
       <Navbar />
       <BannerZone position="below-navbar" />
-      <div
-        className="ph-v1-layout-content"
-        style={discussionLayout ? { flex: "1 0 auto" } : undefined}
-      >
+      <div className={`ph-v1-layout-content${discussionLayout ? " grow shrink-0 basis-auto" : ""}`}>
         <BannerZone position="above-content" />
         <GuidePageHeader />
         <main role="main" className="pb-5 container ph-v1-main-container">

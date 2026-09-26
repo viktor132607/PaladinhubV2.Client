@@ -63,8 +63,7 @@ export default function AuthMenu() {
         <img
           src={avatarSrc}
           alt={t("auth.avatar", "Avatar")}
-          className="rounded-circle border"
-          style={{ width: 28, height: 28, objectFit: "cover" }}
+          className="rounded-circle border h-7 w-7 object-cover"
         />
         <span>{displayName}</span>
       </a>

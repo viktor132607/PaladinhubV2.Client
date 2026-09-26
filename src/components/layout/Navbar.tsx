@@ -28,19 +28,8 @@ function LanguageFlag({ code }: { code: string }) {
   return (
     <span
       aria-hidden="true"
-      style={{
-        display: "inline-block",
-        width: 28,
-        height: 18,
-        flex: "0 0 28px",
-        borderRadius: 2,
-        verticalAlign: "middle",
-        backgroundColor: "#2c2c2c",
-        backgroundImage: `url(/images/flags/${normalizedCode}.webp)`,
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-      }}
+      className="inline-block h-[18px] w-7 shrink-0 basis-7 rounded-[2px] bg-[#2c2c2c] bg-cover bg-center bg-no-repeat align-middle"
+      style={{ backgroundImage: `url(/images/flags/${normalizedCode}.webp)` }}
     />
   );
 }
@@ -74,8 +63,7 @@ function LanguageMenu() {
   return (
     <li
       ref={rootRef}
-      className="nav-item dropdown ms-2"
-      style={{ position: "relative" }}
+      className="nav-item dropdown ms-2 relative"
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
     >
@@ -181,8 +169,7 @@ function GuideMenu({
 
             {hasPermission("pages.delete") ? (
               <Link
-                className="text-danger position-absolute top-50 translate-middle-y"
-                style={{ right: 12, textDecoration: "none" }}
+                className="text-danger position-absolute top-50 translate-middle-y right-3 no-underline"
                 title={t("page.delete", "Delete page")}
                 aria-label={t("page.deleteNamed", "Delete {name}").replace("{name}", t(title))}
                 to={`/Admin/PageBuilder/DeleteConfirm?section=${encodeURIComponent(section)}&slug=${encodeURIComponent(slug)}`}
