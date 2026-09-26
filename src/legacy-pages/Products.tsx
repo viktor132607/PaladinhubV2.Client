@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react
 import { useAuth } from "@/auth/AuthContext";
 import { backendEndpoints, backendUrl, fetchBackend, readApiJson } from "@/config/api";
 import { Link, useLocation, useNavigate } from "@/router/nextCompat";
-import toastStyles from "./ProductsToast.module.css";
+import FloatingNotice from "@/components/feedback/FloatingNotice";
 
 export type Product = {
   id: string;
@@ -1153,38 +1153,17 @@ export default function Products() {
   return (
     <div className="w-full bg-[#0f1115] py-6 text-[#e6e6e6]">
       {(loadError || actionError || notice) && (
-        <div
-          className={`${toastStyles.toast} ${loadError || actionError ? toastStyles.error : toastStyles.success}`}
-          role={loadError || actionError ? "alert" : "status"}
-          onMouseEnter={() => setToastPaused(true)}
-          onMouseLeave={() => setToastPaused(false)}
-          onFocusCapture={() => setToastPaused(true)}
-          onBlurCapture={() => setToastPaused(false)}
-        >
-          <span className={toastStyles.icon} aria-hidden="true">
-            <i className={`fa-solid ${loadError || actionError ? "fa-circle-exclamation" : "fa-circle-check"}`} />
-          </span>
-          <div className={toastStyles.content}>
-            <strong>{loadError ? "Could not load products" : actionError ? "Action failed" : "Done"}</strong>
-            <span>{loadError || actionError || notice}</span>
-            {!loadError && !actionError && notice?.toLowerCase().includes("cart") && (
-              <Link to="/Cart/MyCart" className={toastStyles.retry}>View cart →</Link>
-            )}
-            {loadError && (
-              <button type="button" className={toastStyles.retry} onClick={() => void load()}>
-                Try again
-              </button>
-            )}
-          </div>
-          {!loadError && (
-            <button
-              type="button"
-              className={toastStyles.dismiss}
-              aria-label="Dismiss notification"
-              onClick={() => { setNotice(null); setActionError(null); }}
-            >×</button>
-          )}
-        </div>
+        <FloatingNotice
+          tone={loadError || actionError ? "error" : "success"}
+          title={loadError ? "Could not load products" : actionError ? "Action failed" : notice?.toLowerCase().includes("cart") ? "Added to cart" : "Success"}
+          message={loadError || actionError || notice || ""}
+          action={!loadError && !actionError && notice?.toLowerCase().includes("cart")
+            ? <Link to="/Cart/MyCart">View cart →</Link>
+            : undefined}
+          onRetry={loadError ? () => void load() : undefined}
+          onDismiss={!loadError ? () => { setNotice(null); setActionError(null); } : undefined}
+          onPauseChange={setToastPaused}
+        />
       )}
       <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-12">
         <aside className="lg:col-span-3">

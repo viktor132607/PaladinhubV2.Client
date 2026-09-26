@@ -14,6 +14,7 @@ import ProductGallery, {
   type ProductImage,
 } from "@/components/products/ProductGallery";
 import ProductGalleryModal from "@/components/products/ProductGalleryModal";
+import FloatingNotice from "@/components/feedback/FloatingNotice";
 import {
   backendEndpoints,
   backendUrl,
@@ -992,25 +993,17 @@ export default function ProductDetails() {
   return (
     <main className="min-h-[calc(100vh-4rem)] bg-slate-950 px-4 py-8 text-slate-100">
       <div className="mx-auto max-w-6xl">
-        <div
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          {notice ? (
-            <div className="mb-4 rounded border border-emerald-500/40 bg-emerald-500/10 p-3 text-emerald-200">
-              {notice}
-            </div>
-          ) : null}
-
-          {actionError ? (
-            <div
-              className="mb-4 rounded border border-red-500/40 bg-red-500/10 p-3 text-red-200"
-              role="alert"
-            >
-              {actionError}
-            </div>
-          ) : null}
-        </div>
+        {(notice || actionError) && (
+          <FloatingNotice
+            tone={actionError ? "error" : "success"}
+            title={actionError ? "Action failed" : notice?.toLowerCase().includes("cart") ? "Added to cart" : "Success"}
+            message={actionError || notice || ""}
+            action={!actionError && notice?.toLowerCase().includes("cart")
+              ? <Link to="/Cart/MyCart">View cart →</Link>
+              : undefined}
+            onDismiss={() => { setNotice(null); setActionError(null); }}
+          />
+        )}
 
         <section className="grid gap-7 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
           <ProductGallery

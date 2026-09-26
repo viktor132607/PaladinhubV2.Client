@@ -9,7 +9,7 @@ import {
 } from "@/lib/seo-public";
 
 import "../index.css";
-import "../App.css";
+import "../styles/talent-tree-patches.css";
 import "../styles/v1-adapter.css";
 import "../styles/v1-navbar-exact.css";
 import "../styles/v1-source-corrections.css";

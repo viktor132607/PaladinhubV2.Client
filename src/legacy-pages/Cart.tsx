@@ -10,6 +10,7 @@ import {
   readApiJson,
 } from "@/config/api";
 import { Link } from "@/router/nextCompat";
+import FloatingNotice from "@/components/feedback/FloatingNotice";
 import styles from "./Cart.module.css";
 
 type CartItem = {
@@ -289,11 +290,7 @@ export default function Cart() {
           <Link to="/products" className={styles.continueLink}>Continue shopping <span aria-hidden="true">→</span></Link>
         </header>
 
-        {notice ? (
-          <div className="mb-5 rounded-lg border border-emerald-500/40 bg-emerald-950/40 px-4 py-3 text-emerald-200" role="status">
-            ✓ {notice}
-          </div>
-        ) : null}
+        {notice && <FloatingNotice title="Success" message={notice} onDismiss={() => setNotice(null)} />}
 
         {error ? (
           <div className="mb-5 rounded-lg border border-red-500/50 bg-red-950/40 px-4 py-3 text-red-200" role="alert">
