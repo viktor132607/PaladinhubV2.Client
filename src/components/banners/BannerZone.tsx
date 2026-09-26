@@ -19,7 +19,7 @@ export default function BannerZone({position}:{position:Position}){
    {x.imageUrl?<img className="ph-site-banner-image" src={x.imageUrl} alt={t(x.translationKeys.alt,x.altText)} />:null}
    <div className="ph-site-banner-body"><strong>{t(x.translationKeys.title,x.title)}</strong><span>{t(x.translationKeys.text,x.text)}</span></div>
    {x.buttonText&&x.buttonUrl?<a className="btn btn-sm btn-outline-light ph-site-banner-action" href={x.buttonUrl}>{t(x.translationKeys.button,x.buttonText)}</a>:null}
-   {x.isDismissible?<button type="button" className="ph-site-banner-close" aria-label={t("banners.dismiss","Dismiss message")} onClick={()=>{try{localStorage.setItem(`ph-banner-dismissed:${x.id}:v${x.version}`,"1");}catch{}setTick(v=>v+1);}}>×</button>:null}
+   {x.isDismissible?<button type="button" className="ph-site-banner-close" aria-label={t("banners.dismiss","Dismiss message")} onClick={()=>{try{localStorage.setItem(`ph-banner-dismissed:${x.id}:v${x.version}`,"1");}catch{/* Storage may be unavailable. */}setTick(v=>v+1);}}>×</button>:null}
   </article>)}
  </div>;
 }

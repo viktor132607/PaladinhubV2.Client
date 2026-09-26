@@ -19,7 +19,6 @@ for (const path of files) {
   const source = ts.createSourceFile(path, await readFile(path, "utf8"), ts.ScriptTarget.Latest, true,
     path.endsWith("x") ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
   const records = [];
-  let ordinal = 0;
   function visit(node) {
     if (ts.isJsxText(node) || ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) {
       const text = ts.isJsxText(node) ? node.getText(source).replace(/\s+/g, " ").trim() : node.text;

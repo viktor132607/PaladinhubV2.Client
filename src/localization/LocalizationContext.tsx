@@ -14,7 +14,7 @@ export function LocalizationProvider({ children }: { children: ReactNode }) {
   const [resources, setResources] = useState<Record<string,string>>({});
   const [refresh, setRefresh] = useState(0);
   useEffect(() => {
-    try { const stored = localStorage.getItem("paladinhub-language"); if (stored) setLanguage(stored); } catch {}
+    try { const stored = localStorage.getItem("paladinhub-language"); if (stored) setLanguage(stored); } catch { /* Storage may be unavailable. */ }
     const update = () => setRefresh(value => value + 1);
     window.addEventListener("localization-updated", update);
     return () => window.removeEventListener("localization-updated", update);
@@ -36,11 +36,11 @@ export function LocalizationProvider({ children }: { children: ReactNode }) {
         setResources(data.translations);
         if (data.code !== language) setLanguage(data.code);
         document.documentElement.lang = data.code;
-        try { localStorage.setItem("paladinhub-language", data.code); } catch {}
+        try { localStorage.setItem("paladinhub-language", data.code); } catch { /* Storage may be unavailable. */ }
       }).catch(() => { if (!controller.signal.aborted) document.documentElement.lang = language; });
     return () => controller.abort();
   }, [language, refresh]);
-  const changeLanguage = (code: string) => { setLanguage(code); try { localStorage.setItem("paladinhub-language", code); } catch {} };
+  const changeLanguage = (code: string) => { setLanguage(code); try { localStorage.setItem("paladinhub-language", code); } catch { /* Storage may be unavailable. */ } };
   return <Context.Provider value={{ language, languages, changeLanguage, t: (key, fallback) => resolveMessage(language, resources, key, fallback) }}>{children}</Context.Provider>;
 }
 
