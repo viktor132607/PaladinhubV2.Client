@@ -5,3 +5,7 @@ export const alignmentClass: Record<BlockAlignment, string> = {
   center: "text-center",
   right: "text-right",
 };
+
+export function getAlignmentClass(value?: string | null): string {
+  return alignmentClass[value?.toLowerCase() as BlockAlignment] ?? alignmentClass.left;
+}

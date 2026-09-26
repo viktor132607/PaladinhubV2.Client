@@ -1,4 +1,4 @@
-import { alignmentClass, type BlockAlignment } from "./alignment";
+import { getAlignmentClass, type BlockAlignment } from "./alignment";
 
 export type ParagraphBlockProps = {
   id?: string;
@@ -16,7 +16,7 @@ export default function ParagraphBlock({
   return (
     <section id={id}>
       <p
-        className={`whitespace-pre-wrap ${className} ${alignmentClass[align]}`.trim()}
+        className={`whitespace-pre-wrap ${className} ${getAlignmentClass(align)}`.trim()}
       >
         {text}
       </p>
