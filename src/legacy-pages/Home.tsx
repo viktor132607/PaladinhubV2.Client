@@ -64,7 +64,7 @@ export default function Home() {
                       <div className="card h-100">
                         <div className="position-relative">
                           <img src={image} alt={`${name} Paladin`} className="guide-image" />
-                          <div className="position-absolute start-50 translate-middle-x" style={{ bottom: "10px" }}>
+                          <div className="position-absolute start-50 translate-middle-x bottom-2.5">
                             <Link to={href} className="view-guide-link">View Guide</Link>
                           </div>
                         </div>
