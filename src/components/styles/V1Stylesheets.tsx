@@ -86,17 +86,18 @@ export default function V1Stylesheets() {
 
   useEffect(() => {
     const requiredStyles = getRouteStyles(pathname);
-    const requiredSet = new Set(requiredStyles);
     const activeLinks = Array.from(document.head.querySelectorAll<HTMLLinkElement>(`link[${STYLE_MARKER}]`));
-
-    for (const link of activeLinks) {
-      const href = link.getAttribute("href");
-      if (!href || !requiredSet.has(href)) link.remove();
+    let retained = 0;
+    while (retained < activeLinks.length && retained < requiredStyles.length &&
+      activeLinks[retained].getAttribute("href") === requiredStyles[retained]) {
+      retained++;
     }
 
-    for (const href of requiredStyles) {
-      const existing = document.head.querySelector<HTMLLinkElement>(`link[${STYLE_MARKER}][href="${href}"]`);
-      if (existing) existing.remove();
+    // Retain the common prefix: product navigation keeps Bootstrap and site.css
+    // in their original cascade positions instead of removing and reloading them.
+    for (const link of activeLinks.slice(retained)) link.remove();
+
+    for (const href of requiredStyles.slice(retained)) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
       link.href = href;
