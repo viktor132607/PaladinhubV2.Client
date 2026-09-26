@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import styles from "./CreatePage.module.css";
 import TemplateLibrary from "@/components/admin/page-builder/TemplateLibrary";
 import BuilderNavigation from "@/components/admin/page-builder/BuilderNavigation";
 import DynamicPageContent from "@/components/dynamic-talents/DynamicPageContent";
@@ -497,8 +498,8 @@ export default function CreatePage() {
           </div>
         ) : null}
 
-        <form onSubmit={submit} className="space-y-6">
-          <section className="grid gap-5 rounded-xl border border-slate-700 bg-slate-900 p-6 md:grid-cols-2">
+        <form onSubmit={submit} className={`space-y-6 ${styles.form}`}>
+          <section className={`grid gap-5 rounded-xl border border-slate-700 bg-slate-900 p-6 md:grid-cols-2 ${styles.meta}`}>
             <label className="block">
               <span className="mb-2 block text-sm font-medium text-slate-300">
                 Category / Section
@@ -565,7 +566,7 @@ export default function CreatePage() {
             </label>
           </section>
 
-          <section className="rounded-xl border border-slate-700 bg-slate-900 p-6">
+          <section className={`rounded-xl border border-slate-700 bg-slate-900 p-6 ${styles.models}`}>
             <div className="mb-5">
               <h2 className="text-xl font-semibold">Models</h2>
               <p className="mt-1 text-sm text-slate-400">
@@ -592,7 +593,7 @@ export default function CreatePage() {
 
           <TemplateLibrary content={layoutJson} onInsert={json => setBlocks(current => [...current, ...parseLayout(json)])} />
 
-          <section className="rounded-xl border border-slate-700 bg-slate-900 p-6">
+          <section className={`rounded-xl border border-slate-700 bg-slate-900 p-6 ${styles.content}`}>
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="text-xl font-semibold">Page content</h2>
@@ -627,7 +628,7 @@ export default function CreatePage() {
           </section>
 
           {blocks.length ? (
-            <section className="rounded-xl border border-slate-700 bg-slate-900 p-6">
+            <section className={`rounded-xl border border-slate-700 bg-slate-900 p-6 ${styles.preview}`}>
               <h2 className="mb-5 text-xl font-semibold">Live preview</h2>
               <div className="admin-content-preview min-w-0 overflow-x-auto rounded-lg bg-slate-950 p-3 sm:p-6">
                 <DynamicPageContent json={layoutJson} pageId={editingId || undefined} />
@@ -635,7 +636,7 @@ export default function CreatePage() {
             </section>
           ) : null}
 
-          <div className="flex flex-wrap gap-3">
+          <div className={`flex flex-wrap gap-3 ${styles.actions}`}>
             <button
               type="submit"
               disabled={saving}
