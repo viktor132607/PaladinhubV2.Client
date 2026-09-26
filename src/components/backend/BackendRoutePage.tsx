@@ -130,8 +130,8 @@ export default function BackendRoutePage({
   }, [openRoute]);
 
   return (
-    <section className="ph-route-page">
-      <div className="ph-route-card">
+    <section className="grid min-h-[65vh] place-items-center px-5 py-12">
+      <div className="w-full max-w-[720px] border border-[#ffd700] bg-[#1e1e1e] p-[42px] text-center [&_p]:mb-7 [&_p]:text-[#ccc] [&_.btn-hero]:inline-block">
         <h1>{title}</h1>
 
         {description ? (
