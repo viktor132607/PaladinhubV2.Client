@@ -75,7 +75,6 @@ export default function Footer() {
         target: x.openNewTab ? "_blank" : undefined,
         rel: x.openNewTab ? "noopener noreferrer" : undefined,
         className: s.link,
-        style: { overflowWrap: "anywhere" as const },
       };
       return href.startsWith("/") ? (
         <Link to={href} {...props}>
@@ -89,8 +88,7 @@ export default function Footer() {
     }
     return (
       <p
-        className="mb-2"
-        style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}
+        className="mb-2 whitespace-pre-wrap"
       >
         {label}
       </p>
