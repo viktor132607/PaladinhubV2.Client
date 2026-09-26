@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@/router/nextCompat";
 import { accountPost } from "@/components/account/accountApi";
+import AuthShell, { authStyles } from "@/components/auth/AuthShell";
 export default function VerifyEmail() {
   const [params, setParams] = useState({ userId: "", token: "", email: "" }),
     [busy, setBusy] = useState(false),
@@ -16,11 +17,10 @@ export default function VerifyEmail() {
     });
   }, []);
   return (
-    <main className="ph-auth-page">
-      <section className="ph-auth-card">
+    <AuthShell>
         <h1>Verify your email</h1>
         {error && (
-          <div className="ph-auth-error" role="alert">
+          <div className={authStyles.error} role="alert">
             {error}
           </div>
         )}
@@ -28,7 +28,7 @@ export default function VerifyEmail() {
           <p role="status">{notice}</p>
         ) : params.token && params.userId ? (
           <button
-            className="ph-auth-submit"
+            className={authStyles.submit}
             disabled={busy}
             onClick={() => {
               setBusy(true);
@@ -63,7 +63,6 @@ export default function VerifyEmail() {
         <p>
           <Link to="/Account/Login">Sign in</Link>
         </p>
-      </section>
-    </main>
+    </AuthShell>
   );
 }

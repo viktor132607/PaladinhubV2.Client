@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import { Link, useNavigate } from "@/router/nextCompat";
+import AuthShell, { authStyles } from "@/components/auth/AuthShell";
 
 export default function RecoveryCodeLogin() {
   const { loginWithRecoveryCode } = useAuth();
@@ -34,13 +35,12 @@ export default function RecoveryCodeLogin() {
   };
 
   return (
-    <main className="ph-auth-page">
-      <section className="ph-auth-card">
+    <AuthShell>
         <h1>Recovery-code login</h1>
         <p>Enter one unused recovery code.</p>
 
-        <form onSubmit={handleSubmit} className="ph-auth-form">
-          {error ? <div className="ph-auth-error">{error}</div> : null}
+        <form onSubmit={handleSubmit} className={authStyles.form}>
+          {error ? <div className={authStyles.error}>{error}</div> : null}
           <label>
             <span>Recovery code</span>
             <input
@@ -50,15 +50,14 @@ export default function RecoveryCodeLogin() {
               required
             />
           </label>
-          <button type="submit" disabled={submitting} className="ph-auth-submit">
+          <button type="submit" disabled={submitting} className={authStyles.submit}>
             {submitting ? "Signing in..." : "Sign in"}
           </button>
         </form>
 
-        <p className="ph-auth-switch">
+        <p className={authStyles.switch}>
           <Link to="/Account/Login">Back to login</Link>
         </p>
-      </section>
-    </main>
+    </AuthShell>
   );
 }

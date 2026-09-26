@@ -28,65 +28,6 @@
 @media (max-width: 1100px) { .ph-navbar { align-items: flex-start; flex-wrap: wrap; padding-block: 14px; }.ph-main { padding-top: 145px; }.ph-auth-links { margin-left: auto; } }
 @media (max-width: 760px) { .ph-guide-grid { grid-template-columns: 1fr; }.ph-nav-links { order: 3; width: 100%; gap: 12px; }.ph-main { padding-top: 185px; }.ph-dropdown { position: fixed; left: 20px; right: 20px; top: 150px; }.ph-home-page .hero-section { padding-inline: 18px; } }
 
-.ph-auth-page {
-  min-height: calc(100vh - 140px);
-  display: grid;
-  place-items: center;
-  padding: 48px 20px;
-  background: radial-gradient(circle at top, #2b250d 0, #151515 42%);
-}
-.ph-auth-card {
-  width: min(520px, 100%);
-  padding: 34px;
-  border: 1px solid #ffd700;
-  background: rgba(24, 24, 24, .97);
-  box-shadow: 0 22px 60px rgba(0, 0, 0, .5);
-}
-.ph-auth-card h1 { margin: 0; color: #ffd700; font-size: 2rem; }
-.ph-auth-card > p { color: #c9c9c9; }
-.ph-auth-form { display: grid; gap: 18px; margin-top: 26px; }
-.ph-auth-form label { display: grid; gap: 7px; color: #f3f3f3; font-weight: 700; }
-.ph-auth-form input:not([type="checkbox"]) {
-  width: 100%;
-  box-sizing: border-box;
-  border: 1px solid #6b5c00;
-  background: #0f0f0f;
-  color: #fff;
-  padding: 12px 13px;
-  font: inherit;
-}
-.ph-auth-form input:focus { outline: 2px solid #ffd700; outline-offset: 1px; }
-.ph-auth-form small { color: #aaa; font-weight: 400; }
-.ph-auth-checkbox { display: flex !important; grid-template-columns: auto 1fr; align-items: center; gap: 10px !important; }
-.ph-auth-checkbox input { width: 18px; height: 18px; accent-color: #ffd700; }
-.ph-auth-submit {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid #ffd700;
-  background: #ffd700;
-  color: #111 !important;
-  padding: 12px 18px;
-  font-weight: 900;
-  text-decoration: none;
-  cursor: pointer;
-}
-.ph-auth-submit:disabled { opacity: .6; cursor: wait; }
-.ph-auth-error { border: 1px solid #ff6b6b; background: rgba(160, 0, 0, .2); color: #ffb1b1; padding: 12px; }
-.ph-auth-switch { margin-top: 22px; }
-.ph-auth-switch a { color: #ffd700; }
-.ph-auth-logout {
-  border: 1px solid #ffd700;
-  background: transparent;
-  color: #ffd700;
-  padding: 8px 13px;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-.ph-auth-logout:hover { background: #ffd700; color: #111; }
-.ph-auth-logout:disabled { opacity: .6; cursor: wait; }
-
 /* Keep talent-tree panel dimensions while making their structural borders invisible. */
 section[data-build] {
   box-shadow: none !important;

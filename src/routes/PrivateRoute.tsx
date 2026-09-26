@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import { Navigate, useLocation } from "@/router/nextCompat";
+import AuthShell from "@/components/auth/AuthShell";
 
 interface PrivateRouteProps {
   children: ReactNode;
@@ -14,11 +15,7 @@ export default function PrivateRoute({ children }: PrivateRouteProps) {
 
   if (loading) {
     return (
-      <main className="ph-auth-page">
-        <section className="ph-auth-card">
-          <p>Checking session...</p>
-        </section>
-      </main>
+      <AuthShell><p>Checking session...</p></AuthShell>
     );
   }
 

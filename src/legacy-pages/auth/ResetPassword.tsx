@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@/router/nextCompat";
 import { accountPost } from "@/components/account/accountApi";
+import AuthShell, { authStyles } from "@/components/auth/AuthShell";
 export default function ResetPassword() {
   const [params, setParams] = useState({ userId: "", token: "" }),
     [password, setPassword] = useState(""),
@@ -14,11 +15,10 @@ export default function ResetPassword() {
     setParams({ userId: q.get("userId") || "", token: q.get("token") || "" });
   }, []);
   return (
-    <main className="ph-auth-page">
-      <section className="ph-auth-card">
+    <AuthShell>
         <h1>Choose a new password</h1>
         {error && (
-          <div className="ph-auth-error" role="alert">
+          <div className={authStyles.error} role="alert">
             {error}
           </div>
         )}
@@ -28,7 +28,7 @@ export default function ResetPassword() {
           <p>Open the reset link from your email.</p>
         ) : (
           <form
-            className="ph-auth-form"
+            className={authStyles.form}
             onSubmit={(e) => {
               e.preventDefault();
               if (password !== confirmPassword) {
@@ -80,7 +80,7 @@ export default function ResetPassword() {
                 required
               />
             </label>
-            <button className="ph-auth-submit" disabled={busy}>
+            <button className={authStyles.submit} disabled={busy}>
               Reset password
             </button>
           </form>
@@ -91,7 +91,6 @@ export default function ResetPassword() {
         <p>
           <Link to="/Account/ForgotPassword">Request a new reset link</Link>
         </p>
-      </section>
-    </main>
+    </AuthShell>
   );
 }

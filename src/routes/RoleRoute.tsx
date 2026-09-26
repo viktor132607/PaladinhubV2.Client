@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import { Navigate, useLocation } from "@/router/nextCompat";
+import AuthShell from "@/components/auth/AuthShell";
 
 export default function RoleRoute({
   role,
@@ -16,11 +17,9 @@ export default function RoleRoute({
 
   if (loading) {
     return (
-      <main className="ph-auth-page">
-        <section className="ph-auth-card">
+      <AuthShell>
           <p>Checking permissions...</p>
-        </section>
-      </main>
+      </AuthShell>
     );
   }
 

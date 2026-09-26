@@ -3,6 +3,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "@/auth/AuthContext";
 import { Link, useNavigate } from "@/router/nextCompat";
 import { accountGet, accountPost } from "@/components/account/accountApi";
+import AuthShell, { authStyles } from "@/components/auth/AuthShell";
 export default function LoginWith2FA() {
   const { loginWithTwoFactor } = useAuth();
   const navigate = useNavigate();
@@ -77,17 +78,16 @@ export default function LoginWith2FA() {
     }
   }
   return (
-    <main className="ph-auth-page">
-      <section className="ph-auth-card">
+    <AuthShell>
         <h1>Two-factor authentication</h1>
         {error && (
-          <div className="ph-auth-error" role="alert">
+          <div className={authStyles.error} role="alert">
             {error}
           </div>
         )}
         {notice && <p role="status">{notice}</p>}
         {methods && (
-          <form className="ph-auth-form" onSubmit={submit}>
+          <form className={authStyles.form} onSubmit={submit}>
             {methods.authenticator && methods.email && (
               <label>
                 Verification method
@@ -126,7 +126,7 @@ export default function LoginWith2FA() {
                 required
               />
             </label>
-            <label className="ph-auth-checkbox">
+            <label className={authStyles.checkbox}>
               <input
                 type="checkbox"
                 checked={rememberMachine}
@@ -134,18 +134,17 @@ export default function LoginWith2FA() {
               />
               <span>Remember this device</span>
             </label>
-            <button className="ph-auth-submit" disabled={busy}>
+            <button className={authStyles.submit} disabled={busy}>
               {busy ? "Verifying..." : "Verify"}
             </button>
           </form>
         )}
-        <p className="ph-auth-switch">
+        <p className={authStyles.switch}>
           <Link to="/Account/RecoveryCodeLogin">Use a recovery code</Link>
         </p>
-        <p className="ph-auth-switch">
+        <p className={authStyles.switch}>
           <Link to="/Account/Login">Sign in again</Link>
         </p>
-      </section>
-    </main>
+    </AuthShell>
   );
 }

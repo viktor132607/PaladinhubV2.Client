@@ -2,23 +2,23 @@
 import { useState } from "react";
 import { Link } from "@/router/nextCompat";
 import { accountPost } from "@/components/account/accountApi";
+import AuthShell, { authStyles } from "@/components/auth/AuthShell";
 export default function ForgotPassword() {
   const [email, setEmail] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
   return (
-    <main className="ph-auth-page">
-      <section className="ph-auth-card">
+    <AuthShell>
         <h1>Reset your password</h1>
         {error && (
-          <div className="ph-auth-error" role="alert">
+          <div className={authStyles.error} role="alert">
             {error}
           </div>
         )}
         {notice && <p role="status">{notice}</p>}
         <form
-          className="ph-auth-form"
+          className={authStyles.form}
           onSubmit={(e) => {
             e.preventDefault();
             setBusy(true);
@@ -39,14 +39,13 @@ export default function ForgotPassword() {
               required
             />
           </label>
-          <button className="ph-auth-submit" disabled={busy}>
+          <button className={authStyles.submit} disabled={busy}>
             {busy ? "Sending..." : "Send reset link"}
           </button>
         </form>
         <p>
           <Link to="/Account/Login">Back to sign in</Link>
         </p>
-      </section>
-    </main>
+    </AuthShell>
   );
 }
