@@ -382,7 +382,7 @@ export default function Navbar({ forceVisible = false }: { forceVisible?: boolea
             </ul>
           </div>
 
-          <ul className="navbar-nav ph-navbar-actions">
+          <ul className="navbar-nav ph-navbar-actions items-center">
               <li
                 id="nav-cart"
                 className="nav-item position-relative"
