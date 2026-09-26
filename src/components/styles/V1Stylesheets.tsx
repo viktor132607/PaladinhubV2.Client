@@ -50,11 +50,9 @@ const getRouteStyles = (pathname: string): string[] => {
 
   if (normalized === "/" || normalized === "/home/home") {
     return [
+      `${STYLE_ROOT}/home.css`,
       BOOTSTRAP_STYLE,
       SITE_STYLE,
-      `${STYLE_ROOT}/home.css`,
-      `${BOOTSTRAP_STYLE}?home-reload=1`,
-      `${SITE_STYLE}?home-reload=1`,
     ];
   }
 
